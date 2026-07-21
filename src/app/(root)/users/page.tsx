@@ -26,29 +26,30 @@ export default async function UsersPage({
   const users = await getOrgUsers();
 
   return (
-    <div className="p-6 space-y-6">
-      {isNew && (
-        <DrawerBackdrop>
-          <UserForm />
-        </DrawerBackdrop>
-      )}
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Users</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            Xodimlar va ularning rollarini boshqarish
-          </p>
+    <>
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Users</h1>
+            <p className="text-muted-foreground text-sm mt-0.5">
+              Xodimlar va ularning rollarini boshqarish
+            </p>
+          </div>
+          <Button asChild>
+            <Link href={`${PAGES.USERS}?new=1`}>
+              <Plus className="w-4 h-4 mr-1" />
+              New user
+            </Link>
+          </Button>
         </div>
-        <Button asChild>
-          <Link href={`${PAGES.USERS}?new=1`}>
-            <Plus className="w-4 h-4 mr-1" />
-            New user
-          </Link>
-        </Button>
+
+        <UserList users={users} currentUserId={session.userId} currentRole={session.role} />
       </div>
 
-      <UserList users={users} currentUserId={session.userId} currentRole={session.role} />
-    </div>
+      {/* is new */}
+      <DrawerBackdrop isOpen={isNew === "1"}>
+        <UserForm />
+      </DrawerBackdrop>
+    </>
   );
 }

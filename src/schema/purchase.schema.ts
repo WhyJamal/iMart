@@ -9,7 +9,7 @@ export const PurchaseItemSchema = z.object({
 export const CreatePurchaseSchema = z.object({
   supplierName: z.string().optional(),
   note: z.string().optional(),
-  paymentMethod: z.enum(["card", "cash", "qr"]).default("cash"),
+  paymentMethod: z.enum(["CASH", "CARD", "QR"]).default("CASH"),
   items: z
     .array(PurchaseItemSchema)
     .min(1, "At least one item is required"),

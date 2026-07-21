@@ -200,7 +200,7 @@ export function PurchaseList({ purchases }: Props) {
         <PackagePlus className="w-10 h-10 mx-auto mb-3 opacity-30" />
         <p className="text-sm">No purchases yet</p>
         <Button asChild className="mt-4" size="sm">
-          <Link href="/purchases/new">Create first purchase</Link>
+          <Link href="/purchases?new=1">Create first purchase</Link>
         </Button>
       </div>
     );

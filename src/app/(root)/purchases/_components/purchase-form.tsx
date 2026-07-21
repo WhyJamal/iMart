@@ -18,6 +18,8 @@ import { Separator } from "@/components/ui/separator";
 
 import { createPurchase, updatePurchase } from "@/actions/purchase-actions";
 import type { PurchaseItemInput } from "@/schema/purchase.schema";
+import { PAGES } from "@/config/pages.config";
+import type { CashMethod } from "@/types/cash.types";
 
 interface ProductOption {
   id: string;
@@ -48,6 +50,7 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
     initialData?.supplierName ?? ""
   );
   const [note, setNote] = useState(initialData?.note ?? "");
+  const [paymentMethod, setPaymentMethod] = useState<CashMethod>(initialData?.paymentMethod ?? "CASH");
 
   const [lines, setLines] = useState<LineItem[]>(
     initialData?.items?.map((item: LineItem) => ({
@@ -62,7 +65,7 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
     if (onClose) {
       onClose();
     } else {
-      router.push("/purchases");
+      router.push(PAGES.PURCHASES);
     }
   };
 
@@ -107,6 +110,7 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
       const payload = {
         supplierName,
         note,
+        paymentMethod,
         items: validLines.map(({ productId, qty, unitCost }) => ({
           productId,
           qty: Number(qty),
@@ -120,10 +124,10 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
 
       if (result.success) {
         toast.success("Saved");
-        router.refresh();
+        router.back();
         onClose?.();
       } else {
-        router.push("/purchases");
+        router.push(PAGES.PURCHASES);
         toast.error(result.error);
       }
     });
@@ -160,6 +164,23 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
               onChange={(e) => setNote(e.target.value)}
             />
           </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>To'lov usuli</Label>
+          <Select
+            value={paymentMethod}
+            onValueChange={(v) => setPaymentMethod(v as CashMethod)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="CASH">Naqd</SelectItem>
+              <SelectItem value="CARD">Karta</SelectItem>
+              {/* <SelectItem value="QR">QR</SelectItem> */}
+            </SelectContent>
+          </Select>
         </div>
 
         <Separator />

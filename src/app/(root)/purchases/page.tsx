@@ -24,11 +24,14 @@ export default async function PurchasesPage({
     : null;
 
   const products = (editTarget || isNew) ? await getProducts() : [];
+  
+  const isOpen = !!editTarget || isNew === "1";
 
   return (
-    <div className="p-6 space-y-6">
+    <>
+      <div className="p-6 space-y-6">
 
-      {editTarget && (
+        {/* {editTarget && (
         <DrawerBackdrop>
           <PurchaseForm products={products} initialData={editTarget} />
         </DrawerBackdrop>
@@ -38,24 +41,39 @@ export default async function PurchasesPage({
         <DrawerBackdrop>
           <PurchaseForm products={products} />
         </DrawerBackdrop>
-      )}
+      )} */}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Purchases</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            Inventory receipts — each purchase increases stock
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Purchases</h1>
+            <p className="text-muted-foreground text-sm mt-0.5">
+              Inventory receipts — each purchase increases stock
+            </p>
+          </div>
+          <Button asChild>
+            <Link href="/purchases?new=1">
+              <Plus className="w-4 h-4 mr-1" />
+              New purchase
+            </Link>
+          </Button>
         </div>
-        <Button asChild>
-          <Link href="/purchases?new=1">
-            <Plus className="w-4 h-4 mr-1" />
-            New purchase
-          </Link>
-        </Button>
+
+        <PurchaseList purchases={purchases} />
       </div>
 
-      <PurchaseList purchases={purchases} />
-    </div>
+      {/* edit & new */}
+      <DrawerBackdrop isOpen={isOpen}>
+        {editTarget ? (
+          <PurchaseForm
+            products={products}
+            initialData={editTarget}
+          />
+        ) : (
+          isNew === "1" && (
+            <PurchaseForm products={products} />
+          )
+        )}
+      </DrawerBackdrop>
+    </>
   );
 }
