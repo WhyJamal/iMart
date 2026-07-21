@@ -1,0 +1,21 @@
+model InventoryRegister {
+  id             String   @id @default(cuid())
+
+  organizationId String
+  productId      String
+
+  docType        String   // PURCHASE | SALE | ADJUSTMENT
+  docId          String
+
+  direction      String   // IN | OUT
+
+  qty            Decimal  // for PostgreSQL @db.Decimal(14, 3)
+  unitCost       Decimal? // for PostgreSQL @db.Decimal(14, 2)
+
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  product        Product @relation(fields: [productId], references: [id])
+
+  @@index([organizationId, productId])
+}

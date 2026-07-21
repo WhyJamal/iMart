@@ -1,0 +1,20 @@
+model Product {
+  id        String   @id @default(cuid())
+  name      String
+  price     Float
+  code      String   @unique
+  category  String
+  image     String?
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  inventoryRegisters InventoryRegister[]
+  purchaseItems      PurchaseItem[]
+  saleItems          SaleItem[]
+  saleReturnItems    SaleReturnItem[]
+  purchaseReturnItems PurchaseReturnItem[]
+}

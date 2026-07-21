@@ -1,0 +1,55 @@
+model CashRegister {
+  id             String   @id @default(cuid())
+
+  organizationId String   @unique // bitta magazin — bitta kassa
+
+  balance        Decimal  @default(0) // joriy naqd qoldiq, for PostgreSQL @db.Decimal(14, 2)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  entries        CashFlow[]
+}
+
+model BankAccount {
+  id             String   @id @default(cuid())
+
+  organizationId String   @unique // bitta magazin — bitta bank hisobi
+
+  balance        Decimal  @default(0) // joriy bank qoldig'i (karta/QR), for PostgreSQL @db.Decimal(14, 2)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  entries        CashFlow[]
+}
+
+model CashFlow {
+  id             String   @id @default(cuid())
+
+  organizationId String
+  cashRegisterId String?  // method === CASH bo'lganda to'ldiriladi
+  bankAccountId  String?  // method === CARD | QR bo'lganda to'ldiriladi
+
+  docType        String   // SALE | PURCHASE | DEPOSIT | WITHDRAWAL | EXPENSE | ADJUSTMENT
+  docId          String?  // bog'liq hujjat id (Sale/Purchase), qo'lda kiritilganda null
+
+  direction      String   // IN | OUT
+  method         String   // CASH | CARD | QR
+
+  amount         Decimal  // for PostgreSQL @db.Decimal(14, 2)
+  note           String?
+
+  createdBy      String?  // amalni bajargan foydalanuvchi id
+
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  cashRegister   CashRegister? @relation(fields: [cashRegisterId], references: [id], onDelete: Cascade)
+  bankAccount    BankAccount?  @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+  @@index([docType, docId])
+}

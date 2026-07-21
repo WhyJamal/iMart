@@ -1,0 +1,44 @@
+// Do'kon ta'minotchidan olgan tovarni orqaga qaytarishi
+// (masalan, eskirgan/nosoz/shartnomaga mos kelmagan tovar uchun).
+// Sotuv qaytarish (SaleReturn — mijoz do'konga qaytaradi) bilan
+// ARALASHTIRMASLIK kerak — bu ikkisi butunlay boshqa oqim.
+
+model PurchaseReturn {
+  id             String   @id @default(cuid())
+  returnNumber   String   @unique
+
+  organizationId String
+  purchaseId     String
+
+  reason         String?
+  paymentMethod  String   @default("cash") // cash | card | qr — pul ta'minotchidan qaysi usulda qaytariladi
+
+  totalAmount    Decimal  // for PostgreSQL @db.Decimal(10, 2)
+
+  createdBy      String?  // qaytarishni amalga oshirgan foydalanuvchi id
+
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  purchase       Purchase     @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  items          PurchaseReturnItem[]
+
+  @@index([organizationId, createdAt])
+  @@index([purchaseId])
+}
+
+model PurchaseReturnItem {
+  id             String   @id @default(cuid())
+  returnId       String
+  purchaseItemId String
+  productId      String
+
+  qty            Decimal  // qaytarilayotgan miqdor, for PostgreSQL @db.Decimal(14, 3)
+  unitCost       Decimal  // qaytarish vaqtidagi tannarx (asl PurchaseItem'dan olinadi), for PostgreSQL @db.Decimal(14, 2)
+
+  return         PurchaseReturn @relation(fields: [returnId], references: [id], onDelete: Cascade)
+  purchaseItem   PurchaseItem   @relation(fields: [purchaseItemId], references: [id])
+  product        Product        @relation(fields: [productId], references: [id])
+
+  @@index([purchaseItemId])
+}
