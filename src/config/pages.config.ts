@@ -9,7 +9,8 @@ export const PAGES = {
     SALES: "/sales",
     RETURNS: "/returns",
     PURCHASE_RETURNS: "/purchase-returns",
-
+    USERS: "/users",
+    
     PROFILE: "/u/profile",
     USER_PROFILE: (userId: string) => `/u/profile/${userId}`,
 

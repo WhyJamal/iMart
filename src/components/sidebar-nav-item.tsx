@@ -14,6 +14,7 @@ import {
     Wrench,
     Undo2,
     RotateCcw,
+    Users,
 } from "lucide-react";
 
 const icons = {
@@ -26,6 +27,7 @@ const icons = {
     wrench: Wrench,
     undo: Undo2,
     "rotate-ccw": RotateCcw,
+    users: Users,
 };
 
 export function SidebarNavItem({

@@ -1,11 +1,12 @@
 import type { NextAuthConfig } from "next-auth";
+import { PAGES } from "./pages.config";
 
 export const authConfig: NextAuthConfig = {
   session: { strategy: "jwt" },
 
   pages: {
-    signIn: "/login",
-    error: "/login",
+    signIn: PAGES.LOGIN,
+    error: PAGES.LOGIN,
   },
 
   providers: [],
@@ -16,20 +17,20 @@ export const authConfig: NextAuthConfig = {
       const path = nextUrl.pathname;
 
       const isPublic =
-        path.startsWith("/login") || path.startsWith("/register");
-      const isOnboarding = path.startsWith("/onboarding");
+        path.startsWith(PAGES.LOGIN) || path.startsWith(PAGES.REGISTER);
+      const isOnboarding = path.startsWith(PAGES.ONBOARDING);
 
       if (!isLoggedIn && !isPublic) return false; // → redirects to signIn page
       if (isLoggedIn && isPublic) {
         return Response.redirect(
-          new URL(hasOrg ? "/dashboard" : "/onboarding", nextUrl)
+          new URL(hasOrg ? PAGES.HOME : PAGES.ONBOARDING, nextUrl)
         );
       }
       if (isLoggedIn && !hasOrg && !isOnboarding) {
-        return Response.redirect(new URL("/onboarding", nextUrl));
+        return Response.redirect(new URL(PAGES.ONBOARDING, nextUrl));
       }
       if (isLoggedIn && hasOrg && isOnboarding) {
-        return Response.redirect(new URL("/dashboard", nextUrl));
+        return Response.redirect(new URL(PAGES.HOME, nextUrl));
       }
 
       return true;

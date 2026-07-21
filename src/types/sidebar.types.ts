@@ -1,3 +1,5 @@
+import type { Permission } from "./role.types";
+
 export type TIcon =
     | "dashboard"
     | "monitor"
@@ -7,7 +9,8 @@ export type TIcon =
     | "wallet"
     | "wrench"
     | "undo"
-    | "rotate-ccw";
+    | "rotate-ccw"
+    | "users";
 
     export type TItem = {
     id: string;
@@ -15,6 +18,7 @@ export type TIcon =
     icon: TIcon;
     badge?: number;
     href: string;
+    permission?: Permission; // bo'lmasa — hammaga ko'rinadi
 };
 
 export interface ISidebar { 

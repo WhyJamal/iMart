@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PAGES } from "@/config/pages.config";
 
 const Schema = z.object({
   email: z.string().email("Invalid email"),
@@ -43,7 +44,7 @@ export default function LoginPage() {
       }
 
       router.refresh();
-      router.push("/dashboard");
+      router.push(PAGES.HOME);
     });
   };
 

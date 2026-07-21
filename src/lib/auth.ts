@@ -1,8 +1,10 @@
 import { auth } from "@/auth";
+import type { Role } from "@/types/role.types";
 
 export type ServerSession = {
   userId: string;
   organizationId: string;
+  role: Role;
 };
 
 /**
@@ -18,6 +20,7 @@ export async function getServerSession(): Promise<ServerSession | null> {
   return {
     userId: session.user.id,
     organizationId: session.user.organizationId,
+    role: session.user.role,
   };
 }
 

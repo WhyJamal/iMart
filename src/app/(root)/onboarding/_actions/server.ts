@@ -33,7 +33,7 @@ export async function createOrganization(input: {
 
       await tx.user.update({
         where: { id: session.userId },
-        data: { organizationId: org.id },
+        data: { organizationId: org.id, role: "OWNER" },
       });
     });
 

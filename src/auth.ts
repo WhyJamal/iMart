@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import type { Session } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
@@ -35,6 +36,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           email: user.email,
           organizationId: user.organizationId,
+          role: user.role,
         };
       },
     }),
@@ -47,14 +49,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.organizationId =
           (user as typeof user & { organizationId?: string | null })
             .organizationId ?? null;
+        token.role =
+          (user as typeof user & { role?: string }).role ?? "CASHIER";
       }
 
       if (trigger === "update" || (token.id && !token.organizationId)) {
         const fresh = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { organizationId: true },
+          select: { organizationId: true, role: true },
         });
         token.organizationId = fresh?.organizationId ?? null;
+        token.role = fresh?.role ?? "CASHIER";
       }
 
       return token;
@@ -64,6 +69,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.id = token.id as string;
       session.user.organizationId =
         (token.organizationId as string | null) ?? null;
+      session.user.role = (token.role as Session["user"]["role"]) ?? "CASHIER";
       return session;
     },
   },

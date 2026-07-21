@@ -6,15 +6,25 @@ import { PAGES } from "@/config/pages.config";
 import SidebarSection from "./sidebar-section";
 import { SidebarNavItem } from "./sidebar-nav-item";
 import { getProfile } from "@/actions/user-actions";
+import { getServerSession } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 import { initials } from "@/utils/initials.util";
+import type { TItem } from "@/types/sidebar.types";
 
 export default async function Sidebar() {
-    const user = await getProfile();
-    
+    const [user, session] = await Promise.all([getProfile(), getServerSession()]);
+    const role = session?.role ?? "CASHIER";
+
+    // Ruxsat berilmagan itemlar HTML'ga umuman qo'shilmaydi —
+    // shuning uchun "avval ko'rinib keyin yashiriladi" degan holat
+    // (flash of unauthorized content) bo'lmaydi.
+    const visible = (items: TItem[]) =>
+        items.filter((item) => !item.permission || hasPermission(role, item.permission));
+
     return (
         <aside className="w-60 bg-white border-r border-gray-100 flex flex-col h-full shadow-[1px_0_16px_rgba(0,0,0,0.04)] shrink-0">
             <nav className="px-2 pt-4 space-y-0.5">
-                {SIDEBARITEMS.find((g) => g.group === "top")?.items.map(
+                {visible(SIDEBARITEMS.find((g) => g.group === "top")?.items ?? []).map(
                     (item) => (
                         <SidebarNavItem
                             key={item.id}
@@ -30,7 +40,7 @@ export default async function Sidebar() {
                         <SidebarSection
                             key={section.group}
                             title={section.group}
-                            items={section.items}
+                            items={visible(section.items)}
                             defaultOpen={section.defaultOpen}
                         />
                     )
