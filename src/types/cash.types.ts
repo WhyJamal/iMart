@@ -5,6 +5,7 @@ export type CashDocType =
   | "PURCHASE"
   | "SALE_RETURN" // mijoz do'konga tovar qaytardi (pul chiqim)
   | "PURCHASE_RETURN" // do'kon ta'minotchiga tovar qaytardi (pul kirim)
+  | "PAYROLL" // xodimga oylik/maosh to'landi (pul chiqim)
   | "DEPOSIT"
   | "WITHDRAWAL"
   | "EXPENSE"

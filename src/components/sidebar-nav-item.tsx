@@ -15,6 +15,8 @@ import {
     Undo2,
     RotateCcw,
     Users,
+    BadgeDollarSign,
+    Landmark
 } from "lucide-react";
 
 const icons = {
@@ -28,6 +30,9 @@ const icons = {
     undo: Undo2,
     "rotate-ccw": RotateCcw,
     users: Users,
+    landmark: Landmark,
+    "badge-dollar": BadgeDollarSign,
+    
 };
 
 export function SidebarNavItem({

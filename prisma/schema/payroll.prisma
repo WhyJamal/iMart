@@ -1,0 +1,56 @@
+// SalaryRegister — InventoryRegister bilan bir xil append-only ledger
+// patterni: User'da statik salaryType/salaryRate maydoni YO'Q, "hozirgi
+// maosh" har doim shu jadvaldagi eng oxirgi (effectiveFrom bo'yicha)
+// yozuvdan hisoblanadi. Shunday qilib stavka o'zgarish tarixi saqlanadi.
+model SalaryRegister {
+  id             String   @id @default(cuid())
+
+  organizationId String
+  userId         String
+
+  salaryType     String   // FIXED | DAILY | HOURLY
+  rate           Decimal  // shu turdagi 1 birlik narxi, for PostgreSQL @db.Decimal(14, 2)
+
+  effectiveFrom  DateTime // qaysi sanadan boshlab amal qiladi
+  reason         String?  // masalan "Yillik oshirish", "Lavozim o'zgardi"
+  createdBy      String?
+
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, userId, effectiveFrom])
+}
+
+// PayrollPayment — haqiqiy to'lov yozuvi. Hisoblash paytidagi
+// salaryType/rate shu yerga SNAPSHOT qilinadi — SalaryRegister keyin
+// o'zgarsa ham, eski to'lovlar tarixi buzilmaydi.
+model PayrollPayment {
+  id             String   @id @default(cuid())
+
+  organizationId String
+  userId         String
+
+  periodStart    DateTime
+  periodEnd      DateTime
+
+  salaryType     String   // shu to'lov paytidagi tur (snapshot)
+  rate           Decimal  // shu to'lov paytidagi stavka (snapshot), for PostgreSQL @db.Decimal(14, 2)
+  workedUnits    Decimal? // FIXED uchun null; DAILY uchun kun soni; HOURLY uchun soat soni, for PostgreSQL @db.Decimal(10, 2)
+
+  bonus          Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  deduction      Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  totalAmount    Decimal  // yakuniy to'langan summa, for PostgreSQL @db.Decimal(14, 2)
+
+  paymentMethod  String   @default("cash") // cash | card
+  note           String?
+  createdBy      String?
+
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, userId, createdAt])
+}

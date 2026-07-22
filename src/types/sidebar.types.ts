@@ -10,7 +10,9 @@ export type TIcon =
     | "wrench"
     | "undo"
     | "rotate-ccw"
-    | "users";
+    | "users"
+    | "landmark"
+    | "badge-dollar";
 
     export type TItem = {
     id: string;

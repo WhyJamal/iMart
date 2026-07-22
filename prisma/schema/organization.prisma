@@ -14,6 +14,9 @@ model Organization {
   saleReturns        SaleReturn[]
   purchaseReturns    PurchaseReturn[]
 
+  salaryRegisters    SalaryRegister[]
+  payrollPayments    PayrollPayment[]
+
   cashRegister       CashRegister?
   bankAccount        BankAccount?
   cashFlows          CashFlow[]

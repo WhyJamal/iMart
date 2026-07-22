@@ -25,7 +25,7 @@ interface Props {
 const DOC_TYPE_OPTIONS: {
   value: Exclude<
     CashDocType,
-    "SALE" | "PURCHASE" | "SALE_RETURN" | "PURCHASE_RETURN"
+    "SALE" | "PURCHASE" | "SALE_RETURN" | "PURCHASE_RETURN" | "PAYROLL"
   >;
   label: string;
   direction: CashDirection | null; // null => foydalanuvchi tanlaydi
@@ -45,7 +45,7 @@ export function CashFlowForm({ onClose }: Props) {
   const [isPending, startTransition] = useTransition();
 
   const [docType, setDocType] = useState<
-    Exclude<CashDocType, "SALE" | "PURCHASE" | "SALE_RETURN" | "PURCHASE_RETURN">
+    Exclude<CashDocType, "SALE" | "PURCHASE" | "SALE_RETURN" | "PURCHASE_RETURN" | "PAYROLL">
   >("DEPOSIT");
   const [direction, setDirection] = useState<CashDirection>("IN");
   const [method, setMethod] = useState<CashMethod>("CASH");

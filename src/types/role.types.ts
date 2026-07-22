@@ -17,4 +17,6 @@ export type Permission =
   | "cash:read"
   | "cash:write"
   | "reports:read"
-  | "users:manage";
+  | "users:manage"
+  | "payroll:read"
+  | "payroll:manage";
