@@ -220,7 +220,7 @@ export default function POSTerminal({ products }: Props) {
                   onFocus={() => setSearchOpen(true)}
                   onBlur={() => setTimeout(() => setSearchOpen(false), 150)}
                   placeholder="Search by name, category or code..."
-                  className="w-full h-11 rounded-xl border border-gray-200 px-4 text-sm outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
+                  className="w-full h-11 rounded-xl border border-gray-200 px-4 text-sm outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400"
                 />
                 {searchOpen && suggestions.length > 0 && (
                   <div className="absolute left-0 right-0 top-12 z-30 rounded-2xl border border-gray-200 bg-white shadow-xl overflow-hidden">
@@ -269,7 +269,7 @@ export default function POSTerminal({ products }: Props) {
                   }
                 }}
                 placeholder="Scan QR / barcode ↵"
-                className="h-11 rounded-xl border border-gray-200 px-4 text-sm outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
+                className="h-11 rounded-xl border border-gray-200 px-4 text-sm outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400"
               />
             </div>
           </div>
@@ -334,12 +334,12 @@ export default function POSTerminal({ products }: Props) {
                   onClick={() => setMethod(m.id)}
                   className={`py-3 rounded-[13px] border-[1.5px] flex flex-col items-center gap-1.5 transition-all duration-150 cursor-pointer
                     ${method === m.id
-                      ? "border-blue-500 bg-blue-50 text-blue-600"
+                      ? "border-red-500 bg-red-50 text-red-600"
                       : "border-gray-200 text-gray-400 bg-white hover:border-gray-300"
                     }`}
                 >
                   {methodIcons[m.id]}
-                  <span className={`text-[11px] font-semibold ${method === m.id ? "text-blue-600" : "text-gray-500"}`}>
+                  <span className={`text-[11px] font-semibold ${method === m.id ? "text-red-600" : "text-gray-500"}`}>
                     {m.label}
                   </span>
                 </button>
@@ -356,7 +356,7 @@ export default function POSTerminal({ products }: Props) {
                   onClick={() => setTip(t.value)}
                   className={`py-2 rounded-full text-xs font-semibold border-[1.5px] transition-all duration-150 cursor-pointer
                     ${tip === t.value
-                      ? "border-blue-500 bg-blue-50 text-blue-600 font-bold"
+                      ? "border-red-500 bg-blue-50 text-red-600 font-bold"
                       : "border-gray-200 text-gray-500 hover:border-gray-300 bg-transparent"
                     }`}
                 >
@@ -388,15 +388,15 @@ export default function POSTerminal({ products }: Props) {
               disabled={stage !== "idle" || cart.length === 0 || isPending}
               className={`w-full mt-4 py-4 rounded-2xl text-[14px] font-bold tracking-tight transition-all duration-200 cursor-pointer
                 ${stage === "idle" && cart.length > 0
-                  ? "bg-blue-500 text-white shadow-lg shadow-blue-300 hover:bg-blue-600 active:scale-[.98]"
+                  ? "bg-red-500 text-white shadow-lg shadow-red-300 hover:bg-red-600 active:scale-[.98]"
                   : "bg-gray-100 text-gray-400 cursor-default"
                 }`}
             >
               {cart.length === 0
                 ? "Add products first"
                 : stage === "idle"
-                ? `Charge ${fmt(total)}`
-                : "Processing…"}
+                  ? `Charge ${fmt(total)}`
+                  : "Processing…"}
             </button>
           </div>
         </div>
