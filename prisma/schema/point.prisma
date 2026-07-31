@@ -1,0 +1,14 @@
+model Point {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  warehouses     Warehouse[]
+  users          User[]
+
+  @@index([organizationId])
+}

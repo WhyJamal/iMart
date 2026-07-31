@@ -16,7 +16,9 @@ import {
     RotateCcw,
     Users,
     BadgeDollarSign,
-    Landmark
+    Landmark,
+    Warehouse,
+    MapPin
 } from "lucide-react";
 
 const icons = {
@@ -32,6 +34,8 @@ const icons = {
     users: Users,
     landmark: Landmark,
     "badge-dollar": BadgeDollarSign,
+    warehouse: Warehouse,
+    "map-pin": MapPin,
     
 };
 

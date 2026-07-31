@@ -14,19 +14,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ROLES, type Role } from "@/types/role.types";
+import type { IPointOption } from "@/types/point.types";
 import { useCreateUser } from "../_hooks/use-user-mutations";
 
 interface Props {
+  points: IPointOption[];
   onClose?: () => void;
 }
 
-export function UserForm({ onClose }: Props) {
+export function UserForm({ points, onClose }: Props) {
   const router = useRouter();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("CASHIER");
+  const [pointId, setPointId] = useState<string>("");
 
   const { mutate, isPending } = useCreateUser(() => {
     router.refresh();
@@ -43,7 +46,7 @@ export function UserForm({ onClose }: Props) {
   };
 
   const handleSubmit = () => {
-    mutate({ name, email, password, role });
+    mutate({ name, email, password, role, pointId: pointId || undefined });
   };
 
   return (

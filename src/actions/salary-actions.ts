@@ -15,6 +15,7 @@ import type {
   SalaryType,
 } from "@/types/salary.types";
 import { IOrgUser } from "@/types/user.types";
+import type { Role } from "@/types/role.types";
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
@@ -74,13 +75,14 @@ export async function getEmployeeSalaries(): Promise<IOrgUser[]> {
 
   const users = await prisma.user.findMany({
     where: { organizationId: session.organizationId },
+    include: { point: { select: { id: true, name: true } } },
     orderBy: { name: "asc" },
   });
 
   const latestEntries = await prisma.salaryRegister.findMany({
     where: {
       organizationId: session.organizationId,
-      userId: { in: users.map((u: IOrgUser) => u.id) },
+      userId: { in: users.map((u: (typeof users)[number]) => u.id) },
     },
     orderBy: { effectiveFrom: "desc" },
   });
@@ -95,12 +97,16 @@ export async function getEmployeeSalaries(): Promise<IOrgUser[]> {
     }
   }
 
-  return users.map((u: IOrgUser) => {
+  return users.map((u: (typeof users)[number]) => {
     const latest = latestByUser.get(u.id);
     return {
       id: u.id,
       name: u.name,
-      role: u.role,
+      email: u.email,
+      role: u.role as Role,
+      createdAt: u.createdAt,
+      pointId: u.point?.id ?? null,
+      pointName: u.point?.name ?? null,
       salaryType: latest ? (latest.salaryType as SalaryType) : null,
       rate: latest ? Number(latest.rate) : null,
       effectiveFrom: latest ? latest.effectiveFrom : null,
@@ -147,6 +153,7 @@ export async function setSalaryRate(
       },
     });
 
+    revalidatePath("/salary");
     revalidatePath("/payroll");
     return { success: true, data: { id: entry.id } };
   } catch (err) {

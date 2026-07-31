@@ -7,6 +7,7 @@ import type { Role } from "@/types/role.types";
 import {
   createUser,
   updateUserRole,
+  updateUserPoint,
   deleteOrgUser,
 } from "@/actions/user-actions";
 
@@ -39,6 +40,26 @@ export function useUpdateUserRole(onSuccess?: () => void) {
         const result = await updateUserRole({ userId, role });
         if (result.success) {
           toast.success("Role updated");
+          onSuccess?.();
+        } else {
+          toast.error(result.error);
+        }
+      })();
+    });
+  };
+
+  return { mutate, isPending };
+}
+
+export function useUpdateUserPoint(onSuccess?: () => void) {
+  const [isPending, startTransition] = useTransition();
+
+  const mutate = (userId: string, pointId: string | null) => {
+    startTransition(() => {
+      void (async () => {
+        const result = await updateUserPoint({ userId, pointId });
+        if (result.success) {
+          toast.success("Point updated");
           onSuccess?.();
         } else {
           toast.error(result.error);

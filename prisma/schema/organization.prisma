@@ -8,6 +8,9 @@ model Organization {
   users     User[]
   products  Product[]
 
+  points     Point[]
+  warehouses Warehouse[]
+
   inventoryRegisters InventoryRegister[]
   purchases          Purchase[]
   sales              Sale[]

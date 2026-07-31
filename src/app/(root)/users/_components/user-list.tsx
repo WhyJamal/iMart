@@ -32,10 +32,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ROLES, type Role } from "@/types/role.types";
 import type { IOrgUser } from "@/types/user.types";
-import { useUpdateUserRole, useDeleteUser } from "../_hooks/use-user-mutations";
+import type { IPointOption } from "@/types/point.types";
+import {
+  useUpdateUserRole,
+  useUpdateUserPoint,
+  useDeleteUser,
+} from "../_hooks/use-user-mutations";
 
 interface Props {
   users: IOrgUser[];
+  points: IPointOption[];
   currentUserId: string;
   currentRole: Role;
 }
@@ -43,9 +49,14 @@ interface Props {
 const fmtDate = (d: Date) =>
   new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(d));
 
-export function UserList({ users, currentUserId, currentRole }: Props) {
+const NO_POINT = "__none__";
+
+export function UserList({ users, points, currentUserId, currentRole }: Props) {
   const router = useRouter();
   const { mutate: changeRole, isPending: isChangingRole } = useUpdateUserRole(
+    () => router.refresh()
+  );
+  const { mutate: changePoint, isPending: isChangingPoint } = useUpdateUserPoint(
     () => router.refresh()
   );
   const { mutate: removeUser, isPending: isDeleting } = useDeleteUser(() =>
@@ -71,6 +82,7 @@ export function UserList({ users, currentUserId, currentRole }: Props) {
           <TableHead>Name</TableHead>
           <TableHead>Email</TableHead>
           <TableHead>Role</TableHead>
+          <TableHead>Point</TableHead>
           <TableHead>Joined</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
@@ -97,6 +109,27 @@ export function UserList({ users, currentUserId, currentRole }: Props) {
                     {assignableRoles.map((r) => (
                       <SelectItem key={r} value={r}>
                         {r}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell>
+                <Select
+                  value={u.pointId ?? NO_POINT}
+                  disabled={isChangingPoint}
+                  onValueChange={(v) =>
+                    changePoint(u.id, v === NO_POINT ? null : v)
+                  }
+                >
+                  <SelectTrigger className="w-[160px]">
+                    <SelectValue placeholder="Belgilanmagan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NO_POINT}>Belgilanmagan</SelectItem>
+                    {points.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

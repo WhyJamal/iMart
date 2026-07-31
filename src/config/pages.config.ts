@@ -12,6 +12,8 @@ export const PAGES = {
     USERS: "/users",
     PAYROLL: "/payroll",
     SALARY: "/salary",
+    POINTS: "/points",
+    WAREHOUSES: "/warehouses",
     
     PROFILE: "/u/profile",
     USER_PROFILE: (userId: string) => `/u/profile/${userId}`,

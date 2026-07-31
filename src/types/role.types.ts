@@ -19,4 +19,5 @@ export type Permission =
   | "reports:read"
   | "users:manage"
   | "payroll:read"
-  | "payroll:manage";
+  | "payroll:manage"
+  | "warehouses:manage";

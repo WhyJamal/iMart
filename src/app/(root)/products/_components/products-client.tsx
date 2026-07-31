@@ -31,7 +31,7 @@ interface ProductsClientProps {
 }
 
 const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  new Intl.NumberFormat("ru-RU", { style: "currency", currency: "UZS" }).format(n);
 
 export function ProductsClient({ initialProducts }: ProductsClientProps) {
   const [search, setSearch] = useState("");

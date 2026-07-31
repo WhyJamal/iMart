@@ -12,7 +12,9 @@ export type TIcon =
     | "rotate-ccw"
     | "users"
     | "landmark"
-    | "badge-dollar";
+    | "badge-dollar"
+    | "map-pin"
+    | "warehouse";
 
     export type TItem = {
     id: string;

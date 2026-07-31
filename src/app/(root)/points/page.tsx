@@ -4,57 +4,55 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
-import { getOrgUsers } from "@/actions/user-actions";
-import { getPointOptions } from "@/actions/point-actions";
-import { UserList } from "./_components/user-list";
+import { getPoints } from "@/actions/point-actions";
+import { PointList } from "./_components/point-list";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
-import { UserForm } from "./_components/user-form";
+import { PointForm } from "./_components/point-form";
 import { PAGES } from "@/config/pages.config";
 
 export const dynamic = "force-dynamic";
 
-export default async function UsersPage({
+export default async function PointsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{ new?: string; edit?: string }>;
 }) {
   const session = await getServerSession();
-  if (!session || !hasPermission(session.role, "users:manage")) {
+  if (!session || !hasPermission(session.role, "warehouses:manage")) {
     redirect(PAGES.HOME);
   }
 
-  const { new: isNew } = await searchParams;
-  const [users, points] = await Promise.all([getOrgUsers(), getPointOptions()]);
+  const { new: isNew, edit } = await searchParams;
+  const points = await getPoints();
+  const editTarget = edit ? points.find((p) => p.id === edit) : undefined;
 
   return (
     <>
       <div className="p-6 space-y-6">
+        <DrawerBackdrop isOpen={!!edit}>
+          {editTarget && <PointForm point={editTarget} />}
+        </DrawerBackdrop>
+
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Users</h1>
+            <h1 className="text-2xl font-bold">Points</h1>
             <p className="text-muted-foreground text-sm mt-0.5">
-              Xodimlar va ularning rollarini boshqarish
+              Tashkilotdagi nuqtalar (filiallar, foyda markazlari)
             </p>
           </div>
           <Button asChild>
-            <Link href={`${PAGES.USERS}?new=1`}>
+            <Link href={`${PAGES.POINTS}?new=1`}>
               <Plus className="w-4 h-4 mr-1" />
-              New user
+              New point
             </Link>
           </Button>
         </div>
 
-        <UserList
-          users={users}
-          points={points}
-          currentUserId={session.userId}
-          currentRole={session.role}
-        />
+        <PointList points={points} canManage />
       </div>
 
-      {/* is new */}
       <DrawerBackdrop isOpen={isNew === "1"}>
-        <UserForm points={points} />
+        <PointForm />
       </DrawerBackdrop>
     </>
   );

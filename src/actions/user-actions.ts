@@ -8,8 +8,10 @@ import { checkPermission, hasPermission } from "@/lib/permissions";
 import {
   CreateUserSchema,
   UpdateUserRoleSchema,
+  UpdateUserPointSchema,
   type CreateUserInput,
   type UpdateUserRoleInput,
+  type UpdateUserPointInput,
 } from "@/schema/user.schema";
 import type { ActionResult } from "@/types/action-result.types";
 import type { IOrgUser } from "@/types/user.types";
@@ -113,11 +115,30 @@ export async function getOrgUsers(): Promise<IOrgUser[]> {
 
   const users = await prisma.user.findMany({
     where: { organizationId: session.organizationId },
-    select: { id: true, name: true, email: true, role: true, createdAt: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true,
+      pointId: true,
+      point: { select: { name: true } },
+    },
     orderBy: { createdAt: "asc" },
   });
 
-  return users.map((u: (typeof users)[number]) => ({ ...u, role: u.role as Role }));
+  return users.map((u: (typeof users)[number]) => ({
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    role: u.role as Role,
+    createdAt: u.createdAt,
+    pointId: u.pointId,
+    pointName: u.point?.name ?? null,
+    salaryType: null,
+    rate: null,
+    effectiveFrom: null,
+  }));
 }
 
 export async function createUser(
@@ -134,10 +155,17 @@ export async function createUser(
     if (!parsed.success) {
       return { success: false, error: parsed.error.issues[0].message };
     }
-    const { name, email, password, role } = parsed.data;
+    const { name, email, password, role, pointId } = parsed.data;
 
     if (role === "OWNER" && session.role !== "OWNER") {
       return { success: false, error: "Только владелец может создать нового владельца." };
+    }
+
+    if (pointId) {
+      const point = await prisma.point.findFirst({
+        where: { id: pointId, organizationId: session.organizationId },
+      });
+      if (!point) return { success: false, error: "Nuqta topilmadi" };
     }
 
     const existing = await prisma.user.findUnique({
@@ -153,6 +181,7 @@ export async function createUser(
         email: email.toLowerCase(),
         password: hashed,
         role,
+        pointId: pointId ?? null,
         organizationId: session.organizationId,
       },
     });
@@ -201,6 +230,44 @@ export async function updateUserRole(
   } catch (err) {
     console.error("[updateUserRole]", err);
     return { success: false, error: "Не удалось обновить роль." };
+  }
+}
+
+export async function updateUserPoint(
+  input: UpdateUserPointInput
+): Promise<ActionResult<undefined>> {
+  try {
+    const session = await getServerSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
+    const denied = checkPermission(session.role, "users:manage");
+    if (denied) return denied;
+
+    const parsed = UpdateUserPointSchema.safeParse(input);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const { userId, pointId } = parsed.data;
+
+    const target = await prisma.user.findFirst({
+      where: { id: userId, organizationId: session.organizationId },
+    });
+    if (!target) return { success: false, error: "Пользователь не найден." };
+
+    if (pointId) {
+      const point = await prisma.point.findFirst({
+        where: { id: pointId, organizationId: session.organizationId },
+      });
+      if (!point) return { success: false, error: "Nuqta topilmadi" };
+    }
+
+    await prisma.user.update({ where: { id: userId }, data: { pointId } });
+
+    revalidatePath("/users");
+    return { success: true, data: undefined };
+  } catch (err) {
+    console.error("[updateUserPoint]", err);
+    return { success: false, error: "Nuqtani yangilab bo'lmadi" };
   }
 }
 

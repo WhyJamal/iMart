@@ -1,0 +1,31 @@
+model Warehouse {
+  id             String   @id @default(cuid())
+  organizationId String
+  pointId        String
+  name           String
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  point          Point        @relation(fields: [pointId], references: [id], onDelete: Cascade)
+  cells          WarehouseCell[]
+
+  @@index([organizationId, pointId])
+}
+
+// Yacheyka — sklad ichidagi bo'lim/joy. Nomi ixtiyoriy — masalan non
+// skladida "Oddiy non", "Qora non" bo'lishi mumkin, boshqa turdagi
+// skladda butunlay boshqa nomlar bo'lishi mumkin.
+model WarehouseCell {
+  id          String   @id @default(cuid())
+  warehouseId String
+  name        String
+
+  createdAt   DateTime @default(now())
+
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  inventoryRegisters InventoryRegister[]
+
+  @@index([warehouseId])
+}

@@ -105,7 +105,7 @@ export async function getDashboardStats(): Promise<TDashboardStats> {
   }
 
   const lowStockCount = products.filter(
-    (p) => (stockMap.get(p.id) ?? 0) < LOW_STOCK_THRESHOLD
+    (p: { id: string }) => (stockMap.get(p.id) ?? 0) < LOW_STOCK_THRESHOLD
   ).length;
 
   // ── 14-day daily trend (savdo vs xarid) ──────────────────────────

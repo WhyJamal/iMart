@@ -8,6 +8,9 @@ export interface IOrgUser {
   role: Role;
   createdAt: Date;
 
+  pointId: string | null;
+  pointName: string | null;
+
   salaryType: SalaryType | null;
   rate: number | null;
   effectiveFrom: Date | null;
