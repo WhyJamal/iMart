@@ -14,7 +14,8 @@ export type TIcon =
     | "landmark"
     | "badge-dollar"
     | "map-pin"
-    | "warehouse";
+    | "warehouse"
+    | "building";
 
     export type TItem = {
     id: string;

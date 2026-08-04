@@ -26,6 +26,8 @@ model WarehouseCell {
 
   warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
   inventoryRegisters InventoryRegister[]
+  purchaseItems PurchaseItem[]
+  saleItems SaleItem[]
 
   @@index([warehouseId])
 }

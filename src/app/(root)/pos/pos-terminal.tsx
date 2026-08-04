@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { createSale } from "@/actions/sale-actions";
+import { getPointStockRecord, getPointCellStock } from "@/actions/warehouse-actions";
+import type { IPointOption } from "@/types/point.types";
+import type { ICellStockOption } from "@/types/warehouse.types";
 
 type Stage = "idle" | "processing" | "success";
 type PayMethod = "card" | "cash" | "qr";
@@ -25,6 +28,7 @@ export interface POSProduct {
 
 interface CartItem extends POSProduct {
   qty: number;
+  warehouseCellId: string;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -94,11 +98,21 @@ const SectionLabel = ({ children }: { children: ReactNode }) => (
 
 interface Props {
   products: POSProduct[];
+  points: IPointOption[];
+  defaultPointId: string;
+  initialCellStock: Record<string, ICellStockOption[]>;
 }
 
-export default function POSTerminal({ products }: Props) {
+export default function POSTerminal({ products, points, defaultPointId, initialCellStock }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [isLoadingStock, startStockLoad] = useTransition();
+
+  const [pointId, setPointId] = useState(defaultPointId);
+  // Point o'zgartirilganda shu Point'dagi qoldiqlar bilan almashtiriladi
+  const [stockOverride, setStockOverride] = useState<Record<string, number> | null>(null);
+  // productId -> shu Point ostidagi yacheykalar (eng ko'p qoldiqlisi birinchi)
+  const [cellStock, setCellStock] = useState<Record<string, ICellStockOption[]>>(initialCellStock);
 
   const [search, setSearch] = useState("");
   const [qrInput, setQrInput] = useState("");
@@ -109,11 +123,33 @@ export default function POSTerminal({ products }: Props) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [lastSaleNumber, setLastSaleNumber] = useState("");
 
+  // Point o'zgarganda stockOverride bilan almashtiriladi — dastlab
+  // serverdan kelgan (defaultPointId uchun hisoblangan) qoldiq ishlatiladi
+  const effectiveProducts = useMemo(() => {
+    if (!stockOverride) return products;
+    return products.map((p) => ({ ...p, stock: stockOverride[p.id] ?? 0 }));
+  }, [products, stockOverride]);
+
+  const handlePointChange = (newPointId: string) => {
+    setPointId(newPointId);
+    setCart([]); // boshqa Point'ga o'tganda savat tozalanadi
+    startStockLoad(() => {
+      void (async () => {
+        const [record, cells] = await Promise.all([
+          getPointStockRecord(newPointId),
+          getPointCellStock(newPointId),
+        ]);
+        setStockOverride(record);
+        setCellStock(cells);
+      })();
+    });
+  };
+
   // Only show in-stock products in search
   const suggestions = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return [];
-    return products
+    return effectiveProducts
       .filter(
         (p) =>
           p.stock > 0 &&
@@ -122,7 +158,7 @@ export default function POSTerminal({ products }: Props) {
             p.code.toLowerCase().includes(q))
       )
       .slice(0, 6);
-  }, [search, products]);
+  }, [search, effectiveProducts]);
 
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const taxAmt = subtotal * 0.08;
@@ -131,31 +167,46 @@ export default function POSTerminal({ products }: Props) {
   const totalItems = cart.reduce((s, i) => s + i.qty, 0);
 
   const addToCart = (product: POSProduct) => {
+    const cells = cellStock[product.id] ?? [];
+    if (cells.length === 0) {
+      toast.error(`"${product.name}" uchun bu nuqtada yacheyka topilmadi`);
+      return;
+    }
+    const bestCell = cells[0]; // eng ko'p qoldiqli — avtomatik tanlanadi
+
     setCart((prev) => {
-      const found = prev.find((item) => item.id === product.id);
-      // Don't exceed stock
+      const found = prev.find(
+        (item) => item.id === product.id && item.warehouseCellId === bestCell.warehouseCellId
+      );
       const currentQty = found?.qty ?? 0;
-      if (currentQty >= product.stock) {
-        toast.warning(`Only ${product.stock} in stock`);
+      if (currentQty >= bestCell.available) {
+        toast.warning(`Bu yacheykada faqat ${bestCell.available} dona bor`);
         return prev;
       }
       if (found) {
         return prev.map((item) =>
-          item.id === product.id ? { ...item, qty: item.qty + 1 } : item
+          item === found ? { ...item, qty: item.qty + 1 } : item
         );
       }
-      return [...prev, { ...product, qty: 1 }];
+      return [
+        ...prev,
+        { ...product, qty: 1, warehouseCellId: bestCell.warehouseCellId },
+      ];
     });
   };
 
-  const setQty = (id: string, delta: number) => {
+  const setQty = (id: string, warehouseCellId: string, delta: number) => {
     setCart((prev) => {
       return prev
         .map((item) => {
-          if (item.id !== id) return item;
+          if (item.id !== id || item.warehouseCellId !== warehouseCellId) return item;
+          const cell = (cellStock[item.id] ?? []).find(
+            (c) => c.warehouseCellId === warehouseCellId
+          );
+          const available = cell?.available ?? 0;
           const newQty = item.qty + delta;
-          if (delta > 0 && newQty > item.stock) {
-            toast.warning(`Only ${item.stock} in stock`);
+          if (delta > 0 && newQty > available) {
+            toast.warning(`Bu yacheykada faqat ${available} dona bor`);
             return item;
           }
           return { ...item, qty: newQty };
@@ -164,22 +215,53 @@ export default function POSTerminal({ products }: Props) {
     });
   };
 
-  const removeItem = (id: string) =>
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  const switchCell = (id: string, oldCellId: string, newCellId: string) => {
+    setCart((prev) =>
+      prev.map((item) => {
+        if (item.id !== id || item.warehouseCellId !== oldCellId) return item;
+        const cell = (cellStock[item.id] ?? []).find(
+          (c) => c.warehouseCellId === newCellId
+        );
+        const available = cell?.available ?? 0;
+        if (available === 0) {
+          toast.error("Tanlangan yacheykada qoldiq yo'q");
+          return item;
+        }
+        const qty = Math.min(item.qty, available);
+        if (qty < item.qty) {
+          toast.warning(`Miqdor ${qty} taga tushirildi (yacheykada shuncha bor)`);
+        }
+        return { ...item, warehouseCellId: newCellId, qty };
+      })
+    );
+  };
+
+  const removeItem = (id: string, warehouseCellId: string) =>
+    setCart((prev) =>
+      prev.filter(
+        (item) => !(item.id === id && item.warehouseCellId === warehouseCellId)
+      )
+    );
 
   const handleCharge = () => {
     if (cart.length === 0 || stage !== "idle") return;
+    if (!pointId) {
+      toast.error("Avval Point tanlang");
+      return;
+    }
 
     setStage("processing");
 
     startTransition(async () => {
       const result = await createSale({
+        pointId,
         paymentMethod: method,
         totalAmount: total,
         items: cart.map((item) => ({
           productId: item.id,
           qty: item.qty,
           unitPrice: item.price,
+          warehouseCellId: item.warehouseCellId,
         })),
       });
 
@@ -257,7 +339,7 @@ export default function POSTerminal({ products }: Props) {
                 onChange={(e) => setQrInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    const found = products.find(
+                    const found = effectiveProducts.find(
                       (p) => p.code.toLowerCase() === qrInput.trim().toLowerCase()
                     );
                     if (found) {
@@ -287,37 +369,65 @@ export default function POSTerminal({ products }: Props) {
               </div>
             ) : (
               <div className="space-y-3 overflow-y-auto flex-1 pr-1">
-                {cart.map((item) => (
-                  <div
-                    key={item.id}
-                    className="rounded-2xl border border-gray-100 p-4 flex items-center gap-3"
-                  >
-                    <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center text-2xl">
-                      {item.image ? (
-                        <Image src={item.image} alt={item.name} width={56} height={56} className="object-cover" />
-                      ) : (
-                        "📦"
-                      )}
-                    </div>
+                {cart.map((item) => {
+                  const cells = cellStock[item.id] ?? [];
+                  const currentCell = cells.find(
+                    (c) => c.warehouseCellId === item.warehouseCellId
+                  );
+                  return (
+                    <div
+                      key={`${item.id}:${item.warehouseCellId}`}
+                      className="rounded-2xl border border-gray-100 p-4 flex items-center gap-3"
+                    >
+                      <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center text-2xl">
+                        {item.image ? (
+                          <Image src={item.image} alt={item.name} width={56} height={56} className="object-cover" />
+                        ) : (
+                          "📦"
+                        )}
+                      </div>
 
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate">{item.name}</p>
-                      <p className="text-[11px] text-gray-400">
-                        {item.qty} × {fmt(item.price)} · {item.stock - item.qty} remaining
-                      </p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <button onClick={() => setQty(item.id, -1)} className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 font-bold">−</button>
-                        <span className="text-sm font-bold w-6 text-center">{item.qty}</span>
-                        <button onClick={() => setQty(item.id, 1)} className="w-7 h-7 rounded-full bg-blue-500 text-white hover:bg-blue-600 font-bold">+</button>
-                        <button onClick={() => removeItem(item.id)} className="ml-2 text-[11px] font-semibold text-red-500 hover:text-red-600">Remove</button>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold truncate">{item.name}</p>
+                        <p className="text-[11px] text-gray-400">
+                          {item.qty} × {fmt(item.price)}
+                          {currentCell && (
+                            <>
+                              {" "}· {currentCell.available - item.qty} remaining
+                            </>
+                          )}
+                        </p>
+
+                        {cells.length > 0 && (
+                          <select
+                            value={item.warehouseCellId}
+                            onChange={(e) =>
+                              switchCell(item.id, item.warehouseCellId, e.target.value)
+                            }
+                            className="mt-1 text-[11px] rounded-lg border border-gray-200 px-2 py-1 outline-none focus:ring-1 focus:ring-red-300 max-w-full"
+                          >
+                            {cells.map((c) => (
+                              <option key={c.warehouseCellId} value={c.warehouseCellId}>
+                                {c.warehouseName} — {c.cellName} ({c.available})
+                              </option>
+                            ))}
+                          </select>
+                        )}
+
+                        <div className="flex items-center gap-2 mt-2">
+                          <button onClick={() => setQty(item.id, item.warehouseCellId, -1)} className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 font-bold">−</button>
+                          <span className="text-sm font-bold w-6 text-center">{item.qty}</span>
+                          <button onClick={() => setQty(item.id, item.warehouseCellId, 1)} className="w-7 h-7 rounded-full bg-blue-500 text-white hover:bg-blue-600 font-bold">+</button>
+                          <button onClick={() => removeItem(item.id, item.warehouseCellId)} className="ml-2 text-[11px] font-semibold text-red-500 hover:text-red-600">Remove</button>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <p className="font-bold text-gray-900">{fmt(item.qty * item.price)}</p>
                       </div>
                     </div>
-
-                    <div className="text-right shrink-0">
-                      <p className="font-bold text-gray-900">{fmt(item.qty * item.price)}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -325,6 +435,26 @@ export default function POSTerminal({ products }: Props) {
 
         {/* ── Right: payment panel ────────────────────────────────────────── */}
         <div className="w-100 flex flex-col gap-3 shrink-0">
+          <div className="bg-white rounded-2xl shadow-sm p-4">
+            <SectionLabel>Point</SectionLabel>
+            <select
+              value={pointId}
+              onChange={(e) => handlePointChange(e.target.value)}
+              disabled={isLoadingStock}
+              className="w-full h-11 rounded-xl border border-gray-200 px-3 text-sm outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400 disabled:opacity-50"
+            >
+              {points.length === 0 && <option value="">Point yo'q</option>}
+              {points.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+            {isLoadingStock && (
+              <p className="text-[11px] text-gray-400 mt-1.5">Qoldiq yuklanmoqda…</p>
+            )}
+          </div>
+
           <div className="bg-white rounded-2xl shadow-sm p-4">
             <SectionLabel>Payment method</SectionLabel>
             <div className="grid grid-cols-3 gap-2">

@@ -5,6 +5,7 @@ export type ServerSession = {
   userId: string;
   organizationId: string;
   role: Role;
+  pointId: string | null;
 };
 
 /**
@@ -21,6 +22,7 @@ export async function getServerSession(): Promise<ServerSession | null> {
     userId: session.user.id,
     organizationId: session.user.organizationId,
     role: session.user.role,
+    pointId: session.user.pointId ?? null,
   };
 }
 

@@ -37,6 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           organizationId: user.organizationId,
           role: user.role,
+          pointId: user.pointId,
         };
       },
     }),
@@ -51,15 +52,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             .organizationId ?? null;
         token.role =
           (user as typeof user & { role?: string }).role ?? "CASHIER";
+        token.pointId =
+          (user as typeof user & { pointId?: string | null }).pointId ?? null;
       }
 
       if (trigger === "update" || (token.id && !token.organizationId)) {
         const fresh = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { organizationId: true, role: true },
+          select: { organizationId: true, role: true, pointId: true },
         });
         token.organizationId = fresh?.organizationId ?? null;
         token.role = fresh?.role ?? "CASHIER";
+        token.pointId = fresh?.pointId ?? null;
       }
 
       return token;
@@ -70,6 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.organizationId =
         (token.organizationId as string | null) ?? null;
       session.user.role = (token.role as Session["user"]["role"]) ?? "CASHIER";
+      session.user.pointId = (token.pointId as string | null) ?? null;
       return session;
     },
   },

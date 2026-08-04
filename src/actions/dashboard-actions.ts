@@ -32,6 +32,7 @@ export type TDashboardStats = {
   monthlyOverview: { label: string; savdo: number; xarid: number }[];
   paymentBreakdown: { method: string; amount: number; fill: string }[];
   topProducts: { name: string; revenue: number }[];
+  pointRevenue: { name: string; revenue: number }[];
 };
 
 export async function getDashboardStats(): Promise<TDashboardStats> {
@@ -57,7 +58,13 @@ export async function getDashboardStats(): Promise<TDashboardStats> {
   ] = await Promise.all([
     prisma.sale.findMany({
       where: { organizationId, createdAt: { gte: sixMonthsAgo } },
-      select: { totalAmount: true, paymentMethod: true, createdAt: true },
+      select: {
+        totalAmount: true,
+        paymentMethod: true,
+        createdAt: true,
+        pointId: true,
+        point: { select: { name: true } },
+      },
     }),
     prisma.purchaseItem.findMany({
       where: { receipt: { organizationId, createdAt: { gte: sixMonthsAgo } } },
@@ -168,6 +175,18 @@ export async function getDashboardStats(): Promise<TDashboardStats> {
     fill: paymentColors[method] ?? "var(--color-chart-4)",
   }));
 
+  // ── Pointlar bo'yicha savdo (shu oy) — "qaysi nuqta ko'proq foyda
+  // keltiryapti" degan savolga javob ────────────────────────────────
+  const pointTotals = new Map<string, number>();
+  for (const sale of saleRows) {
+    if (sale.createdAt < startOfMonth) continue;
+    const name = sale.point?.name ?? "Point biriktirilmagan";
+    pointTotals.set(name, (pointTotals.get(name) ?? 0) + Number(sale.totalAmount));
+  }
+  const pointRevenue = Array.from(pointTotals.entries())
+    .map(([name, revenue]) => ({ name, revenue }))
+    .sort((a, b) => b.revenue - a.revenue);
+
   // ── Top 5 products this month (bar) ──────────────────────────────
   const productTotals = new Map<string, number>();
   for (const item of monthSaleItems) {
@@ -192,5 +211,6 @@ export async function getDashboardStats(): Promise<TDashboardStats> {
     monthlyOverview,
     paymentBreakdown,
     topProducts,
+    pointRevenue,
   };
 }

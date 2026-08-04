@@ -7,6 +7,7 @@ export const SaleItemSchema = z.object({
 });
 
 export const CreateSaleSchema = z.object({
+  pointId: z.string().min(1, "Nuqta tanlanishi shart"),
   items: z.array(SaleItemSchema).min(1, "At least one item is required"),
   paymentMethod: z.enum(["card", "cash", "qr"]).default("cash"),
   totalAmount: z.number({ error: "Unit price must be a number" }).nonnegative("Unit price cannot be negative")

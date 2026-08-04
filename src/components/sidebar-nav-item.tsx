@@ -18,7 +18,8 @@ import {
     BadgeDollarSign,
     Landmark,
     Warehouse,
-    MapPin
+    MapPin,
+    Building,
 } from "lucide-react";
 
 const icons = {
@@ -36,7 +37,7 @@ const icons = {
     "badge-dollar": BadgeDollarSign,
     warehouse: Warehouse,
     "map-pin": MapPin,
-    
+    "building": Building,
 };
 
 export function SidebarNavItem({

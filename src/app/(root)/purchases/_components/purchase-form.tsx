@@ -20,6 +20,9 @@ import { createPurchase, updatePurchase } from "@/actions/purchase-actions";
 import type { PurchaseItemInput } from "@/schema/purchase.schema";
 import { PAGES } from "@/config/pages.config";
 import type { CashMethod } from "@/types/cash.types";
+import type { IPointOption } from "@/types/point.types";
+import type { IWarehouse } from "@/types/warehouse.types";
+import type { IContragentOption } from "@/types/contragent.types";
 
 interface ProductOption {
   id: string;
@@ -30,35 +33,68 @@ interface ProductOption {
 
 interface Props {
   products: ProductOption[];
+  points: IPointOption[];
+  warehouses: IWarehouse[];
+  contragents: IContragentOption[];
+  defaultPointId?: string | null;
   initialData?: any;
   onClose?: () => void;
 }
 
-interface LineItem extends PurchaseItemInput {
+interface LineItem extends Omit<PurchaseItemInput, "qty" | "unitCost"> {
   _key: string;
+  qty: string;
+  unitCost: string;
 }
 
 function newLine(): LineItem {
-  return { _key: crypto.randomUUID(), productId: "", qty: 1, unitCost: 0 };
+  return {
+    _key: crypto.randomUUID(),
+    productId: "",
+    qty: "1",
+    unitCost: "0",
+    warehouseCellId: "",
+  };
 }
 
-export function PurchaseForm({ products, initialData, onClose }: Props) {
+export function PurchaseForm({
+  products,
+  points,
+  warehouses,
+  contragents,
+  defaultPointId,
+  initialData,
+  onClose,
+}: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const [supplierName, setSupplierName] = useState(
-    initialData?.supplierName ?? ""
+  const [pointId, setPointId] = useState(
+    initialData?.pointId ?? defaultPointId ?? ""
+  );
+  const [contragentId, setContragentId] = useState(
+    initialData?.contragentId ?? ""
   );
   const [note, setNote] = useState(initialData?.note ?? "");
   const [paymentMethod, setPaymentMethod] = useState<CashMethod>(initialData?.paymentMethod ?? "CASH");
 
   const [lines, setLines] = useState<LineItem[]>(
-    initialData?.items?.map((item: LineItem) => ({
+    initialData?.items?.map((item: { productId: string; qty: number; unitCost: number; warehouseCellId?: string }) => ({
       _key: crypto.randomUUID(),
       productId: item.productId,
-      qty: Number(item.qty),
-      unitCost: Number(item.unitCost),
+      qty: String(item.qty),
+      unitCost: String(item.unitCost),
+      warehouseCellId: item.warehouseCellId ?? "",
     })) ?? [newLine()]
+  );
+
+  // Faqat tanlangan Point'ga tegishli skladlar/yacheykalar
+  const warehousesForPoint = warehouses.filter((w) => w.pointId === pointId);
+  const cellOptions = warehousesForPoint.flatMap((w) =>
+    w.cells.map((c) => ({
+      id: c.id,
+      label: `${w.name} — ${c.name}`,
+    }))
   );
 
   const handleClose = () => {
@@ -67,6 +103,11 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
     } else {
       router.push(PAGES.PURCHASES);
     }
+  };
+
+  const handlePointChange = (value: string) => {
+    setPointId(value);
+    setLines((prev) => prev.map((l) => ({ ...l, warehouseCellId: "" })));
   };
 
   const addLine = () => setLines((prev) => [...prev, newLine()]);
@@ -87,34 +128,52 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
     setLines((prev) =>
       prev.map((l) =>
         l._key === key
-          ? { ...l, productId, unitCost: product?.price ?? 0 }
+          ? { ...l, productId, unitCost: String(product?.price ?? 0) }
           : l
       )
     );
   };
 
   const totalCost = lines.reduce(
-    (sum, l) => sum + (l.qty || 0) * (l.unitCost || 0),
+    (sum, l) => sum + (Number(l.qty) || 0) * (Number(l.unitCost) || 0),
     0
   );
 
   const handleSubmit = () => {
     const validLines = lines.filter((l) => l.productId);
 
+    if (!pointId) {
+      toast.error("Nuqtani tanlang");
+      return;
+    }
+    if (!contragentId) {
+      toast.error("Sotuvchini (kontragent) tanlang");
+      return;
+    }
     if (validLines.length === 0) {
       toast.error("Add at least one product");
+      return;
+    }
+    if (validLines.some((l) => !l.warehouseCellId)) {
+      toast.error("Har bir qator uchun yacheyka tanlang");
+      return;
+    }
+    if (validLines.some((l) => !(Number(l.qty) > 0))) {
+      toast.error("Miqdor 0 dan katta bo'lishi kerak");
       return;
     }
 
     startTransition(async () => {
       const payload = {
-        supplierName,
+        pointId,
+        contragentId,
         note,
         paymentMethod,
-        items: validLines.map(({ productId, qty, unitCost }) => ({
+        items: validLines.map(({ productId, qty, unitCost, warehouseCellId }) => ({
           productId,
           qty: Number(qty),
           unitCost: Number(unitCost),
+          warehouseCellId,
         })),
       };
 
@@ -146,15 +205,39 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
       {/* Scrollable body */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
-        {/* Supplier & Note */}
+        {/* Point */}
+        <div className="space-y-1.5">
+          <Label>Point</Label>
+          <Select value={pointId} onValueChange={handlePointChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Nuqtani tanlang" />
+            </SelectTrigger>
+            <SelectContent>
+              {points.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Contragent (Supplier) & Note */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label>Supplier name (optional)</Label>
-            <Input
-              placeholder="e.g. ABC Distributors"
-              value={supplierName}
-              onChange={(e) => setSupplierName(e.target.value)}
-            />
+            <Label>Sotuvchi (kontragent)</Label>
+            <Select value={contragentId} onValueChange={setContragentId}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Kontragentni tanlang" />
+              </SelectTrigger>
+              <SelectContent>
+                {contragents.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1.5">
             <Label>Note (optional)</Label>
@@ -187,8 +270,9 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
 
         {/* Lines */}
         <div className="space-y-3">
-          <div className="grid grid-cols-[1fr_100px_120px_36px] gap-2 text-xs font-medium text-muted-foreground px-1">
+          <div className="grid grid-cols-[1fr_140px_90px_110px_36px] gap-2 text-xs font-medium text-muted-foreground px-1">
             <span>Product</span>
+            <span>Cell</span>
             <span>Qty</span>
             <span>Unit cost</span>
             <span />
@@ -197,14 +281,14 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
           {lines.map((line) => (
             <div
               key={line._key}
-              className="grid grid-cols-[1fr_100px_120px_36px] gap-2 items-center"
+              className="grid grid-cols-[1fr_140px_90px_110px_36px] gap-2 items-center"
             >
               <Select
                 value={line.productId}
                 onValueChange={(v) => handleProductChange(line._key, v)}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select product" />
+                <SelectTrigger className="w-full min-w-0">
+                  <SelectValue placeholder="Select product" className="truncate" />
                 </SelectTrigger>
                 <SelectContent>
                   {products.map((p) => (
@@ -218,13 +302,32 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
                 </SelectContent>
               </Select>
 
+              <Select
+                value={line.warehouseCellId}
+                disabled={!pointId || cellOptions.length === 0}
+                onValueChange={(v) =>
+                  updateLine(line._key, "warehouseCellId", v)
+                }
+              >
+                <SelectTrigger className="w-full min-w-0">
+                  <SelectValue placeholder="Yacheyka" className="truncate" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cellOptions.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
               <Input
                 type="number"
                 min={0.001}
                 step={0.001}
                 value={line.qty}
                 onChange={(e) =>
-                  updateLine(line._key, "qty", Number(e.target.value))
+                  updateLine(line._key, "qty", e.target.value)
                 }
               />
 
@@ -234,7 +337,7 @@ export function PurchaseForm({ products, initialData, onClose }: Props) {
                 step={0.01}
                 value={line.unitCost}
                 onChange={(e) =>
-                  updateLine(line._key, "unitCost", Number(e.target.value))
+                  updateLine(line._key, "unitCost", e.target.value)
                 }
               />
 

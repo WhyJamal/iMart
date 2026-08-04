@@ -3,6 +3,10 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getPurchases, getPurchaseById } from "@/actions/purchase-actions";
 import { getProducts } from "@/actions/product-actions";
+import { getPointOptions } from "@/actions/point-actions";
+import { getWarehouses } from "@/actions/warehouse-actions";
+import { getContragentOptions } from "@/actions/contragent-actions";
+import { getServerSession } from "@/lib/auth";
 import { PurchaseList } from "./_components/purchase-list";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
 import { PurchaseForm } from "./_components/purchase-form";
@@ -17,15 +21,23 @@ export default async function PurchasesPage({
 }) {
   const { edit, new: isNew } = await searchParams;
 
+  const session = await getServerSession();
   const purchases = await getPurchases();
 
   const editTarget = edit
     ? purchases.find((p: TSerializedPurchase) => p.id === edit) ?? null
     : null;
 
-  const products = (editTarget || isNew) ? await getProducts() : [];
-  
   const isOpen = !!editTarget || isNew === "1";
+
+  const [products, points, warehouses, contragents] = isOpen
+    ? await Promise.all([
+        getProducts(),
+        getPointOptions(),
+        getWarehouses(),
+        getContragentOptions("SUPPLIER"),
+      ])
+    : [[], [], [], []];
 
   return (
     <>
@@ -66,11 +78,21 @@ export default async function PurchasesPage({
         {editTarget ? (
           <PurchaseForm
             products={products}
+            points={points}
+            warehouses={warehouses}
+            contragents={contragents}
+            defaultPointId={session?.pointId ?? null}
             initialData={editTarget}
           />
         ) : (
           isNew === "1" && (
-            <PurchaseForm products={products} />
+            <PurchaseForm
+              products={products}
+              points={points}
+              warehouses={warehouses}
+              contragents={contragents}
+              defaultPointId={session?.pointId ?? null}
+            />
           )
         )}
       </DrawerBackdrop>

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
+import { checkPermission } from "@/lib/permissions";
 import {
   CreatePurchaseSchema,
   type CreatePurchaseInput,
@@ -33,12 +34,14 @@ export async function getPurchases() {
       items: {
         include: { product: { select: { id: true, name: true, code: true } } },
       },
+      contragent: { select: { id: true, name: true } },
     },
     orderBy: { createdAt: "desc" },
   });
 
   return purchases.map((purchase: TPurchaseWithItems) => ({
     ...purchase,
+    contragentName: purchase.contragent?.name ?? null,
     items: purchase.items.map((item: TPurchaseItemWithProduct) => ({
       ...item,
       qty: Number(item.qty),
@@ -132,7 +135,7 @@ export async function createPurchase(
       return { success: false, error: parsed.error.issues[0].message };
     }
 
-    const { supplierName, note, paymentMethod, items } = parsed.data;
+    const { pointId, contragentId, note, paymentMethod, items } = parsed.data;
 
     // Verify all products belong to this org
     const productIds = items.map((i) => i.productId);
@@ -142,6 +145,37 @@ export async function createPurchase(
     });
     if (found.length !== new Set(productIds).size) {
       return { success: false, error: "One or more products not found" };
+    }
+
+    const point = await prisma.point.findFirst({
+      where: { id: pointId, organizationId: session.organizationId },
+    });
+    if (!point) return { success: false, error: "Nuqta topilmadi" };
+
+    const contragent = await prisma.contragent.findFirst({
+      where: {
+        id: contragentId,
+        organizationId: session.organizationId,
+        type: "SUPPLIER",
+      },
+    });
+    if (!contragent) return { success: false, error: "Sotuvchi (kontragent) topilmadi" };
+
+    // Har bir item'ning yacheykasi shu Point ostidagi skladga tegishli
+    // ekanligini tekshiramiz
+    const cellIds = items.map((i) => i.warehouseCellId);
+    const cells = await prisma.warehouseCell.findMany({
+      where: {
+        id: { in: cellIds },
+        warehouse: { pointId },
+      },
+      select: { id: true },
+    });
+    if (cells.length !== new Set(cellIds).size) {
+      return {
+        success: false,
+        error: "Yacheykalardan biri tanlangan nuqtaga tegishli emas",
+      };
     }
 
     const receiptNumber = generateReceiptNumber();
@@ -156,7 +190,8 @@ export async function createPurchase(
         data: {
           receiptNumber,
           organizationId: session.organizationId,
-          supplierName: supplierName?.trim() || null,
+          pointId,
+          contragentId,
           note: note?.trim() || null,
           paymentMethod,
           postedAt: new Date(),
@@ -165,6 +200,7 @@ export async function createPurchase(
               productId: item.productId,
               qty: item.qty,
               unitCost: item.unitCost,
+              warehouseCellId: item.warehouseCellId,
             })),
           },
         },
@@ -175,6 +211,7 @@ export async function createPurchase(
         data: items.map((item) => ({
           organizationId: session.organizationId,
           productId: item.productId,
+          warehouseCellId: item.warehouseCellId,
           docType: "PURCHASE",
           docId: doc.id,
           direction: "IN",
@@ -242,38 +279,96 @@ export async function deletePurchase(
   }
 }
 
-export async function updatePurchase(id: string, data: {
-  supplierName?: string;
-  note?: string;
-  items: {
-    productId: string;
-    qty: number;
-    unitCost: number;
-  }[];
-}) {
+export async function updatePurchase(
+  id: string,
+  data: CreatePurchaseInput
+): Promise<ActionResult<{ id: string }>> {
   try {
-    // eski itemlarni o‘chiramiz
-    await prisma.purchaseItem.deleteMany({
-      where: { purchaseId: id },
-    });
+    const session = await getServerSession();
+    if (!session) return { success: false, error: "Unauthorized" };
 
-    // purchase update
-    const purchase = await prisma.purchase.update({
-      where: { id },
-      data: {
-        supplierName: data.supplierName,
-        note: data.note,
-        items: {
-          create: data.items,
+    const denied = checkPermission(session.role, "purchases:create");
+    if (denied) return denied;
+
+    const parsed = CreatePurchaseSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+    const { pointId, contragentId, note, paymentMethod, items } = parsed.data;
+
+    const existing = await prisma.purchase.findFirst({
+      where: { id, organizationId: session.organizationId },
+    });
+    if (!existing) return { success: false, error: "Purchase not found" };
+
+    const point = await prisma.point.findFirst({
+      where: { id: pointId, organizationId: session.organizationId },
+    });
+    if (!point) return { success: false, error: "Nuqta topilmadi" };
+
+    const contragent = await prisma.contragent.findFirst({
+      where: { id: contragentId, organizationId: session.organizationId, type: "SUPPLIER" },
+    });
+    if (!contragent) return { success: false, error: "Sotuvchi (kontragent) topilmadi" };
+
+    const cellIds = items.map((i) => i.warehouseCellId);
+    const cells = await prisma.warehouseCell.findMany({
+      where: { id: { in: cellIds }, warehouse: { pointId } },
+      select: { id: true },
+    });
+    if (cells.length !== new Set(cellIds).size) {
+      return {
+        success: false,
+        error: "Yacheykalardan biri tanlangan nuqtaga tegishli emas",
+      };
+    }
+
+    await prisma.$transaction(async (tx: TxClient) => {
+      // Eski itemlar va shu hujjatga tegishli ombor yozuvlarini olib tashlaymiz
+      await tx.purchaseItem.deleteMany({ where: { receiptId: id } });
+      await tx.inventoryRegister.deleteMany({
+        where: { docType: "PURCHASE", docId: id },
+      });
+
+      await tx.purchase.update({
+        where: { id },
+        data: {
+          pointId,
+          contragentId,
+          note: note?.trim() || null,
+          paymentMethod,
+          items: {
+            create: items.map((item) => ({
+              productId: item.productId,
+              qty: item.qty,
+              unitCost: item.unitCost,
+              warehouseCellId: item.warehouseCellId,
+            })),
+          },
         },
-      },
-      include: {
-        items: true,
-      },
+      });
+
+      await tx.inventoryRegister.createMany({
+        data: items.map((item) => ({
+          organizationId: session.organizationId,
+          productId: item.productId,
+          warehouseCellId: item.warehouseCellId,
+          docType: "PURCHASE",
+          docId: id,
+          direction: "IN",
+          qty: item.qty,
+          unitCost: item.unitCost,
+        })),
+      });
     });
 
-    return { success: true, data: purchase };
-  } catch (e) {
+    revalidatePath("/purchases");
+    revalidatePath("/products");
+    revalidatePath("/warehouses");
+
+    return { success: true, data: { id } };
+  } catch (err) {
+    console.error("[updatePurchase]", err);
     return { success: false, error: "Update failed" };
   }
 }

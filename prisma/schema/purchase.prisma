@@ -3,7 +3,8 @@ model Purchase {
   receiptNumber  String   @unique
 
   organizationId String
-  supplierName   String?
+  pointId        String?  // qaysi nuqtaga kirim qilingani
+  contragentId   String?  // sotuvchi (Contragent, type=SUPPLIER)
   note           String?
   paymentMethod  String   @default("cash") // cash | card | qr
 
@@ -13,19 +14,23 @@ model Purchase {
   updatedAt      DateTime @updatedAt
 
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  point          Point?       @relation(fields: [pointId], references: [id])
+  contragent     Contragent?  @relation(fields: [contragentId], references: [id])
   items          PurchaseItem[]
   returns        PurchaseReturn[]
 }
 
 model PurchaseItem {
-  id         String   @id @default(cuid())
-  receiptId  String
-  productId  String
+  id              String   @id @default(cuid())
+  receiptId       String
+  productId       String
+  warehouseCellId String?  // tovar qaysi sklad yacheykasiga kirim qilingani
 
   qty        Decimal  // for PostgreSQL @db.Decimal(14, 3)
   unitCost   Decimal  // for PostgreSQL @db.Decimal(14, 2)
 
   receipt    Purchase @relation(fields: [receiptId], references: [id], onDelete: Cascade)
   product    Product @relation(fields: [productId], references: [id])
+  warehouseCell WarehouseCell? @relation(fields: [warehouseCellId], references: [id])
   returnItems PurchaseReturnItem[]
 }

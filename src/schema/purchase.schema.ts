@@ -4,10 +4,12 @@ export const PurchaseItemSchema = z.object({
   productId: z.string().min(1, "Product is required"),
   qty: z.number({ error: "Qty must be a number" }).positive("Qty must be positive"),
   unitCost: z.number({ error: "Unit cost must be a number" }).nonnegative("Unit cost cannot be negative"),
+  warehouseCellId: z.string().min(1, "Yacheyka tanlanishi shart"),
 });
 
 export const CreatePurchaseSchema = z.object({
-  supplierName: z.string().optional(),
+  pointId: z.string().min(1, "Nuqta tanlanishi shart"),
+  contragentId: z.string().min(1, "Sotuvchi (kontragent) tanlanishi shart"),
   note: z.string().optional(),
   paymentMethod: z.enum(["CASH", "CARD", "QR"]).default("CASH"),
   items: z

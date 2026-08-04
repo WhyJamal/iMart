@@ -237,3 +237,163 @@ export async function deleteWarehouse(
     return { success: false, error: "Skladni o'chirib bo'lmadi" };
   }
 }
+
+// ─── Point-level stock (Purchases/POS integratsiyasi uchun) ───────────────────
+
+/**
+ * Point'ga tegishli barcha sklad yacheykalarining id'lari.
+ */
+async function getCellIdsForPoint(pointId: string): Promise<string[]> {
+  const cells = await prisma.warehouseCell.findMany({
+    where: { warehouse: { pointId } },
+    select: { id: true },
+  });
+  return cells.map((c: (typeof cells)[number]) => c.id);
+}
+
+/**
+ * Berilgan Point'dagi (uning skladlari/yacheykalari bo'yicha jamlangan)
+ * har bir mahsulot uchun joriy qoldiq. POS'da sotish uchun ishlatiladi.
+ */
+export async function getPointStockMap(
+  pointId: string
+): Promise<Map<string, number>> {
+  const cellIds = await getCellIdsForPoint(pointId);
+  const map = new Map<string, number>();
+  if (cellIds.length === 0) return map;
+
+  const rows = await prisma.inventoryRegister.groupBy({
+    by: ["productId", "direction"],
+    where: { warehouseCellId: { in: cellIds } },
+    _sum: { qty: true },
+  });
+
+  for (const row of rows) {
+    const val = Number(row._sum.qty ?? 0);
+    const prev = map.get(row.productId) ?? 0;
+    map.set(row.productId, row.direction === "IN" ? prev + val : prev - val);
+  }
+  return map;
+}
+
+/**
+ * Sotuvda bitta mahsulotni Point ostidagi yacheykalardan "greedy"
+ * usulda yechib olish uchun — har bir yacheykadagi joriy qoldiqni
+ * eng ko'pidan kamiga qarab qaytaradi. sale-actions.ts shu ro'yxatdan
+ * kerakli miqdorni yig'ib, har biriga alohida InventoryRegister OUT
+ * yozuvi yozadi.
+ */
+export async function getSellableCellsForProduct(
+  pointId: string,
+  productId: string,
+  tx?: TxClient
+): Promise<{ warehouseCellId: string; available: number }[]> {
+  const client = tx ?? prisma;
+  const cellIds = await getCellIdsForPoint(pointId);
+  if (cellIds.length === 0) return [];
+
+  const rows = await client.inventoryRegister.groupBy({
+    by: ["warehouseCellId", "direction"],
+    where: { warehouseCellId: { in: cellIds }, productId },
+    _sum: { qty: true },
+  });
+
+  const map = new Map<string, number>();
+  for (const row of rows) {
+    if (!row.warehouseCellId) continue;
+    const val = Number(row._sum.qty ?? 0);
+    const prev = map.get(row.warehouseCellId) ?? 0;
+    map.set(
+      row.warehouseCellId,
+      row.direction === "IN" ? prev + val : prev - val
+    );
+  }
+
+  return Array.from(map.entries())
+    .map(([warehouseCellId, available]) => ({ warehouseCellId, available }))
+    .filter((c) => c.available > 0)
+    .sort((a, b) => b.available - a.available);
+}
+
+/**
+ * getPointStockMap() Map qaytaradi — Server Action orqali client'ga
+ * to'g'ridan-to'g'ri yuborish uchun oddiy object'ga aylantiradi.
+ * pos-terminal.tsx Point o'zgarganda shuni chaqiradi.
+ */
+export async function getPointStockRecord(
+  pointId: string
+): Promise<Record<string, number>> {
+  const map = await getPointStockMap(pointId);
+  return Object.fromEntries(map);
+}
+
+export interface ICellStockOption {
+  warehouseCellId: string;
+  cellName: string;
+  warehouseName: string;
+  available: number;
+}
+
+/**
+ * Point ostidagi HAR BIR mahsulot uchun qaysi yacheykada qancha bor
+ * ekanini qaytaradi (eng ko'pidan kamiga saralangan). POS'da savatga
+ * mahsulot qo'shilganda avtomatik eng ko'p qoldiqli yacheyka
+ * tanlanadi, kassir xohlasa boshqasiga o'zgartiradi.
+ */
+export async function getPointCellStock(
+  pointId: string
+): Promise<Record<string, ICellStockOption[]>> {
+  const cells = await prisma.warehouseCell.findMany({
+    where: { warehouse: { pointId } },
+    include: { warehouse: { select: { name: true } } },
+  });
+  if (cells.length === 0) return {};
+
+  const cellIds = cells.map((c: (typeof cells)[number]) => c.id);
+  const cellInfo = new Map<string, { cellName: string; warehouseName: string }>(
+    cells.map((c: (typeof cells)[number]) => [
+      c.id,
+      { cellName: c.name, warehouseName: c.warehouse.name },
+    ])
+  );
+
+  const rows = await prisma.inventoryRegister.groupBy({
+    by: ["productId", "warehouseCellId", "direction"],
+    where: { warehouseCellId: { in: cellIds } },
+    _sum: { qty: true },
+  });
+
+  // productId -> cellId -> qty
+  const byProduct = new Map<string, Map<string, number>>();
+  for (const row of rows) {
+    if (!row.warehouseCellId) continue;
+    const val = Number(row._sum.qty ?? 0);
+    if (!byProduct.has(row.productId)) byProduct.set(row.productId, new Map());
+    const cellMap = byProduct.get(row.productId)!;
+    const prev = cellMap.get(row.warehouseCellId) ?? 0;
+    cellMap.set(
+      row.warehouseCellId,
+      row.direction === "IN" ? prev + val : prev - val
+    );
+  }
+
+  const result: Record<string, ICellStockOption[]> = {};
+  for (const [productId, cellMap] of byProduct.entries()) {
+    const options = Array.from(cellMap.entries())
+      .map(([warehouseCellId, available]) => {
+        const info = cellInfo.get(warehouseCellId);
+        return {
+          warehouseCellId,
+          cellName: info?.cellName ?? "",
+          warehouseName: info?.warehouseName ?? "",
+          available,
+        };
+      })
+      .filter((c) => c.available > 0)
+      .sort((a, b) => b.available - a.available);
+
+    if (options.length > 0) result[productId] = options;
+  }
+
+  return result;
+}

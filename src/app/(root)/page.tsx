@@ -5,6 +5,7 @@ import { RevenueTrendChart } from "./_components/revenue-trend-chart";
 import { MonthlyOverviewChart } from "./_components/monthly-overview-chart";
 import { PaymentMethodChart } from "./_components/payment-method-chart";
 import { TopProductsChart } from "./_components/top-products-chart";
+import { PointRevenueChart } from "./_components/point-revenue-chart";
 
 import {
   Wallet,
@@ -70,6 +71,10 @@ export default async function DashboardPage() {
       <div className="grid gap-6 xl:grid-cols-2">
         <PaymentMethodChart data={stats.paymentBreakdown} />
         <TopProductsChart data={stats.topProducts} />
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-1">
+        <PointRevenueChart data={stats.pointRevenue} />
       </div>
 
     </div>

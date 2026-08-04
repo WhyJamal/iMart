@@ -10,6 +10,7 @@ import type { IProduct } from "@/types/product.types";
 import type { TSaleWithItems, TSerializedSale } from "@/types/sale.types";
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
+import { getPointStockMap, getSellableCellsForProduct } from "@/actions/warehouse-actions";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -98,7 +99,7 @@ export async function createSale(
       return { success: false, error: parsed.error.issues[0].message };
     }
 
-    const { items } = parsed.data;
+    const { pointId, items } = parsed.data;
 
     // ── 1. Fetch products ──────────────────────────────────────────────────
     const productIds = items.map((i) => i.productId);
@@ -111,25 +112,13 @@ export async function createSale(
       return { success: false, error: "One or more products not found" };
     }
 
-    // ── 2. Stock check ────────────────────────────────────────────────────
-    const stockRows = await prisma.inventoryRegister.groupBy({
-      by: ["productId", "direction"],
-      where: {
-        productId: { in: productIds },
-        organizationId: session.organizationId,
-      },
-      _sum: { qty: true },
+    const point = await prisma.point.findFirst({
+      where: { id: pointId, organizationId: session.organizationId },
     });
+    if (!point) return { success: false, error: "Nuqta topilmadi" };
 
-    const stockMap = new Map<string, number>();
-    for (const row of stockRows) {
-      const val = Number(row._sum.qty ?? 0);
-      const prev = stockMap.get(row.productId) ?? 0;
-      stockMap.set(
-        row.productId,
-        row.direction === "IN" ? prev + val : prev - val
-      );
-    }
+    // ── 2. Stock check (shu Point ostidagi skladlar bo'yicha) ──────────────
+    const stockMap = await getPointStockMap(pointId);
 
     for (const item of items) {
       const available = stockMap.get(item.productId) ?? 0;
@@ -137,7 +126,7 @@ export async function createSale(
         const product = products.find((p: IProduct) => p.id === item.productId);
         return {
           success: false,
-          error: `Insufficient stock for "${product?.name ?? item.productId}". Available: ${available}`,
+          error: `Insufficient stock for "${product?.name ?? item.productId}" at this point. Available: ${available}`,
         };
       }
     }
@@ -157,6 +146,7 @@ export async function createSale(
           saleNumber,
           organizationId: session.organizationId,
           cashierId: session.userId ?? null,
+          pointId,
           totalAmount: parsed.data.totalAmount,
           paymentMethod: parsed.data.paymentMethod,
           items: {
@@ -169,18 +159,42 @@ export async function createSale(
         },
       });
 
-      // Write OUT movements to the inventory ledger
-      await tx.inventoryRegister.createMany({
-        data: items.map((item) => ({
-          organizationId: session.organizationId,
-          productId: item.productId,
-          docType: "SALE",
-          docId: doc.id,
-          direction: "OUT",
-          qty: item.qty,
-          unitCost: null, // cost not known at POS level
-        })),
-      });
+      // Har bir mahsulot uchun Point ostidagi yacheykalardan "greedy"
+      // usulda yechib, har biriga alohida OUT yozuvi yoziladi.
+      for (const item of items) {
+        const cells = await getSellableCellsForProduct(
+          pointId,
+          item.productId,
+          tx
+        );
+
+        let remaining = item.qty;
+        for (const cell of cells) {
+          if (remaining <= 0) break;
+          const take = Math.min(remaining, cell.available);
+          await tx.inventoryRegister.create({
+            data: {
+              organizationId: session.organizationId,
+              productId: item.productId,
+              warehouseCellId: cell.warehouseCellId,
+              docType: "SALE",
+              docId: doc.id,
+              direction: "OUT",
+              qty: take,
+              unitCost: null,
+            },
+          });
+          remaining -= take;
+        }
+
+        if (remaining > 0) {
+          // Stock check yuqorida o'tgan bo'lsa ham, race condition
+          // ehtimoliga qarshi xavfsizlik uchun.
+          throw new Error(
+            `Insufficient stock for product ${item.productId} at this point`
+          );
+        }
+      }
 
       // Write IN movement to the cash register (kassa)
       await recordCashFlow(tx, {

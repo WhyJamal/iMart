@@ -1,16 +1,18 @@
-model Point {
+// Kontragent — sotuvchi (SUPPLIER) yoki xaridor (BUYER). Hozircha
+// faqat Purchase (kirim) sotuvchi tanlashda ishlatiladi.
+model Contragent {
   id             String   @id @default(cuid())
   organizationId String
   name           String
+  phone          String?
+  inn            String?
+  type           String   @default("SUPPLIER") // SUPPLIER | BUYER
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  warehouses     Warehouse[]
-  users          User[]
   purchases      Purchase[]
-  sales          Sale[]
 
-  @@index([organizationId])
+  @@index([organizationId, type])
 }

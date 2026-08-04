@@ -14,6 +14,7 @@ export const PAGES = {
     SALARY: "/salary",
     POINTS: "/points",
     WAREHOUSES: "/warehouses",
+    CONTRAGENTS: "/contragents",
     
     PROFILE: "/u/profile",
     USER_PROFILE: (userId: string) => `/u/profile/${userId}`,

@@ -45,7 +45,7 @@ interface PurchaseItem {
 interface Purchase {
   id: string;
   receiptNumber: string;
-  supplierName: string | null;
+  contragentName?: string | null;
   note: string | null;
   postedAt: Date | null;
   createdAt: Date;
@@ -102,7 +102,7 @@ function PurchaseRow({ purchase }: { purchase: Purchase }) {
         <TableCell className="font-mono text-sm">
           {purchase.receiptNumber}
         </TableCell>
-        <TableCell>{purchase.supplierName ?? "—"}</TableCell>
+        <TableCell>{purchase.contragentName ?? "—"}</TableCell>
         <TableCell>
           <Badge variant="secondary">{purchase.items.length} items</Badge>
         </TableCell>
@@ -212,7 +212,7 @@ export function PurchaseList({ purchases }: Props) {
         <TableRow>
           <TableHead className="w-6" />
           <TableHead>Receipt #</TableHead>
-          <TableHead>Supplier</TableHead>
+          <TableHead>Contragent</TableHead>
           <TableHead>Items</TableHead>
           <TableHead>Total</TableHead>
           <TableHead>Date</TableHead>

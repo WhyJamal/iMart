@@ -12,6 +12,7 @@ export const SIDEBARITEMS: ISidebar[] = [
       { id: "sales", label: "Продажи", icon: "receipt", href: PAGES.SALES },
       { id: "cash", label: "Касса", icon: "landmark", href: PAGES.CASH, permission: "cash:read" },
       { id: "points", label: "Точки", icon: "map-pin", href: PAGES.POINTS, permission: "warehouses:manage" },
+      { id: "contragents", label: "Контрагенты", icon: "building", href: PAGES.CONTRAGENTS, permission: "contragents:manage" },
     ],
   },
   {
