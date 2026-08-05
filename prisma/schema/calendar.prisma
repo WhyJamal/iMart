@@ -1,0 +1,56 @@
+// WorkCalendar — 1C ERP dagi "Производственный календарь" patternidagi
+// yillik ish kalendari. Har bir tashkilot uchun yiliga bitta yozuv:
+// to'ldirilganda (create paytida) nomi avtomatik qo'yiladi ("Ish
+// kalendari 2027"), tasdiqlangach (isConfirmed) tahrirlash qulflanadi.
+// Standart qoida: Dush-Juma — ish kuni, Shanba-Yakshanba — dam olish.
+// Shu qoidadan chetga chiquvchi kunlar (bayram, ko'chirilgan ish kuni,
+// qisqartirilgan kun) WorkCalendarDay'da alohida saqlanadi — bo'sh
+// kunlar uchun qatorlar generatsiya qilinmaydi, hisoblash paytida
+// standart qoida + shu istisnolar bo'yicha aniqlanadi.
+//
+// MUHIM: bu yerda ish SOATLARI saqlanmaydi — u alohida "Grafik работы"
+// spravochnigida (keyingi bosqich) bo'ladi: har bir xodimga o'z grafigi
+// (smena turi, kunlik/haftalik soat) biriktiriladi. WorkCalendar faqat
+// kun toifasini (ish/dam/bayram/qisqa) belgilaydi — bu toifa qaysi
+// grafikka biriktirilgan xodimga ham baravar qo'llanadi. Tabel shu
+// kalendar + xodimning grafigi kesishmasidan hisoblanadi.
+model WorkCalendar {
+  id             String    @id @default(cuid())
+  organizationId String
+  year           Int
+
+  name           String    // "Ish kalendari 2027" — yaratilganda avtomatik qo'yiladi
+
+  isConfirmed    Boolean   @default(false) // tasdiqlangach tahrirlash qulflanadi
+  confirmedAt    DateTime?
+  createdBy      String?
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  days           WorkCalendarDay[]
+
+  @@unique([organizationId, year])
+  @@index([organizationId, year])
+}
+
+// WorkCalendarDay — standart Dush-Juma/Shanba-Yakshanba qoidasidan
+// chetga chiquvchi faqat bitta kun uchun istisno yozuvi.
+// dayType: HOLIDAY (bayram/dam olish kuni), SHORT (predprazdnichniy —
+// qisqartirilgan ish kuni), WORKDAY (dam olish kuni ish kuniga
+// ko'chirilgan holat, masalan bayram tufayli).
+model WorkCalendarDay {
+  id          String   @id @default(cuid())
+  calendarId  String
+
+  date        DateTime
+  dayType     String   // HOLIDAY | SHORT | WORKDAY
+  title       String?  // masalan "Navro'z bayrami"
+  shortenedBy Decimal? // SHORT uchun necha soatga qisqaradi, for PostgreSQL @db.Decimal(4, 2)
+
+  calendar    WorkCalendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
+
+  @@unique([calendarId, date])
+  @@index([calendarId, date])
+}

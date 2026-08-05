@@ -27,3 +27,12 @@ export interface IWarehouseStockRow {
   productCode: string;
   qty: number;
 }
+
+// POS'da bitta mahsulot uchun qaysi yacheykalarda qancha bor ekani
+// (eng ko'pidan kamiga saralangan)
+export interface ICellStockOption {
+  warehouseCellId: string;
+  cellName: string;
+  warehouseName: string;
+  available: number;
+}

@@ -15,7 +15,8 @@ export type TIcon =
     | "badge-dollar"
     | "map-pin"
     | "warehouse"
-    | "building";
+    | "building"
+    | "calendar";
 
     export type TItem = {
     id: string;

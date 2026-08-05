@@ -4,6 +4,7 @@ export const SaleItemSchema = z.object({
   productId: z.string().min(1, "Product is required"),
   qty: z.number({ error: "Qty must be a number" }).positive("Qty must be positive"),
   unitPrice: z.number({ error: "Unit price must be a number" }).nonnegative("Unit price cannot be negative"),
+  warehouseCellId: z.string().min(1, "Yacheyka tanlanishi shart"),
 });
 
 export const CreateSaleSchema = z.object({

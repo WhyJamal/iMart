@@ -20,6 +20,7 @@ model Organization {
 
   salaryRegisters    SalaryRegister[]
   payrollPayments    PayrollPayment[]
+  workCalendars      WorkCalendar[]
 
   cashRegister       CashRegister?
   bankAccount        BankAccount?

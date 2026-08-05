@@ -20,6 +20,7 @@ import {
     Warehouse,
     MapPin,
     Building,
+    Calendar,
 } from "lucide-react";
 
 const icons = {
@@ -38,6 +39,7 @@ const icons = {
     warehouse: Warehouse,
     "map-pin": MapPin,
     "building": Building,
+    calendar: Calendar,
 };
 
 export function SidebarNavItem({

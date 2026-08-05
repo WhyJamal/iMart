@@ -10,6 +10,7 @@ export const PAGES = {
     RETURNS: "/returns",
     PURCHASE_RETURNS: "/purchase-returns",
     USERS: "/users",
+    CALENDAR: "/calendar",
     PAYROLL: "/payroll",
     SALARY: "/salary",
     POINTS: "/points",

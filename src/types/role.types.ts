@@ -21,4 +21,5 @@ export type Permission =
   | "payroll:read"
   | "payroll:manage"
   | "warehouses:manage"
-  | "contragents:manage";
+  | "contragents:manage"
+  | "calendar:manage";

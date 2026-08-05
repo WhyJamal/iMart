@@ -10,7 +10,6 @@ import type { IProduct } from "@/types/product.types";
 import type { TSaleWithItems, TSerializedSale } from "@/types/sale.types";
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
-import { getPointStockMap, getSellableCellsForProduct } from "@/actions/warehouse-actions";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -83,9 +82,12 @@ export async function getSaleById(id: string) {
  * Steps (inside one transaction):
  *  1. Validate input with zod.
  *  2. Verify every product belongs to the org.
- *  3. Check stock sufficiency for every item.
- *  4. Create Sale + SaleItems.
- *  5. Write OUT movements to InventoryRegister.
+ *  3. Verify every item's warehouseCellId belongs to a warehouse under
+ *     the selected Point, and has enough stock — EXACTLY the cell the
+ *     cashier chose (or auto-selected) in the POS UI, no substitution.
+ *  4. Create Sale + SaleItems (with warehouseCellId).
+ *  5. Write OUT movements to InventoryRegister — one row per item,
+ *     against that specific cell.
  */
 export async function createSale(
   input: CreateSaleInput
@@ -117,25 +119,47 @@ export async function createSale(
     });
     if (!point) return { success: false, error: "Nuqta topilmadi" };
 
-    // ── 2. Stock check (shu Point ostidagi skladlar bo'yicha) ──────────────
-    const stockMap = await getPointStockMap(pointId);
+    // ── 2. Har bir item'ning tanlangan yacheykasi shu Point ostidagi
+    // skladga tegishli ekanligini tekshiramiz ──────────────────────────────
+    const cellIds = items.map((i) => i.warehouseCellId);
+    const cells = await prisma.warehouseCell.findMany({
+      where: { id: { in: cellIds }, warehouse: { pointId } },
+      select: { id: true },
+    });
+    if (cells.length !== new Set(cellIds).size) {
+      return {
+        success: false,
+        error: "Yacheykalardan biri tanlangan nuqtaga tegishli emas",
+      };
+    }
+
+    // ── 3. Har bir tanlangan yacheykaning joriy qoldig'ini tekshiramiz ─────
+    const cellStockRows = await prisma.inventoryRegister.groupBy({
+      by: ["warehouseCellId", "direction"],
+      where: { warehouseCellId: { in: cellIds } },
+      _sum: { qty: true },
+    });
+    const cellStockMap = new Map<string, number>();
+    for (const row of cellStockRows) {
+      if (!row.warehouseCellId) continue;
+      const val = Number(row._sum.qty ?? 0);
+      const prev = cellStockMap.get(row.warehouseCellId) ?? 0;
+      cellStockMap.set(
+        row.warehouseCellId,
+        row.direction === "IN" ? prev + val : prev - val
+      );
+    }
 
     for (const item of items) {
-      const available = stockMap.get(item.productId) ?? 0;
+      const available = cellStockMap.get(item.warehouseCellId) ?? 0;
       if (available < item.qty) {
         const product = products.find((p: IProduct) => p.id === item.productId);
         return {
           success: false,
-          error: `Insufficient stock for "${product?.name ?? item.productId}" at this point. Available: ${available}`,
+          error: `Insufficient stock for "${product?.name ?? item.productId}" in the selected cell. Available: ${available}`,
         };
       }
     }
-
-    // // ── 3. Calculate total ────────────────────────────────────────────────
-    // const totalAmount = items.reduce(
-    //   (sum, item) => sum + item.qty * item.unitPrice,
-    //   0
-    // );
 
     const saleNumber = generateSaleNumber();
 
@@ -154,47 +178,27 @@ export async function createSale(
               productId: item.productId,
               qty: item.qty,
               unitPrice: item.unitPrice,
+              warehouseCellId: item.warehouseCellId,
             })),
           },
         },
       });
 
-      // Har bir mahsulot uchun Point ostidagi yacheykalardan "greedy"
-      // usulda yechib, har biriga alohida OUT yozuvi yoziladi.
-      for (const item of items) {
-        const cells = await getSellableCellsForProduct(
-          pointId,
-          item.productId,
-          tx
-        );
-
-        let remaining = item.qty;
-        for (const cell of cells) {
-          if (remaining <= 0) break;
-          const take = Math.min(remaining, cell.available);
-          await tx.inventoryRegister.create({
-            data: {
-              organizationId: session.organizationId,
-              productId: item.productId,
-              warehouseCellId: cell.warehouseCellId,
-              docType: "SALE",
-              docId: doc.id,
-              direction: "OUT",
-              qty: take,
-              unitCost: null,
-            },
-          });
-          remaining -= take;
-        }
-
-        if (remaining > 0) {
-          // Stock check yuqorida o'tgan bo'lsa ham, race condition
-          // ehtimoliga qarshi xavfsizlik uchun.
-          throw new Error(
-            `Insufficient stock for product ${item.productId} at this point`
-          );
-        }
-      }
+      // Har bir item — kassir POS'da aniq tanlagan (yoki avtomatik
+      // tanlangan) bitta yacheykadan yechiladi. Boshqa yacheykaga
+      // "sakrash" yo'q.
+      await tx.inventoryRegister.createMany({
+        data: items.map((item) => ({
+          organizationId: session.organizationId,
+          productId: item.productId,
+          warehouseCellId: item.warehouseCellId,
+          docType: "SALE",
+          docId: doc.id,
+          direction: "OUT",
+          qty: item.qty,
+          unitCost: null,
+        })),
+      });
 
       // Write IN movement to the cash register (kassa)
       await recordCashFlow(tx, {
