@@ -19,29 +19,29 @@ export default async function PurchaseReturnsPage({
   const returns = await getPurchaseReturns();
 
   return (
-    <div className="p-6 space-y-6">
-      {isNew && (
-        <DrawerBackdrop>
-          <PurchaseReturnForm />
-        </DrawerBackdrop>
-      )}
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Supplier returns</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            Ta'minotchiga tovar qaytarish — eskirgan/nosoz tovarlar uchun
-          </p>
+    <>
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Supplier returns</h1>
+            <p className="text-muted-foreground text-sm mt-0.5">
+              Ta'minotchiga tovar qaytarish — eskirgan/nosoz tovarlar uchun
+            </p>
+          </div>
+          <Button asChild>
+            <Link href={`${PAGES.PURCHASE_RETURNS}?new=1`}>
+              <Plus className="w-4 h-4 mr-1" />
+              New return
+            </Link>
+          </Button>
         </div>
-        <Button asChild>
-          <Link href={`${PAGES.PURCHASE_RETURNS}?new=1`}>
-            <Plus className="w-4 h-4 mr-1" />
-            New return
-          </Link>
-        </Button>
+
+        <PurchaseReturnList returns={returns} />
       </div>
 
-      <PurchaseReturnList returns={returns} />
-    </div>
+      <DrawerBackdrop isOpen={isNew === "1"}>
+        <PurchaseReturnForm />
+      </DrawerBackdrop>
+    </>
   );
 }

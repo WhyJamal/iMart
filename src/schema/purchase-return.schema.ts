@@ -5,6 +5,9 @@ export const PurchaseReturnItemSchema = z.object({
   qty: z
     .number({ error: "Qty must be a number" })
     .positive("Qty must be positive"),
+  unitCost: z
+    .number({ error: "Unit cost must be a number" })
+    .nonnegative("Unit cost cannot be negative"),
 });
 
 export const CreatePurchaseReturnSchema = z.object({

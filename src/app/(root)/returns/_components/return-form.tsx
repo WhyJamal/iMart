@@ -34,6 +34,8 @@ export function ReturnForm({ onClose }: Props) {
 
   // saleItemId -> qty to return
   const [qtyMap, setQtyMap] = useState<Record<string, number>>({});
+  // saleItemId -> qaytarish narxi (default — asl sotuv narxi, o'zgartirsa bo'ladi)
+  const [priceMap, setPriceMap] = useState<Record<string, number>>({});
   const [reason, setReason] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "qr">(
     "cash"
@@ -55,6 +57,14 @@ export function ReturnForm({ onClose }: Props) {
       setNotFound(!result);
       setSale(result);
       setQtyMap({});
+      // Har bir item uchun default narx — asl sotuv narxi
+      if (result) {
+        const defaults: Record<string, number> = {};
+        for (const item of result.items) defaults[item.id] = item.unitPrice;
+        setPriceMap(defaults);
+      } else {
+        setPriceMap({});
+      }
     });
   };
 
@@ -63,13 +73,17 @@ export function ReturnForm({ onClose }: Props) {
     setQtyMap((prev) => ({ ...prev, [saleItemId]: clamped }));
   };
 
+  const setPrice = (saleItemId: string, value: number) => {
+    setPriceMap((prev) => ({ ...prev, [saleItemId]: Math.max(0, value) }));
+  };
+
   const selectedItems = sale
     ? sale.items
         .filter((i) => (qtyMap[i.id] ?? 0) > 0)
         .map((i) => ({
           saleItemId: i.id,
           qty: qtyMap[i.id],
-          unitPrice: i.unitPrice,
+          unitPrice: priceMap[i.id] ?? i.unitPrice,
         }))
     : [];
 
@@ -91,9 +105,10 @@ export function ReturnForm({ onClose }: Props) {
         saleId: sale.id,
         reason: reason || undefined,
         paymentMethod,
-        items: selectedItems.map(({ saleItemId, qty }) => ({
+        items: selectedItems.map(({ saleItemId, qty, unitPrice }) => ({
           saleItemId,
           qty,
+          unitPrice,
         })),
       });
 
@@ -151,17 +166,18 @@ export function ReturnForm({ onClose }: Props) {
 
             {/* Items */}
             <div className="space-y-3">
-              <div className="grid grid-cols-[1fr_90px_100px_100px] gap-2 text-xs font-medium text-muted-foreground px-1">
+              <div className="grid grid-cols-[1fr_80px_90px_90px_100px] gap-2 text-xs font-medium text-muted-foreground px-1">
                 <span>Product</span>
                 <span className="text-right">Sold</span>
                 <span className="text-right">Returnable</span>
                 <span className="text-right">Return qty</span>
+                <span className="text-right">Return price</span>
               </div>
 
               {sale.items.map((item) => (
                 <div
                   key={item.id}
-                  className="grid grid-cols-[1fr_90px_100px_100px] gap-2 items-center"
+                  className="grid grid-cols-[1fr_80px_90px_90px_100px] gap-2 items-center"
                 >
                   <div>
                     <div className="text-sm font-medium">
@@ -189,6 +205,14 @@ export function ReturnForm({ onClose }: Props) {
                         item.returnableQty
                       )
                     }
+                  />
+                  <Input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    value={priceMap[item.id] ?? item.unitPrice}
+                    disabled={item.returnableQty === 0}
+                    onChange={(e) => setPrice(item.id, Number(e.target.value))}
                   />
                 </div>
               ))}

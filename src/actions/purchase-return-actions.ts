@@ -16,6 +16,7 @@ import type {
 } from "@/types/purchase-return.types";
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
+import { applyStockMovement } from "@/actions/stock-actions";
 import type { PurchaseItem } from "@/generated/prisma/client";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -38,7 +39,11 @@ export async function getPurchaseReturns(): Promise<
     where: { organizationId: session.organizationId },
     include: {
       purchase: {
-        select: { id: true, receiptNumber: true, supplierName: true },
+        select: {
+          id: true,
+          receiptNumber: true,
+          contragent: { select: { name: true } },
+        },
       },
       items: {
         include: {
@@ -51,6 +56,7 @@ export async function getPurchaseReturns(): Promise<
 
   return (returns as TPurchaseReturnWithItems[]).map((r) => ({
     ...r,
+    contragentName: r.purchase.contragent?.name ?? null,
     totalAmount: Number(r.totalAmount),
     items: r.items.map((item: TPurchaseReturnWithItems["items"][number]) => ({
       ...item,
@@ -78,6 +84,7 @@ export async function findPurchaseForReturn(
       organizationId: session.organizationId,
     },
     include: {
+      contragent: { select: { name: true } },
       items: {
         include: {
           product: { select: { id: true, name: true, code: true } },
@@ -121,7 +128,7 @@ export async function findPurchaseForReturn(
   return {
     id: purchase.id,
     receiptNumber: purchase.receiptNumber,
-    supplierName: purchase.supplierName,
+    contragentName: purchase.contragent?.name ?? null,
     createdAt: purchase.createdAt,
     items: purchase.items.map(
       (item: PurchaseItem & { product: { id: string; name: string; code: string } }) => {
@@ -137,6 +144,7 @@ export async function findPurchaseForReturn(
         return {
           id: item.id,
           productId: item.productId,
+          warehouseCellId: item.warehouseCellId ?? null,
           qty,
           unitCost: Number(item.unitCost),
           returnedQty,
@@ -246,7 +254,7 @@ export async function createPurchaseReturn(
         };
       }
 
-      totalAmount += item.qty * Number(purchaseItem.unitCost);
+      totalAmount += item.qty * item.unitCost;
     }
 
     const returnNumber = generateReturnNumber();
@@ -271,30 +279,43 @@ export async function createPurchaseReturn(
                 purchaseItemId: item.purchaseItemId,
                 productId: purchaseItem.productId,
                 qty: item.qty,
-                unitCost: Number(purchaseItem.unitCost),
+                unitCost: item.unitCost,
               };
             }),
           },
         },
       });
 
-      // Tovar ombordan chiqadi — ta'minotchiga jo'natiladi (OUT)
-      await tx.inventoryRegister.createMany({
-        data: items.map((item) => {
-          const purchaseItem = purchaseItems.find(
-            (pi: PurchaseItem) => pi.id === item.purchaseItemId
-          )!;
-          return {
+      // Tovar ombordan chiqadi — ta'minotchiga jo'natiladi (OUT).
+      // Narx (unitCost) — kassir kiritgan (yoki asl xariddan default
+      // olingan) qiymat, o'sha yacheykaning o'ziga qaytariladi.
+      for (const item of items) {
+        const purchaseItem = purchaseItems.find(
+          (pi: PurchaseItem) => pi.id === item.purchaseItemId
+        )!;
+        if (!purchaseItem.warehouseCellId) continue; // eski, joylashuvsiz xarid
+
+        await tx.inventoryRegister.create({
+          data: {
             organizationId: session.organizationId,
             productId: purchaseItem.productId,
+            warehouseCellId: purchaseItem.warehouseCellId,
             docType: "PURCHASE_RETURN",
             docId: doc.id,
             direction: "OUT",
             qty: item.qty,
-            unitCost: purchaseItem.unitCost,
-          };
-        }),
-      });
+            unitCost: item.unitCost,
+          },
+        });
+
+        await applyStockMovement(tx, {
+          warehouseCellId: purchaseItem.warehouseCellId,
+          productId: purchaseItem.productId,
+          direction: "OUT",
+          qty: item.qty,
+          unitCost: item.unitCost,
+        });
+      }
 
       // Pul ta'minotchidan qaytariladi — kassa/bank balansiga kirim (IN)
       await recordCashFlow(tx, {
@@ -339,6 +360,20 @@ export async function deletePurchaseReturn(
     if (!purchaseReturn) return { success: false, error: "Return not found" };
 
     await prisma.$transaction(async (tx: TxClient) => {
+      const registers = await tx.inventoryRegister.findMany({
+        where: { docType: "PURCHASE_RETURN", docId: id },
+      });
+      for (const reg of registers) {
+        if (!reg.warehouseCellId) continue;
+        await applyStockMovement(tx, {
+          warehouseCellId: reg.warehouseCellId,
+          productId: reg.productId,
+          direction: "IN", // eski OUT'ni bekor qilish uchun teskarisi
+          qty: Number(reg.qty),
+          unitCost: Number(reg.unitCost ?? 0),
+        });
+      }
+
       await tx.inventoryRegister.deleteMany({
         where: { docType: "PURCHASE_RETURN", docId: id },
       });

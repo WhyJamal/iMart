@@ -16,6 +16,7 @@ import type {
   IWarehouse,
   IWarehouseOption,
   IWarehouseStockRow,
+  ICellStockOption,
 } from "@/types/warehouse.types";
 
 export async function getWarehouses(): Promise<IWarehouse[]> {
@@ -327,13 +328,6 @@ export async function getPointStockRecord(
   return Object.fromEntries(map);
 }
 
-export interface ICellStockOption {
-  warehouseCellId: string;
-  cellName: string;
-  warehouseName: string;
-  available: number;
-}
-
 /**
  * Point ostidagi HAR BIR mahsulot uchun qaysi yacheykada qancha bor
  * ekanini qaytaradi (eng ko'pidan kamiga saralangan). POS'da savatga
@@ -363,6 +357,15 @@ export async function getPointCellStock(
     _sum: { qty: true },
   });
 
+  // ItemPrice — shu yacheykalardagi joriy narxlar
+  const priceRows = await prisma.itemPrice.findMany({
+    where: { warehouseCellId: { in: cellIds } },
+  });
+  const priceMap = new Map<string, number>(); // `${cellId}:${productId}` -> price
+  for (const p of priceRows) {
+    priceMap.set(`${p.warehouseCellId}:${p.productId}`, Number(p.price));
+  }
+
   // productId -> cellId -> qty
   const byProduct = new Map<string, Map<string, number>>();
   for (const row of rows) {
@@ -387,6 +390,7 @@ export async function getPointCellStock(
           cellName: info?.cellName ?? "",
           warehouseName: info?.warehouseName ?? "",
           available,
+          price: priceMap.get(`${warehouseCellId}:${productId}`) ?? 0,
         };
       })
       .filter((c) => c.available > 0)

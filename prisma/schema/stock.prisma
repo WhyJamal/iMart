@@ -1,0 +1,33 @@
+// ItemPrice (ЦенаНоменклатура) — JORIY holat, tarix emas. Har bir
+// (sklad yacheykasi, mahsulot) juftligi uchun hozirgi o'rtacha
+// vaznli tannarx. Har safar IN yoki OUT harakatdan keyin qayta
+// hisoblanadi (applyStockMovement() orqali).
+model ItemPrice {
+  id              String   @id @default(cuid())
+  warehouseCellId String
+  productId       String
+  price           Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  updatedAt       DateTime @updatedAt
+
+  warehouseCell WarehouseCell @relation(fields: [warehouseCellId], references: [id], onDelete: Cascade)
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([warehouseCellId, productId])
+}
+
+// StockBalance (ТоварыНаСкладах) — JORIY qoldiq + summa. InventoryRegister
+// (harakatlar jurnali) bilan bir vaqtda, bitta tranzaksiyada yangilanadi —
+// shunday qilib har safar butun tarixni yig'ib hisoblash shart bo'lmaydi.
+model StockBalance {
+  id              String   @id @default(cuid())
+  warehouseCellId String
+  productId       String
+  qty             Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 3)
+  amount          Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  updatedAt       DateTime @updatedAt
+
+  warehouseCell WarehouseCell @relation(fields: [warehouseCellId], references: [id], onDelete: Cascade)
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([warehouseCellId, productId])
+}

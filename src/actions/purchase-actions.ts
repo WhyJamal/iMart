@@ -13,6 +13,7 @@ import { TxClient } from "@/types/prisma.types";
 import type { TPurchaseItemWithProduct, TPurchaseWithItems } from "@/types/purchase.types";
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
+import { applyStockMovement } from "@/actions/stock-actions";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -220,6 +221,17 @@ export async function createPurchase(
         })),
       });
 
+      // ItemPrice (o'rtacha narx) va StockBalance (qoldiq+summa)ni yangilash
+      for (const item of items) {
+        await applyStockMovement(tx, {
+          warehouseCellId: item.warehouseCellId,
+          productId: item.productId,
+          direction: "IN",
+          qty: item.qty,
+          unitCost: item.unitCost,
+        });
+      }
+
       // Write OUT movement to the cash register (taminotchiga tolov)
       await recordCashFlow(tx, {
         organizationId: session.organizationId,
@@ -261,6 +273,20 @@ export async function deletePurchase(
     if (!purchase) return { success: false, error: "Purchase not found" };
 
     await prisma.$transaction(async (tx: TxClient) => {
+      const registers = await tx.inventoryRegister.findMany({
+        where: { docType: "PURCHASE", docId: id },
+      });
+      for (const reg of registers) {
+        if (!reg.warehouseCellId) continue;
+        await applyStockMovement(tx, {
+          warehouseCellId: reg.warehouseCellId,
+          productId: reg.productId,
+          direction: "OUT",
+          qty: Number(reg.qty),
+          unitCost: Number(reg.unitCost ?? 0),
+        });
+      }
+
       await tx.inventoryRegister.deleteMany({
         where: { docType: "PURCHASE", docId: id },
       });
@@ -324,6 +350,22 @@ export async function updatePurchase(
     }
 
     await prisma.$transaction(async (tx: TxClient) => {
+      // Eski harakatlarni StockBalance/ItemPrice'dan qaytarib olamiz
+      // (aks holda eski va yangi miqdorlar ustma-ust tushib qoladi)
+      const oldRegisters = await tx.inventoryRegister.findMany({
+        where: { docType: "PURCHASE", docId: id },
+      });
+      for (const reg of oldRegisters) {
+        if (!reg.warehouseCellId) continue;
+        await applyStockMovement(tx, {
+          warehouseCellId: reg.warehouseCellId,
+          productId: reg.productId,
+          direction: "OUT", // eski IN'ni bekor qilish uchun teskarisi
+          qty: Number(reg.qty),
+          unitCost: Number(reg.unitCost ?? 0),
+        });
+      }
+
       // Eski itemlar va shu hujjatga tegishli ombor yozuvlarini olib tashlaymiz
       await tx.purchaseItem.deleteMany({ where: { receiptId: id } });
       await tx.inventoryRegister.deleteMany({
@@ -360,6 +402,16 @@ export async function updatePurchase(
           unitCost: item.unitCost,
         })),
       });
+
+      for (const item of items) {
+        await applyStockMovement(tx, {
+          warehouseCellId: item.warehouseCellId,
+          productId: item.productId,
+          direction: "IN",
+          qty: item.qty,
+          unitCost: item.unitCost,
+        });
+      }
     });
 
     revalidatePath("/purchases");

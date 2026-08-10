@@ -37,6 +37,8 @@ export function PurchaseReturnForm({ onClose }: Props) {
 
   // purchaseItemId -> qty to return
   const [qtyMap, setQtyMap] = useState<Record<string, number>>({});
+  // purchaseItemId -> qaytarish narxi (default — asl xarid narxi, o'zgartirsa bo'ladi)
+  const [costMap, setCostMap] = useState<Record<string, number>>({});
   const [reason, setReason] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "qr">(
     "cash"
@@ -58,6 +60,13 @@ export function PurchaseReturnForm({ onClose }: Props) {
       setNotFound(!result);
       setPurchase(result);
       setQtyMap({});
+      if (result) {
+        const defaults: Record<string, number> = {};
+        for (const item of result.items) defaults[item.id] = item.unitCost;
+        setCostMap(defaults);
+      } else {
+        setCostMap({});
+      }
     });
   };
 
@@ -66,13 +75,17 @@ export function PurchaseReturnForm({ onClose }: Props) {
     setQtyMap((prev) => ({ ...prev, [purchaseItemId]: clamped }));
   };
 
+  const setCost = (purchaseItemId: string, value: number) => {
+    setCostMap((prev) => ({ ...prev, [purchaseItemId]: Math.max(0, value) }));
+  };
+
   const selectedItems = purchase
     ? purchase.items
         .filter((i) => (qtyMap[i.id] ?? 0) > 0)
         .map((i) => ({
           purchaseItemId: i.id,
           qty: qtyMap[i.id],
-          unitCost: i.unitCost,
+          unitCost: costMap[i.id] ?? i.unitCost,
         }))
     : [];
 
@@ -94,9 +107,10 @@ export function PurchaseReturnForm({ onClose }: Props) {
         purchaseId: purchase.id,
         reason: reason || undefined,
         paymentMethod,
-        items: selectedItems.map(({ purchaseItemId, qty }) => ({
+        items: selectedItems.map(({ purchaseItemId, qty, unitCost }) => ({
           purchaseItemId,
           qty,
+          unitCost,
         })),
       });
 
@@ -152,25 +166,26 @@ export function PurchaseReturnForm({ onClose }: Props) {
           <>
             <Separator />
 
-            {purchase.supplierName && (
+            {purchase.contragentName && (
               <p className="text-sm text-muted-foreground">
-                Supplier: <span className="font-medium">{purchase.supplierName}</span>
+                Contragent: <span className="font-medium">{purchase.contragentName}</span>
               </p>
             )}
 
             {/* Items */}
             <div className="space-y-3">
-              <div className="grid grid-cols-[1fr_80px_100px_100px] gap-2 text-xs font-medium text-muted-foreground px-1">
+              <div className="grid grid-cols-[1fr_70px_90px_90px_100px] gap-2 text-xs font-medium text-muted-foreground px-1">
                 <span>Product</span>
                 <span className="text-right">Bought</span>
                 <span className="text-right">Returnable</span>
                 <span className="text-right">Return qty</span>
+                <span className="text-right">Return cost</span>
               </div>
 
               {purchase.items.map((item) => (
                 <div
                   key={item.id}
-                  className="grid grid-cols-[1fr_80px_100px_100px] gap-2 items-center"
+                  className="grid grid-cols-[1fr_70px_90px_90px_100px] gap-2 items-center"
                 >
                   <div>
                     <div className="text-sm font-medium">
@@ -198,6 +213,14 @@ export function PurchaseReturnForm({ onClose }: Props) {
                         item.returnableQty
                       )
                     }
+                  />
+                  <Input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    value={costMap[item.id] ?? item.unitCost}
+                    disabled={item.returnableQty === 0}
+                    onChange={(e) => setCost(item.id, Number(e.target.value))}
                   />
                 </div>
               ))}

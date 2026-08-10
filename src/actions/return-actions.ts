@@ -16,6 +16,7 @@ import type {
 } from "@/types/return.types";
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
+import { applyStockMovement } from "@/actions/stock-actions";
 import type { SaleItem } from "@/generated/prisma/client";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -108,6 +109,7 @@ export async function findSaleForReturn(
       return {
         id: item.id,
         productId: item.productId,
+        warehouseCellId: item.warehouseCellId ?? null,
         qty,
         unitPrice: Number(item.unitPrice),
         returnedQty,
@@ -188,7 +190,7 @@ export async function createSaleReturn(
         };
       }
 
-      totalAmount += item.qty * Number(saleItem.unitPrice);
+      totalAmount += item.qty * item.unitPrice;
     }
 
     const returnNumber = generateReturnNumber();
@@ -213,30 +215,44 @@ export async function createSaleReturn(
                 saleItemId: item.saleItemId,
                 productId: saleItem.productId,
                 qty: item.qty,
-                unitPrice: Number(saleItem.unitPrice),
+                unitPrice: item.unitPrice,
               };
             }),
           },
         },
       });
 
-      // Tovar omborga qaytadi (IN)
-      await tx.inventoryRegister.createMany({
-        data: items.map((item) => {
-          const saleItem = saleItems.find(
-            (si: SaleItem) => si.id === item.saleItemId
-          )!;
-          return {
+      // Tovar omborga qaytadi (IN) — asl sotilgan yacheykaning o'ziga.
+      // Narx (unitCost) — kassir kiritgan (yoki asl sotuvdan default
+      // olingan) unitPrice, chunki o'rtacha narx shu qiymat asosida
+      // qayta hisoblanadi.
+      for (const item of items) {
+        const saleItem = saleItems.find(
+          (si: SaleItem) => si.id === item.saleItemId
+        )!;
+        if (!saleItem.warehouseCellId) continue; // eski, joylashuvsiz sotuv
+
+        await tx.inventoryRegister.create({
+          data: {
             organizationId: session.organizationId,
             productId: saleItem.productId,
+            warehouseCellId: saleItem.warehouseCellId,
             docType: "SALE_RETURN",
             docId: doc.id,
             direction: "IN",
             qty: item.qty,
-            unitCost: null,
-          };
-        }),
-      });
+            unitCost: item.unitPrice,
+          },
+        });
+
+        await applyStockMovement(tx, {
+          warehouseCellId: saleItem.warehouseCellId,
+          productId: saleItem.productId,
+          direction: "IN",
+          qty: item.qty,
+          unitCost: item.unitPrice,
+        });
+      }
 
       // Pul mijozga qaytariladi — kassa/bank balansidan chiqim (OUT)
       await recordCashFlow(tx, {
@@ -281,6 +297,20 @@ export async function deleteSaleReturn(
     if (!saleReturn) return { success: false, error: "Return not found" };
 
     await prisma.$transaction(async (tx: TxClient) => {
+      const registers = await tx.inventoryRegister.findMany({
+        where: { docType: "SALE_RETURN", docId: id },
+      });
+      for (const reg of registers) {
+        if (!reg.warehouseCellId) continue;
+        await applyStockMovement(tx, {
+          warehouseCellId: reg.warehouseCellId,
+          productId: reg.productId,
+          direction: "OUT", // eski IN'ni bekor qilish uchun teskarisi
+          qty: Number(reg.qty),
+          unitCost: Number(reg.unitCost ?? 0),
+        });
+      }
+
       await tx.inventoryRegister.deleteMany({
         where: { docType: "SALE_RETURN", docId: id },
       });

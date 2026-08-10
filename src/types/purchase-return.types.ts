@@ -10,7 +10,9 @@ export type TPurchaseReturnItemWithProduct = PurchaseReturnItem & {
 };
 
 export type TPurchaseReturnWithItems = PurchaseReturn & {
-  purchase: Pick<Purchase, "id" | "receiptNumber" | "supplierName">;
+  purchase: Pick<Purchase, "id" | "receiptNumber"> & {
+    contragent?: { name: string } | null;
+  };
   items: TPurchaseReturnItemWithProduct[];
 };
 
@@ -28,6 +30,7 @@ export type TSerializedPurchaseReturn = Omit<
 > & {
   totalAmount: number;
   items: TSerializedPurchaseReturnItem[];
+  contragentName?: string | null;
 };
 
 export interface IPurchaseReturnItem {
@@ -54,6 +57,7 @@ export interface IPurchaseReturn {
 export interface IPurchaseItemReturnable {
   id: string; // PurchaseItem id
   productId: string;
+  warehouseCellId: string | null;
   qty: number; // olingan (xarid qilingan) miqdor
   unitCost: number;
   returnedQty: number; // avval qaytarilgan miqdor
@@ -64,7 +68,7 @@ export interface IPurchaseItemReturnable {
 export interface IPurchaseForReturn {
   id: string;
   receiptNumber: string;
-  supplierName: string | null;
+  contragentName: string | null;
   createdAt: Date;
   items: IPurchaseItemReturnable[];
 }

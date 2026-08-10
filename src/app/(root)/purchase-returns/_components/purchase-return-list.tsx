@@ -74,7 +74,7 @@ function ReturnRow({ ret }: { ret: TSerializedPurchaseReturn }) {
           {ret.purchase.receiptNumber}
         </TableCell>
         <TableCell className="text-sm">
-          {ret.purchase.supplierName || "—"}
+          {ret.contragentName || "—"}
         </TableCell>
         <TableCell>
           <Badge variant="secondary">{ret.items.length} items</Badge>

@@ -17,4 +17,6 @@ model Product {
   saleItems          SaleItem[]
   saleReturnItems    SaleReturnItem[]
   purchaseReturnItems PurchaseReturnItem[]
+  itemPrices         ItemPrice[]
+  stockBalances      StockBalance[]
 }

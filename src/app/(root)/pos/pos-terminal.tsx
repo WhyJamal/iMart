@@ -135,10 +135,8 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
     setCart([]); // boshqa Point'ga o'tganda savat tozalanadi
     startStockLoad(() => {
       void (async () => {
-        const [record, cells] = await Promise.all([
-          getPointStockRecord(newPointId),
-          getPointCellStock(newPointId),
-        ]);
+        const record = await getPointStockRecord(newPointId);
+        const cells = await getPointCellStock(newPointId);
         setStockOverride(record);
         setCellStock(cells);
       })();
@@ -190,7 +188,12 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
       }
       return [
         ...prev,
-        { ...product, qty: 1, warehouseCellId: bestCell.warehouseCellId },
+        {
+          ...product,
+          qty: 1,
+          warehouseCellId: bestCell.warehouseCellId,
+          price: bestCell.price, // ItemPrice — statik product.price emas
+        },
       ];
     });
   };
@@ -231,7 +234,7 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
         if (qty < item.qty) {
           toast.warning(`Miqdor ${qty} taga tushirildi (yacheykada shuncha bor)`);
         }
-        return { ...item, warehouseCellId: newCellId, qty };
+        return { ...item, warehouseCellId: newCellId, qty, price: cell!.price };
       })
     );
   };
@@ -326,7 +329,9 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
                             {p.category} · {p.stock} in stock
                           </p>
                         </div>
-                        <p className="font-bold">{fmt(p.price)}</p>
+                        <p className="font-bold">
+                          {fmt(cellStock[p.id]?.[0]?.price ?? p.price)}
+                        </p>
                       </button>
                     ))}
                   </div>

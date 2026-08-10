@@ -28,6 +28,8 @@ model WarehouseCell {
   inventoryRegisters InventoryRegister[]
   purchaseItems PurchaseItem[]
   saleItems SaleItem[]
+  itemPrices ItemPrice[]
+  stockBalances StockBalance[]
 
   @@index([warehouseId])
 }

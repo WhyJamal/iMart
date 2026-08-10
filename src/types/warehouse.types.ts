@@ -35,4 +35,5 @@ export interface ICellStockOption {
   cellName: string;
   warehouseName: string;
   available: number;
+  price: number; // shu yacheykadagi joriy narx (ItemPrice)
 }

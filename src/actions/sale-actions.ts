@@ -10,6 +10,7 @@ import type { IProduct } from "@/types/product.types";
 import type { TSaleWithItems, TSerializedSale } from "@/types/sale.types";
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
+import { applyStockMovement, getItemPrice } from "@/actions/stock-actions";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -186,19 +187,36 @@ export async function createSale(
 
       // Har bir item — kassir POS'da aniq tanlagan (yoki avtomatik
       // tanlangan) bitta yacheykadan yechiladi. Boshqa yacheykaga
-      // "sakrash" yo'q.
-      await tx.inventoryRegister.createMany({
-        data: items.map((item) => ({
-          organizationId: session.organizationId,
-          productId: item.productId,
+      // "sakrash" yo'q. unitCost — shu yacheykadagi JORIY o'rtacha
+      // tannarx (ItemPrice) — endi null qoldirilmaydi.
+      for (const item of items) {
+        const currentCost = await getItemPrice(
+          tx,
+          item.warehouseCellId,
+          item.productId
+        );
+
+        await tx.inventoryRegister.create({
+          data: {
+            organizationId: session.organizationId,
+            productId: item.productId,
+            warehouseCellId: item.warehouseCellId,
+            docType: "SALE",
+            docId: doc.id,
+            direction: "OUT",
+            qty: item.qty,
+            unitCost: currentCost,
+          },
+        });
+
+        await applyStockMovement(tx, {
           warehouseCellId: item.warehouseCellId,
-          docType: "SALE",
-          docId: doc.id,
+          productId: item.productId,
           direction: "OUT",
           qty: item.qty,
-          unitCost: null,
-        })),
-      });
+          unitCost: currentCost,
+        });
+      }
 
       // Write IN movement to the cash register (kassa)
       await recordCashFlow(tx, {
@@ -241,6 +259,20 @@ export async function deleteSale(
     if (!sale) return { success: false, error: "Sale not found" };
 
     await prisma.$transaction(async (tx: TxClient) => {
+      const registers = await tx.inventoryRegister.findMany({
+        where: { docType: "SALE", docId: id },
+      });
+      for (const reg of registers) {
+        if (!reg.warehouseCellId) continue;
+        await applyStockMovement(tx, {
+          warehouseCellId: reg.warehouseCellId,
+          productId: reg.productId,
+          direction: "IN", // eski OUT'ni bekor qilish uchun teskarisi
+          qty: Number(reg.qty),
+          unitCost: Number(reg.unitCost ?? 0),
+        });
+      }
+
       await tx.inventoryRegister.deleteMany({
         where: { docType: "SALE", docId: id },
       });

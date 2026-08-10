@@ -54,6 +54,7 @@ export interface ISaleReturn {
 export interface ISaleItemReturnable {
   id: string; // SaleItem id
   productId: string;
+  warehouseCellId: string | null;
   qty: number; // sotilgan miqdor
   unitPrice: number;
   returnedQty: number; // avval qaytarilgan miqdor

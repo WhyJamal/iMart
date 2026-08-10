@@ -7,7 +7,6 @@ export const SIDEBARITEMS: ISidebar[] = [
     items: [
       { id: "dashboard", label: "Панель управления", icon: "dashboard", href: PAGES.HOME },
       { id: "pos", label: "Терминал", icon: "monitor", href: PAGES.POS },
-      { id: "items", label: "Товары", icon: "tag", href: PAGES.PRODUCTS },
       { id: "purchases", label: "Закупки", icon: "cart", href: PAGES.PURCHASES },
       { id: "sales", label: "Продажи", icon: "receipt", href: PAGES.SALES },
       { id: "cash", label: "Касса", icon: "landmark", href: PAGES.CASH, permission: "cash:read" },
@@ -28,6 +27,7 @@ export const SIDEBARITEMS: ISidebar[] = [
     group: "Склад",
     items: [
       { id: "warehouses", label: "Склады", icon: "warehouse", href: PAGES.WAREHOUSES, permission: "warehouses:manage" },
+      { id: "items", label: "Товары", icon: "tag", href: PAGES.PRODUCTS },
       { id: "returns", label: "Возвраты продаж", icon: "undo", href: PAGES.RETURNS, permission: "returns:create" },
       { id: "purchase-returns", label: "Возвраты поставщикам", icon: "rotate-ccw", href: PAGES.PURCHASE_RETURNS, permission: "returns:create" },
     ],
