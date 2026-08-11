@@ -18,6 +18,7 @@ export const SIDEBARITEMS: ISidebar[] = [
     group: "Персонал и зарплата",
     items: [
       { id: "calendar", label: "Производственный календарь", icon: "calendar", href: PAGES.CALENDAR, permission: "calendar:manage" },
+      { id: "work-schedules", label: "Графики работы", icon: "clock", href: PAGES.WORK_SCHEDULES, permission: "schedules:manage" },
       { id: "users", label: "Пользователи", icon: "users", href: PAGES.USERS, permission: "users:manage" },
       { id: "salary", label: "Зарплаты", icon: "badge-dollar", href: PAGES.SALARY, permission: "payroll:read" },
       { id: "payroll", label: "Начисление зарплаты", icon: "wallet", href: PAGES.PAYROLL, permission: "payroll:read" },

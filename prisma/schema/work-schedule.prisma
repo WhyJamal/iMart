@@ -1,0 +1,76 @@
+// WorkScheduleTemplate (Шаблон расписания) — haftaning har bir kuni
+// uchun "agar shu kun ish kuni bo'lsa, necha soat" degan qiymatni
+// belgilaydi. Ish kuni yoki dam kuniligini BU YERDA hal qilmaymiz —
+// buni WorkCalendar (bayram/dam qoidasi) hal qiladi. Shablon faqat
+// "necha soat" ma'lumotini beradi.
+model WorkScheduleTemplate {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  days         WorkScheduleTemplateDay[]
+  schedules    WorkSchedule[]
+
+  @@index([organizationId])
+}
+
+model WorkScheduleTemplateDay {
+  id         String  @id @default(cuid())
+  templateId String
+  dayOfWeek  Int     // 1=Dushanba ... 7=Yakshanba
+
+  startTime  String? // "08:00" — faqat ma'lumot uchun, hisoblashda ishlatilmaydi
+  endTime    String? // "16:00"
+  workHours  Decimal @default(0) // for PostgreSQL @db.Decimal(4, 2)
+  breakHours Decimal @default(0) // for PostgreSQL @db.Decimal(4, 2)
+
+  template WorkScheduleTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, dayOfWeek])
+}
+
+// WorkSchedule (sizning "А Смена 2026" kabi) — bitta yil uchun,
+// Shablon + WorkCalendar kesishmasidan "Заполнить" orqali generatsiya
+// qilinadigan konkret grafik. Xodimlar shu grafikka biriktiriladi.
+model WorkSchedule {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String   // "A Smena 2026"
+  year           Int
+
+  templateId     String
+  workCalendarId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  template     WorkScheduleTemplate @relation(fields: [templateId], references: [id])
+  workCalendar WorkCalendar?        @relation(fields: [workCalendarId], references: [id])
+  days         WorkScheduleDay[]
+  users        User[]
+
+  @@unique([organizationId, name, year])
+  @@index([organizationId, year])
+}
+
+// Har bir aniq kun uchun natija — "Заполнить" bilan avtomatik
+// to'ldiriladi, keyin qo'lda tuzatilishi mumkin (isManual = true).
+model WorkScheduleDay {
+  id         String   @id @default(cuid())
+  scheduleId String
+  date       DateTime
+
+  hours      Decimal  @default(0) // for PostgreSQL @db.Decimal(4, 2)
+  dayKind    String   // workday | weekend | holiday | short | moved-workday (WorkCalendar'dan)
+  isManual   Boolean  @default(false)
+
+  schedule WorkSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@unique([scheduleId, date])
+  @@index([scheduleId, date])
+}

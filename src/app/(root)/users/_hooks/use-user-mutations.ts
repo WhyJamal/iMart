@@ -9,6 +9,7 @@ import {
   updateUserRole,
   updateUserPoint,
   deleteOrgUser,
+  updateUserSchedule,
 } from "@/actions/user-actions";
 
 export function useCreateUser(onSuccess?: () => void) {
@@ -80,6 +81,33 @@ export function useDeleteUser(onSuccess?: () => void) {
         const result = await deleteOrgUser(userId);
         if (result.success) {
           toast.success("User deleted");
+          onSuccess?.();
+        } else {
+          toast.error(result.error);
+        }
+      })();
+    });
+  };
+
+  return { mutate, isPending };
+}
+
+export function useUpdateUserSchedule(onSuccess?: () => void) {
+  const [isPending, startTransition] = useTransition();
+
+  const mutate = (
+    userId: string,
+    workScheduleId: string | null
+  ) => {
+    startTransition(() => {
+      void (async () => {
+        const result = await updateUserSchedule({
+          userId,
+          workScheduleId,
+        });
+
+        if (result.success) {
+          toast.success("Schedule updated");
           onSuccess?.();
         } else {
           toast.error(result.error);

@@ -37,11 +37,17 @@ import {
   useUpdateUserRole,
   useUpdateUserPoint,
   useDeleteUser,
+  useUpdateUserSchedule,
 } from "../_hooks/use-user-mutations";
 
 interface Props {
   users: IOrgUser[];
   points: IPointOption[];
+  schedules: {
+    id: string;
+    name: string;
+    year: number;
+  }[];
   currentUserId: string;
   currentRole: Role;
 }
@@ -50,8 +56,9 @@ const fmtDate = (d: Date) =>
   new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(d));
 
 const NO_POINT = "__none__";
+const NO_SCHEDULE = "**none**";
 
-export function UserList({ users, points, currentUserId, currentRole }: Props) {
+export function UserList({ users, points, schedules, currentUserId, currentRole }: Props) {
   const router = useRouter();
   const { mutate: changeRole, isPending: isChangingRole } = useUpdateUserRole(
     () => router.refresh()
@@ -62,6 +69,10 @@ export function UserList({ users, points, currentUserId, currentRole }: Props) {
   const { mutate: removeUser, isPending: isDeleting } = useDeleteUser(() =>
     router.refresh()
   );
+  const {
+    mutate: changeSchedule,
+    isPending: isChangingSchedule,
+  } = useUpdateUserSchedule(() => router.refresh());
 
   if (users.length === 0) {
     return (
@@ -83,6 +94,7 @@ export function UserList({ users, points, currentUserId, currentRole }: Props) {
           <TableHead>Email</TableHead>
           <TableHead>Role</TableHead>
           <TableHead>Point</TableHead>
+          <TableHead>Schedule</TableHead>
           <TableHead>Joined</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
@@ -102,7 +114,7 @@ export function UserList({ users, points, currentUserId, currentRole }: Props) {
                   disabled={isSelf || isChangingRole}
                   onValueChange={(v) => changeRole(u.id, v as Role)}
                 >
-                  <SelectTrigger className="w-[140px]">
+                  <SelectTrigger className="w-35">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -122,7 +134,7 @@ export function UserList({ users, points, currentUserId, currentRole }: Props) {
                     changePoint(u.id, v === NO_POINT ? null : v)
                   }
                 >
-                  <SelectTrigger className="w-[160px]">
+                  <SelectTrigger className="w-40">
                     <SelectValue placeholder="Belgilanmagan" />
                   </SelectTrigger>
                   <SelectContent>
@@ -130,6 +142,37 @@ export function UserList({ users, points, currentUserId, currentRole }: Props) {
                     {points.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
                         {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell>
+                <Select
+                  value={u.workScheduleId ?? NO_SCHEDULE}
+                  disabled={isChangingSchedule}
+                  onValueChange={(v) =>
+                    changeSchedule(
+                      u.id,
+                      v === NO_SCHEDULE ? null : v
+                    )
+                  }
+                >
+                  <SelectTrigger className="w-45">
+                    <SelectValue placeholder="График" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectItem value={NO_SCHEDULE}>
+                      Не назначен
+                    </SelectItem>
+
+                    {schedules.map((schedule) => (
+                      <SelectItem
+                        key={schedule.id}
+                        value={schedule.id}
+                      >
+                        {schedule.name} ({schedule.year})
                       </SelectItem>
                     ))}
                   </SelectContent>

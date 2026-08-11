@@ -10,6 +10,7 @@ import { UserList } from "./_components/user-list";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
 import { UserForm } from "./_components/user-form";
 import { PAGES } from "@/config/pages.config";
+import { getWorkScheduleOptions } from "@/actions/work-schedule-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,11 @@ export default async function UsersPage({
   }
 
   const { new: isNew } = await searchParams;
-  const [users, points] = await Promise.all([getOrgUsers(), getPointOptions()]);
+  const [users, points, schedules] = await Promise.all([
+    getOrgUsers(),
+    getPointOptions(),
+    getWorkScheduleOptions(),
+  ]);
 
   return (
     <>
@@ -47,6 +52,7 @@ export default async function UsersPage({
         <UserList
           users={users}
           points={points}
+          schedules={schedules}
           currentUserId={session.userId}
           currentRole={session.role}
         />

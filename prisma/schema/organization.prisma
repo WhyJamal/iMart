@@ -11,6 +11,8 @@ model Organization {
   points     Point[]
   warehouses Warehouse[]
   contragents Contragent[]
+  workScheduleTemplates WorkScheduleTemplate[]
+  workSchedules         WorkSchedule[]
 
   inventoryRegisters InventoryRegister[]
   purchases          Purchase[]

@@ -21,6 +21,7 @@ import {
     MapPin,
     Building,
     Calendar,
+    Clock,
 } from "lucide-react";
 
 const icons = {
@@ -40,6 +41,7 @@ const icons = {
     "map-pin": MapPin,
     "building": Building,
     calendar: Calendar,
+    clock: Clock, 
 };
 
 export function SidebarNavItem({

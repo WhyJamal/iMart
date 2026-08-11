@@ -122,6 +122,7 @@ export async function getOrgUsers(): Promise<IOrgUser[]> {
       role: true,
       createdAt: true,
       pointId: true,
+      workScheduleId: true,
       point: { select: { name: true } },
     },
     orderBy: { createdAt: "asc" },
@@ -135,6 +136,7 @@ export async function getOrgUsers(): Promise<IOrgUser[]> {
     createdAt: u.createdAt,
     pointId: u.pointId,
     pointName: u.point?.name ?? null,
+    workScheduleId: u.workScheduleId,
     salaryType: null,
     rate: null,
     effectiveFrom: null,
@@ -297,5 +299,95 @@ export async function deleteOrgUser(
   } catch (err) {
     console.error("[deleteOrgUser]", err);
     return { success: false, error: "Не удалось удалить пользователя." };
+  }
+}
+
+export async function updateUserSchedule({
+  userId,
+  workScheduleId,
+}: {
+  userId: string;
+  workScheduleId: string | null;
+}): Promise<ActionResult> {
+  try {
+    const session = await getServerSession();
+
+    if (!session) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const denied = checkPermission(session.role, "users:manage");
+    if (denied) return denied;
+
+    const target = await prisma.user.findFirst({
+      where: {
+        id: userId,
+        organizationId: session.organizationId,
+      },
+    });
+
+    if (!target) {
+      return {
+        success: false,
+        error: "Пользователь не найден.",
+      };
+    }
+
+    // Grafikni olib tashlash
+    if (workScheduleId === null) {
+      await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          workScheduleId: null,
+        },
+      });
+
+      revalidatePath(PAGES.USERS);
+
+      return {
+        success: true,
+        data: undefined,
+      };
+    }
+
+    // Tanlangan grafik shu tashkilotga tegishlimi?
+    const schedule = await prisma.workSchedule.findFirst({
+      where: {
+        id: workScheduleId,
+        organizationId: session.organizationId,
+      },
+    });
+
+    if (!schedule) {
+      return {
+        success: false,
+        error: "График не найден.",
+      };
+    }
+
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        workScheduleId,
+      },
+    });
+
+    revalidatePath(PAGES.USERS);
+
+    return {
+      success: true,
+      data: undefined,
+    };
+  } catch (err) {
+    console.error("[updateUserSchedule]", err);
+
+    return {
+      success: false,
+      error: "Не удалось изменить график пользователя.",
+    };
   }
 }

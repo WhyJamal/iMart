@@ -30,6 +30,7 @@ model WorkCalendar {
 
   organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   days           WorkCalendarDay[]
+  workSchedules  WorkSchedule[]
 
   @@unique([organizationId, year])
   @@index([organizationId, year])

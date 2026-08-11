@@ -11,6 +11,7 @@ export const PAGES = {
     PURCHASE_RETURNS: "/purchase-returns",
     USERS: "/users",
     CALENDAR: "/calendar",
+    WORK_SCHEDULES: "/work-schedules",
     PAYROLL: "/payroll",
     SALARY: "/salary",
     POINTS: "/points",

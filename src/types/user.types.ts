@@ -10,6 +10,7 @@ export interface IOrgUser {
 
   pointId: string | null;
   pointName: string | null;
+  workScheduleId: string | null;
 
   salaryType: SalaryType | null;
   rate: number | null;
