@@ -19,6 +19,7 @@ model Organization {
   sales              Sale[]
   saleReturns        SaleReturn[]
   purchaseReturns    PurchaseReturn[]
+  writeOffs WriteOff[]
 
   salaryRegisters    SalaryRegister[]
   payrollPayments    PayrollPayment[]

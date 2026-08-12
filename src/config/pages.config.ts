@@ -9,6 +9,7 @@ export const PAGES = {
     SALES: "/sales",
     RETURNS: "/returns",
     PURCHASE_RETURNS: "/purchase-returns",
+    WRITE_OFFS: "/write-offs",
     USERS: "/users",
     CALENDAR: "/calendar",
     WORK_SCHEDULES: "/work-schedules",

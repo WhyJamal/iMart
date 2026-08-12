@@ -12,6 +12,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "sales:create", "sales:delete",
     "purchases:create", "purchases:delete",
     "returns:create", "returns:delete",
+    "writeoffs:create", "writeoffs:delete",
     "cash:read", "cash:write",
     "reports:read",
     "users:manage",
@@ -27,6 +28,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "sales:create", "sales:delete",
     "purchases:create", "purchases:delete",
     "returns:create", "returns:delete",
+    "writeoffs:create", "writeoffs:delete",
     "cash:read", "cash:write",
     "reports:read",
     "payroll:read", "payroll:manage",
@@ -41,6 +43,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "sales:create",
     "purchases:create",
     "returns:create",
+    "writeoffs:create",
     "cash:read",
     "reports:read",
   ],
@@ -50,3 +53,4 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "returns:create",
   ],
 };
+

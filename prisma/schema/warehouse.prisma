@@ -30,6 +30,7 @@ model WarehouseCell {
   saleItems SaleItem[]
   itemPrices ItemPrice[]
   stockBalances StockBalance[]
+  writeOffItems WriteOffItem[]
 
   @@index([warehouseId])
 }

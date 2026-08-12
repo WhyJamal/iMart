@@ -47,6 +47,21 @@ export async function getPointOptions(): Promise<IPointOption[]> {
   return points;
 }
 
+export async function getCurrentUserPointId(): Promise<string | null> {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const user = await prisma.user.findFirst({
+    where: {
+      id: session.userId,
+      organizationId: session.organizationId,
+    },
+    select: { pointId: true },
+  });
+
+  return user?.pointId ?? null;
+}
+
 export async function createPoint(
   input: CreatePointInput
 ): Promise<ActionResult<{ id: string }>> {

@@ -14,6 +14,8 @@ export type Permission =
   | "purchases:delete"
   | "returns:create"
   | "returns:delete"
+  | "writeoffs:create"
+  | "writeoffs:delete"
   | "cash:read"
   | "cash:write"
   | "reports:read"

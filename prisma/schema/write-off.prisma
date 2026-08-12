@@ -1,0 +1,33 @@
+model WriteOff {
+  id             String         @id @default(cuid())
+  writeOffNumber String         @unique
+  organizationId String
+  reason         String?
+  totalAmount    Decimal
+  createdBy      String?
+  pointId        String?
+  createdAt      DateTime       @default(now())
+
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  point          Point?         @relation(fields: [pointId], references: [id], onDelete: SetNull)
+  items          WriteOffItem[]
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, pointId])
+}
+
+model WriteOffItem {
+  id              String       @id @default(cuid())
+  writeOffId      String
+  warehouseCellId String
+  productId       String
+  qty             Decimal
+  unitCost        Decimal
+
+  writeOff        WriteOff     @relation(fields: [writeOffId], references: [id], onDelete: Cascade)
+  warehouseCell   WarehouseCell @relation(fields: [warehouseCellId], references: [id], onDelete: Restrict)
+  product         Product      @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([writeOffId])
+  @@index([warehouseCellId])
+}

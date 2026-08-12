@@ -23,6 +23,7 @@ import {
     Calendar,
     Clock,
     ClipboardClock,
+    FileMinus,
 } from "lucide-react";
 
 const icons = {
@@ -39,6 +40,7 @@ const icons = {
     landmark: Landmark,
     "badge-dollar": BadgeDollarSign,
     warehouse: Warehouse,
+    "file-minus": FileMinus,
     "map-pin": MapPin,
     "building": Building,
     calendar: Calendar,

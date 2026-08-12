@@ -19,4 +19,5 @@ model Product {
   purchaseReturnItems PurchaseReturnItem[]
   itemPrices         ItemPrice[]
   stockBalances      StockBalance[]
+  writeOffItems      WriteOffItem[]
 }
