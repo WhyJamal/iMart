@@ -17,7 +17,9 @@ export type TIcon =
     | "warehouse"
     | "building"
     | "calendar"
-    | "clock";
+    | "clock"
+    | "timesheet"
+    ;
 
     export type TItem = {
     id: string;

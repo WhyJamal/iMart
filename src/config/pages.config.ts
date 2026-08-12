@@ -12,6 +12,7 @@ export const PAGES = {
     USERS: "/users",
     CALENDAR: "/calendar",
     WORK_SCHEDULES: "/work-schedules",
+    TIMESHEETS: "/timesheets",
     PAYROLL: "/payroll",
     SALARY: "/salary",
     POINTS: "/points",

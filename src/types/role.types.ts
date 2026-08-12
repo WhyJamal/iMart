@@ -23,4 +23,5 @@ export type Permission =
   | "warehouses:manage"
   | "contragents:manage"
   | "calendar:manage"
-  | "schedules:manage";
+  | "schedules:manage"
+  | "timesheets:read";

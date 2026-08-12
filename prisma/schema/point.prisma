@@ -11,6 +11,7 @@ model Point {
   users          User[]
   purchases      Purchase[]
   sales          Sale[]
+  timesheets     Timesheet[]
 
   @@index([organizationId])
 }

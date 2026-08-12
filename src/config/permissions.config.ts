@@ -20,6 +20,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "contragents:manage",
     "calendar:manage",
     "schedules:manage",
+    "timesheets:read",
   ],
   ADMIN: [
     "products:read", "products:write",
@@ -33,6 +34,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "contragents:manage",
     "calendar:manage",
     "schedules:manage",
+    "timesheets:read",
   ],
   MANAGER: [
     "products:read", "products:write",

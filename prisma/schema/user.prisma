@@ -11,8 +11,9 @@ model User {
   point          Point?        @relation(fields: [pointId], references: [id])
   pointId        String?
 
-  workScheduleId String?
   workSchedule   WorkSchedule? @relation(fields: [workScheduleId], references: [id])
+  timesheetEntries TimesheetEntry[]
+  workScheduleId String?
 
   salaryRegisters SalaryRegister[]
   payrollPayments PayrollPayment[]

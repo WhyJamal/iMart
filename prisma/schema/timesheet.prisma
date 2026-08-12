@@ -1,0 +1,39 @@
+// Tabel — Point + Oy bo'yicha hujjat. WorkSchedule (Grafik) asosida
+// avtomatik to'ldiriladi, keyin qo'lda tuzatiladi (1C'dagi Табель kabi).
+model Timesheet {
+  id             String   @id @default(cuid())
+  organizationId String
+  pointId        String
+  year           Int
+  month          Int // 1-12
+
+  status    String   @default("DRAFT") // DRAFT | CONFIRMED
+  createdBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  point        Point             @relation(fields: [pointId], references: [id])
+  entries      TimesheetEntry[]
+
+  @@unique([pointId, year, month])
+  @@index([organizationId, year, month])
+}
+
+// Har bir xodim + har bir kun uchun bitta yozuv.
+model TimesheetEntry {
+  id          String   @id @default(cuid())
+  timesheetId String
+  userId      String
+  date        DateTime
+
+  hours    Decimal @default(0) // for PostgreSQL @db.Decimal(4, 2)
+  dayKind  String // workday | weekend | holiday | short | moved-workday | absent
+  isManual Boolean @default(false)
+
+  timesheet Timesheet @relation(fields: [timesheetId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([timesheetId, userId, date])
+  @@index([timesheetId, userId])
+}
