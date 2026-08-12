@@ -13,6 +13,7 @@ model User {
 
   workSchedule   WorkSchedule? @relation(fields: [workScheduleId], references: [id])
   timesheetEntries TimesheetEntry[]
+  payrollAccrualLines PayrollAccrualLine[]
   workScheduleId String?
 
   salaryRegisters SalaryRegister[]

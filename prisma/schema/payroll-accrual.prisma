@@ -1,0 +1,46 @@
+// PayrollAccrual — Tabel kabi, Point + Oy bo'yicha hujjat. Bitta oy
+// uchun bir necha marta yaratilishi mumkin (masalan avans kuni +
+// oy oxiri) — har safar faqat QOLGAN summa hisoblanadi va to'lanadi.
+// Alohida "to'lash" bosqichi yo'q: "Заполнить" hisoblaydi,
+// "Записать и закрыть" (CONFIRMED) o'sha zahoti kassadan pul chiqaradi.
+model PayrollAccrual {
+  id             String   @id @default(cuid())
+  organizationId String
+  pointId        String
+  year           Int
+  month          Int // 1-12
+
+  status    String   @default("DRAFT") // DRAFT | CONFIRMED
+  createdBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  point        Point                @relation(fields: [pointId], references: [id])
+  lines        PayrollAccrualLine[]
+
+  @@index([organizationId, pointId, year, month])
+}
+
+model PayrollAccrualLine {
+  id        String @id @default(cuid())
+  accrualId String
+  userId    String
+
+  salaryType  String // FIXED | DAILY | HOURLY (snapshot)
+  rate        Decimal // snapshot, for PostgreSQL @db.Decimal(14, 2)
+  workedUnits Decimal? // Tabeldan (kun/soat), FIXED uchun null, for PostgreSQL @db.Decimal(10, 2)
+
+  grossAmount Decimal @default(0) // workedUnits*rate yoki rate (FIXED), for PostgreSQL @db.Decimal(14, 2)
+  alreadyPaid Decimal @default(0) // shu oy uchun oldingi CONFIRMED hujjatlardan to'langan, for PostgreSQL @db.Decimal(14, 2)
+  bonus       Decimal @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  deduction   Decimal @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  payAmount   Decimal @default(0) // haqiqiy to'lanadigan summa — tahrirlanadi, for PostgreSQL @db.Decimal(14, 2)
+
+  paymentMethod String @default("cash") // cash | card
+
+  accrual PayrollAccrual @relation(fields: [accrualId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([accrualId, userId])
+}

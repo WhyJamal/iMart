@@ -70,17 +70,17 @@ export function ScheduleTable({ schedule, canManage }: Props) {
         <table className="text-sm border-collapse w-full">
           <thead>
             <tr className="bg-muted/50">
-              <th className="sticky left-0 bg-muted/50 px-3 py-2 text-left font-medium border-r min-w-[110px]">
+              <th className="sticky left-0 bg-muted/50 px-3 py-2 text-left font-medium border-r min-w-27.5">
                 Oy
               </th>
-              <th className="px-2 py-2 text-right font-medium border-r min-w-[60px]">
+              <th className="px-2 py-2 text-right font-medium border-r min-w-15">
                 Kun
               </th>
-              <th className="px-2 py-2 text-right font-medium border-r min-w-[60px]">
+              <th className="px-2 py-2 text-right font-medium border-r min-w-15">
                 Soat
               </th>
               {Array.from({ length: 31 }, (_, i) => (
-                <th key={i} className="px-1.5 py-2 text-center font-medium min-w-[34px]">
+                <th key={i} className="px-1.5 py-2 text-center font-medium min-w-8.5">
                   {i + 1}
                 </th>
               ))}

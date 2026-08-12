@@ -12,6 +12,7 @@ model Point {
   purchases      Purchase[]
   sales          Sale[]
   timesheets     Timesheet[]
+  payrollAccruals PayrollAccrual[]
 
   @@index([organizationId])
 }

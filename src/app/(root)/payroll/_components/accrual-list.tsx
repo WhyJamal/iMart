@@ -23,29 +23,33 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import type { IPayrollPayment } from "@/types/payroll.types";
-import { useDeletePayrollPayment } from "../_hooks/use-payroll-mutations";
+import type { IPayrollAccrualSummary } from "@/types/payroll-accrual.types";
+import { PAGES } from "@/config/pages.config";
+import { useDeletePayrollAccrual } from "../_hooks/use-payroll-accrual-mutations";
+
+const MONTH_LABELS = [
+  "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
+  "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr",
+];
+
+const fmt = (n: number) => n.toLocaleString("uz-UZ");
 
 interface Props {
-  payments: IPayrollPayment[];
+  accruals: IPayrollAccrualSummary[];
   canManage: boolean;
 }
 
-const fmt = (n: number) => n.toFixed(2) + " сум";
-const fmtDate = (d: Date) =>
-  new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(d));
-
-export function PayrollList({ payments, canManage }: Props) {
+export function AccrualList({ accruals, canManage }: Props) {
   const router = useRouter();
-  const { mutate: remove, isPending } = useDeletePayrollPayment(() =>
+  const { mutate: remove, isPending } = useDeletePayrollAccrual(() =>
     router.refresh()
   );
 
-  if (payments.length === 0) {
+  if (accruals.length === 0) {
     return (
-      <div className="text-center py-24 text-muted-foreground">
+      <div className="text-center py-16 text-muted-foreground">
         <Wallet2 className="w-10 h-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">No payroll payments yet</p>
+        <p className="text-sm">No documents yet</p>
       </div>
     );
   }
@@ -54,36 +58,38 @@ export function PayrollList({ payments, canManage }: Props) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Employee</TableHead>
-          <TableHead>Period</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Units</TableHead>
-          <TableHead>Total</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead>Date</TableHead>
+          <TableHead>Point</TableHead>
+          <TableHead>Davr</TableHead>
+          <TableHead>Xodimlar</TableHead>
+          <TableHead>Summa</TableHead>
+          <TableHead>Holat</TableHead>
           {canManage && <TableHead className="text-right">Actions</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
-        {payments.map((p) => (
-          <TableRow key={p.id}>
-            <TableCell className="font-medium">{p.userName}</TableCell>
-            <TableCell className="text-muted-foreground text-sm">
-              {fmtDate(p.periodStart)} — {fmtDate(p.periodEnd)}
+        {accruals.map((a) => (
+          <TableRow
+            key={a.id}
+            className="cursor-pointer hover:bg-muted/50"
+            onClick={() => router.push(`${PAGES.PAYROLL}/${a.id}`)}
+          >
+            <TableCell className="font-medium">{a.pointName}</TableCell>
+            <TableCell>
+              {MONTH_LABELS[a.month - 1]} {a.year}
             </TableCell>
             <TableCell>
-              <Badge variant="secondary">{p.salaryType}</Badge>
+              <Badge variant="secondary">{a.lineCount}</Badge>
             </TableCell>
-            <TableCell className="text-sm">
-              {p.workedUnits !== null ? p.workedUnits : "—"}
+            <TableCell className="font-semibold">
+              {fmt(a.totalPayAmount)} so'm
             </TableCell>
-            <TableCell className="font-semibold">{fmt(p.totalAmount)}</TableCell>
-            <TableCell className="text-sm capitalize">{p.paymentMethod}</TableCell>
-            <TableCell className="text-muted-foreground text-sm">
-              {fmtDate(p.createdAt)}
+            <TableCell>
+              <Badge variant={a.status === "CONFIRMED" ? "default" : "secondary"}>
+                {a.status === "CONFIRMED" ? "Tasdiqlangan" : "Qoralama"}
+              </Badge>
             </TableCell>
             {canManage && (
-              <TableCell className="text-right">
+              <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
@@ -97,16 +103,17 @@ export function PayrollList({ payments, canManage }: Props) {
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete payment?</AlertDialogTitle>
+                      <AlertDialogTitle>Hujjatni o'chirish?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will reverse the cash movement for this payroll
-                        payment. This action cannot be undone.
+                        {a.status === "CONFIRMED"
+                          ? "Bu hujjat tasdiqlangan — o'chirilsa kassadan chiqqan pul teskari qaytariladi."
+                          : "Bu qoralama hujjat, hech qanday pul harakati yo'q."}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => remove(p.id)}
+                        onClick={() => remove(a.id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
                         Delete
