@@ -66,7 +66,7 @@ export function ScheduleTable({ schedule, canManage }: Props) {
         </Button>
       )}
 
-      <div className="overflow-x-auto rounded-xl border bg-white">
+      <div className="overflow-x-auto rounded-xl border bg-white pb-5">
         <table className="text-sm border-collapse w-full">
           <thead>
             <tr className="bg-muted/50">
