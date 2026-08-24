@@ -4,28 +4,45 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import Barcode from "react-barcode";
+import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { useCreateProduct, useUpdateProduct } from "../_hooks/use-product-mutations";
 import { IProduct } from "@/types/product.types";
 import { ProductInput } from "@/schema/product.schema";
 import { uploadProductImage } from "@/utils/upload-product-image";
+import { createProductCategory } from "@/actions/product-category-actions";
+import { UNIT_OPTIONS, DEFAULT_UNIT } from "@/config/units";
 
 type FormValues = {
   name: string;
   price: string;
   code?: string;
-  category: string;
 };
+
+interface ICategoryOption {
+  id: string;
+  name: string;
+}
 
 export function ProductFormContent({
   editTarget,
+  categories,
   onClose,
 }: {
   editTarget?: IProduct | null;
+  categories: ICategoryOption[];
   onClose: () => void;
 }) {
   const isEdit = !!editTarget;
@@ -34,7 +51,20 @@ export function ProductFormContent({
   const [previewUrl, setPreviewUrl] = useState("");
   const [codePreview, setCodePreview] = useState("");
 
+  const [categoryOptions, setCategoryOptions] = useState<ICategoryOption[]>(categories);
+  const [categoryId, setCategoryId] = useState("");
+  const [unit, setUnit] = useState<string>(DEFAULT_UNIT);
+
+  // Spravochnikka shu yerning o'zida yangi categoriya qo'shish uchun
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [isSavingCategory, setIsSavingCategory] = useState(false);
+
   const { register, handleSubmit, reset } = useForm<FormValues>();
+
+  useEffect(() => {
+    setCategoryOptions(categories);
+  }, [categories]);
 
   useEffect(() => {
     if (editTarget) {
@@ -42,15 +72,20 @@ export function ProductFormContent({
         name: editTarget.name,
         price: String(editTarget.price),
         code: editTarget.code ?? "",
-        category: editTarget.category,
       });
       setPreviewUrl(editTarget.image ?? "");
       setCodePreview(editTarget.code ?? "");
+      setCategoryId(editTarget.categoryId ?? "");
+      setUnit(editTarget.unit || DEFAULT_UNIT);
     } else {
-      reset({ name: "", price: "", code: "", category: "" });
+      reset({ name: "", price: "", code: "" });
       setPreviewUrl("");
       setCodePreview("");
+      setCategoryId("");
+      setUnit(DEFAULT_UNIT);
     }
+    setAddingCategory(false);
+    setNewCategoryName("");
   }, [editTarget, reset]);
 
   const { mutate: create } = useCreateProduct(onClose);
@@ -59,7 +94,7 @@ export function ProductFormContent({
   const onImageChange = (file?: File) => {
     if (!file) return;
 
-    setImageFile(file); 
+    setImageFile(file);
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
   };
@@ -69,7 +104,34 @@ export function ProductFormContent({
     setCodePreview(c);
   };
 
+  // Foydalanuvchi "+ Yangi categoriya" orqali spravochnikni o'zi to'ldiradi
+  const handleAddCategory = async () => {
+    const name = newCategoryName.trim();
+    if (!name) return;
+
+    setIsSavingCategory(true);
+    const result = await createProductCategory({ name });
+    setIsSavingCategory(false);
+
+    if (result.success) {
+      setCategoryOptions((prev) => {
+        if (prev.some((c) => c.id === result.data.id)) return prev;
+        return [...prev, result.data].sort((a, b) => a.name.localeCompare(b.name));
+      });
+      setCategoryId(result.data.id);
+      setAddingCategory(false);
+      setNewCategoryName("");
+    } else {
+      toast.error(result.error);
+    }
+  };
+
   const onSubmit = async (data: FormValues) => {
+    if (!categoryId) {
+      toast.error("Categoriya tanlanishi shart");
+      return;
+    }
+
     let imageUrl = editTarget?.image || "";
 
     if (imageFile) {
@@ -84,7 +146,8 @@ export function ProductFormContent({
       name: data.name,
       price: parseFloat(data.price),
       code: data.code || codePreview,
-      category: data.category,
+      categoryId,
+      unit,
       image: imageUrl,
     };
 
@@ -118,7 +181,85 @@ export function ProductFormContent({
 
             <div>
               <Label>Category</Label>
-              <Input placeholder="Coffee" {...register("category")} />
+
+              {addingCategory ? (
+                <div className="flex items-center gap-2 mt-1">
+                  <Input
+                    autoFocus
+                    placeholder="Yangi categoriya nomi"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        void handleAddCategory();
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={isSavingCategory || !newCategoryName.trim()}
+                    onClick={handleAddCategory}
+                  >
+                    Qo&apos;shish
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setAddingCategory(false);
+                      setNewCategoryName("");
+                    }}
+                  >
+                    Bekor
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 mt-1">
+                  <Select value={categoryId} onValueChange={setCategoryId}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Categoriyani tanlang" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoryOptions.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    title="Yangi categoriya qo'shish"
+                    onClick={() => setAddingCategory(true)}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label>Unit (yedinitsa izmereniya)</Label>
+              <Select value={unit} onValueChange={setUnit}>
+                <SelectTrigger className="w-full mt-1">
+                  <SelectValue placeholder="Birlikni tanlang" />
+                </SelectTrigger>
+                <SelectContent>
+                  {UNIT_OPTIONS.map((u) => (
+                    <SelectItem key={u.value} value={u.value}>
+                      {u.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                kg / litr / metr — POS terminalda kasr miqdorda (masalan 0.8 kg) sotiladi
+              </p>
             </div>
 
             <div>

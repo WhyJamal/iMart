@@ -12,10 +12,16 @@ export async function getProducts() {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
-  return prisma.product.findMany({
+  const products = await prisma.product.findMany({
     where: { organizationId: session.organizationId },
     orderBy: { createdAt: "desc" },
+    include: { category: { select: { id: true, name: true } } },
   });
+
+  return products.map((p) => ({
+    ...p,
+    categoryName: p.category?.name ?? "Bo'limsiz",
+  }));
 }
 
 export async function getProductById(id: string) {
@@ -24,6 +30,7 @@ export async function getProductById(id: string) {
 
   return prisma.product.findFirst({
     where: { id, organizationId: session.organizationId },
+    include: { category: { select: { id: true, name: true } } },
   });
 }
 
@@ -39,7 +46,15 @@ export async function createProduct(
       return { success: false, error: parsed.error.issues[0].message };
     }
 
-    const { name, price, code, category, image } = parsed.data;
+    const { name, price, code, categoryId, unit, image } = parsed.data;
+
+    const category = await prisma.productCategory.findFirst({
+      where: { id: categoryId, organizationId: session.organizationId },
+    });
+    if (!category) {
+      return { success: false, error: "Category not found" };
+    }
+
     const finalCode = code?.trim() ? code.trim() : generateProductCode(name);
 
     const existing = await prisma.product.findFirst({
@@ -55,7 +70,8 @@ export async function createProduct(
         name,
         price,
         code: finalCode,
-        category,
+        categoryId,
+        unit,
         image: image?.trim() ? image.trim() : null,
         organizationId: session.organizationId,
       },
@@ -90,7 +106,15 @@ export async function updateProduct(
       return { success: false, error: parsed.error.issues[0].message };
     }
 
-    const { name, price, code, category, image } = parsed.data;
+    const { name, price, code, categoryId, unit, image } = parsed.data;
+
+    const category = await prisma.productCategory.findFirst({
+      where: { id: categoryId, organizationId: session.organizationId },
+    });
+    if (!category) {
+      return { success: false, error: "Category not found" };
+    }
+
     const finalCode = code?.trim() ? code.trim() : product.code || generateProductCode(name);
 
     const duplicate = await prisma.product.findFirst({
@@ -111,7 +135,8 @@ export async function updateProduct(
         name,
         price,
         code: finalCode,
-        category,
+        categoryId,
+        unit,
         image: image?.trim() ? image.trim() : null,
       },
     });

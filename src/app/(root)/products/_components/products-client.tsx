@@ -25,15 +25,22 @@ import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { IProduct } from "@/types/product.types";
 import { Drawer } from "@/components/drawer";
 import { ProductFormContent } from "./product-form-content";
+import { getUnitLabel } from "@/config/units";
+
+interface ICategoryOption {
+  id: string;
+  name: string;
+}
 
 interface ProductsClientProps {
   initialProducts: IProduct[];
+  categories: ICategoryOption[];
 }
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("ru-RU", { style: "currency", currency: "UZS" }).format(n);
 
-export function ProductsClient({ initialProducts }: ProductsClientProps) {
+export function ProductsClient({ initialProducts, categories }: ProductsClientProps) {
   const [search, setSearch] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<IProduct | null>(null);
@@ -46,12 +53,12 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
       (p) =>
         p.name.toLowerCase().includes(q) ||
         p.code.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q)
+        p.categoryName.toLowerCase().includes(q)
     );
   }, [initialProducts, search]);
 
-  const categories = useMemo(
-    () => [...new Set(initialProducts.map((p) => p.category))],
+  const usedCategories = useMemo(
+    () => [...new Set(initialProducts.map((p) => p.categoryName))],
     [initialProducts]
   );
 
@@ -74,6 +81,7 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
         <Drawer open={formOpen} onClose={() => setFormOpen(false)}>
           <ProductFormContent
             editTarget={editTarget}
+            categories={categories}
             onClose={() => setFormOpen(false)}
           />
         </Drawer>
@@ -84,7 +92,7 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
               <h1 className="text-xl font-semibold tracking-tight">Products</h1>
               <p className="text-sm text-muted-foreground mt-0.5">
                 {initialProducts.length} product{initialProducts.length !== 1 ? "s" : ""} across{" "}
-                {categories.length} categor{categories.length !== 1 ? "ies" : "y"}
+                {usedCategories.length} categor{usedCategories.length !== 1 ? "ies" : "y"}
               </p>
             </div>
 
@@ -115,6 +123,7 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
                     <TableHead>Product</TableHead>
                     <TableHead>Code</TableHead>
                     <TableHead>Category</TableHead>
+                    <TableHead>Unit</TableHead>
                     <TableHead className="text-right">Price</TableHead>
                     <TableHead className="w-10" />
                   </TableRow>
@@ -151,8 +160,12 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
 
                       <TableCell>
                         <Badge variant="secondary" className="font-normal">
-                          {product.category}
+                          {product.categoryName}
                         </Badge>
+                      </TableCell>
+
+                      <TableCell className="text-xs text-muted-foreground">
+                        {getUnitLabel(product.unit)}
                       </TableCell>
 
                       <TableCell className="text-right font-medium tabular-nums">

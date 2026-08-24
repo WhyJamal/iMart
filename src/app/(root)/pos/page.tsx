@@ -26,7 +26,8 @@ export default async function POSPage() {
     name: p.name,
     price: p.price,
     code: p.code,
-    category: p.category,
+    category: p.categoryName,
+    unit: p.unit,
     image: p.image,
     stock: stockMap.get(p.id) ?? 0,
   }));

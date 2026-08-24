@@ -3,8 +3,11 @@ model Product {
   name      String
   price     Float
   code      String   @unique
-  category  String
+  unit      String   @default("dona") // birlik: dona | kg | litr | metr | quti — src/config/units.ts
   image     String?
+
+  category   ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId String?
 
   organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
@@ -20,4 +23,25 @@ model Product {
   itemPrices         ItemPrice[]
   stockBalances      StockBalance[]
   writeOffItems      WriteOffItem[]
+
+  @@index([categoryId])
+}
+
+// ProductCategory (Категория товара) — nomenklatura uchun foydalanuvchi
+// o'zi to'ldiradigan spravochnik. Mahsulot formasida ro'yxatdan tanlanadi
+// yoki shu yerning o'zida yangi nom kiritib qo'shiladi. Bitta tashkilot
+// ichida nomi takrorlanmaydi.
+model ProductCategory {
+  id             String   @id @default(cuid())
+  name           String
+  organizationId String
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  products       Product[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
 }

@@ -4,7 +4,9 @@ export interface IProduct {
   name: string;
   price: number;
   code: string;
-  category: string;
+  categoryId: string | null;
+  categoryName: string;
+  unit: string;
   image: string | null;
   createdAt: Date;
 }

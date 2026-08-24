@@ -1,5 +1,6 @@
-import { Bell, Search } from "lucide-react";
+import { Bell } from "lucide-react";
 import { DateTimeNow } from "./date-time-now";
+import { HeaderSearch } from "./header-search";
 import Image from "next/image";
 import Link from "next/link";
 import { PAGES } from "@/config/pages.config";
@@ -25,16 +26,7 @@ export default async function Header() {
                 </div>
             </Link>
 
-            <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 w-4 h-4" />
-                <input
-                    type="text"
-                    placeholder="Search..."
-                    className="w-full bg-white/5 border border-white/10 rounded pl-9 pr-4 py-2 text-sm
-                    text-white placeholder-white/40 focus:outline-none focus:ring-2
-                    focus:ring-red-500 focus:bg-white/10 transition-all duration-150"
-                />
-            </div>
+            <HeaderSearch />
 
             <div className="flex-1" />
 

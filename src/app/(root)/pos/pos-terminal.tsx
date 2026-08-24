@@ -10,6 +10,7 @@ import { createSale } from "@/actions/sale-actions";
 import { getPointStockRecord, getPointCellStock } from "@/actions/warehouse-actions";
 import type { IPointOption } from "@/types/point.types";
 import type { ICellStockOption } from "@/types/warehouse.types";
+import { isFractionalUnit } from "@/config/units";
 
 type Stage = "idle" | "processing" | "success";
 type PayMethod = "card" | "cash" | "qr";
@@ -22,6 +23,7 @@ export interface POSProduct {
   price: number;
   code: string;
   category: string;
+  unit: string; // dona | kg | litr | metr | quti — @/config/units
   image: string | null;
   stock: number; // current qty from InventoryRegister
 }
@@ -172,25 +174,32 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
     }
     const bestCell = cells[0]; // eng ko'p qoldiqli — avtomatik tanlanadi
 
+    const fractional = isFractionalUnit(product.unit);
+    // Dona/quti uchun har bosishda +1 qo'shiladi. Kg/litr/metr kabi
+    // kasr birliklarda esa avval 1 birlik (masalan 1 kg) qo'yiladi — aniq
+    // og'irlikni (masalan 0.8 kg) kassir keyin qatordagi inputga yozadi.
+    const step = 1;
+
     setCart((prev) => {
       const found = prev.find(
         (item) => item.id === product.id && item.warehouseCellId === bestCell.warehouseCellId
       );
       const currentQty = found?.qty ?? 0;
       if (currentQty >= bestCell.available) {
-        toast.warning(`Bu yacheykada faqat ${bestCell.available} dona bor`);
+        toast.warning(`Bu yacheykada faqat ${bestCell.available} ${product.unit} bor`);
         return prev;
       }
+      const nextQty = Math.min(currentQty + step, bestCell.available);
       if (found) {
         return prev.map((item) =>
-          item === found ? { ...item, qty: item.qty + 1 } : item
+          item === found ? { ...item, qty: nextQty } : item
         );
       }
       return [
         ...prev,
         {
           ...product,
-          qty: 1,
+          qty: fractional ? Math.min(step, bestCell.available) : 1,
           warehouseCellId: bestCell.warehouseCellId,
           price: bestCell.price, // ItemPrice — statik product.price emas
         },
@@ -216,6 +225,36 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
         })
         .filter((item) => item.qty > 0);
     });
+  };
+
+  // Kilolik (fractional) tovarlar uchun — kassir aniq og'irlikni qo'lda
+  // kiritadi, masalan haridor 800 gr shakar olsa "0.8" deb yoziladi.
+  // Item bo'sh/0 holatda qatordan bo'sh input bilan qolaveradi — Remove
+  // tugmasidan boshqa hech narsa qatorni avtomatik o'chirmaydi, shunda
+  // foydalanuvchi qiymatni kiritib bo'lguncha qator yo'qolib ketmaydi.
+  const setExactQty = (id: string, warehouseCellId: string, raw: string) => {
+    const parsed = parseFloat(raw);
+    setCart((prev) =>
+      prev.map((item) => {
+        if (item.id !== id || item.warehouseCellId !== warehouseCellId) return item;
+        if (raw.trim() === "" || Number.isNaN(parsed)) return { ...item, qty: 0 };
+
+        const cell = (cellStock[item.id] ?? []).find(
+          (c) => c.warehouseCellId === warehouseCellId
+        );
+        const available = cell?.available ?? 0;
+        if (parsed > available) {
+          toast.warning(`Bu yacheykada faqat ${available} ${item.unit} bor`);
+          return { ...item, qty: available };
+        }
+        return { ...item, qty: parsed };
+      })
+    );
+  };
+
+  // Input'dan chiqqanda (blur) — hali ham 0/bo'sh qolgan qatorni tozalaydi
+  const cleanupZeroQty = () => {
+    setCart((prev) => prev.filter((item) => item.qty > 0));
   };
 
   const switchCell = (id: string, oldCellId: string, newCellId: string) => {
@@ -326,7 +365,7 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
                         <div className="flex-1">
                           <p className="text-sm font-semibold">{p.name}</p>
                           <p className="text-[11px] text-gray-400">
-                            {p.category} · {p.stock} in stock
+                            {p.category} · {p.stock} {p.unit} in stock
                           </p>
                         </div>
                         <p className="font-bold">
@@ -379,6 +418,7 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
                   const currentCell = cells.find(
                     (c) => c.warehouseCellId === item.warehouseCellId
                   );
+                  const fractional = isFractionalUnit(item.unit);
                   return (
                     <div
                       key={`${item.id}:${item.warehouseCellId}`}
@@ -395,10 +435,10 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold truncate">{item.name}</p>
                         <p className="text-[11px] text-gray-400">
-                          {item.qty} × {fmt(item.price)}
+                          {item.qty} {item.unit} × {fmt(item.price)}
                           {currentCell && (
                             <>
-                              {" "}· {currentCell.available - item.qty} remaining
+                              {" "}· {(currentCell.available - item.qty).toFixed(fractional ? 3 : 0)} {item.unit} remaining
                             </>
                           )}
                         </p>
@@ -420,9 +460,28 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
                         )}
 
                         <div className="flex items-center gap-2 mt-2">
-                          <button onClick={() => setQty(item.id, item.warehouseCellId, -1)} className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 font-bold">−</button>
-                          <span className="text-sm font-bold w-6 text-center">{item.qty}</span>
-                          <button onClick={() => setQty(item.id, item.warehouseCellId, 1)} className="w-7 h-7 rounded-full bg-blue-500 text-white hover:bg-blue-600 font-bold">+</button>
+                          {fractional ? (
+                            <>
+                              <input
+                                type="number"
+                                step="0.001"
+                                min="0"
+                                value={item.qty}
+                                onChange={(e) =>
+                                  setExactQty(item.id, item.warehouseCellId, e.target.value)
+                                }
+                                onBlur={cleanupZeroQty}
+                                className="w-20 h-7 rounded-lg border border-gray-200 px-2 text-sm font-bold outline-none focus:ring-1 focus:ring-red-300"
+                              />
+                              <span className="text-[11px] text-gray-400">{item.unit}</span>
+                            </>
+                          ) : (
+                            <>
+                              <button onClick={() => setQty(item.id, item.warehouseCellId, -1)} className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 font-bold">−</button>
+                              <span className="text-sm font-bold w-6 text-center">{item.qty}</span>
+                              <button onClick={() => setQty(item.id, item.warehouseCellId, 1)} className="w-7 h-7 rounded-full bg-blue-500 text-white hover:bg-blue-600 font-bold">+</button>
+                            </>
+                          )}
                           <button onClick={() => removeItem(item.id, item.warehouseCellId)} className="ml-2 text-[11px] font-semibold text-red-500 hover:text-red-600">Remove</button>
                         </div>
                       </div>
