@@ -9,7 +9,7 @@ model InventoryRegister {
   // ulanganda yangi yozuvlar doim shu bilan yoziladi.
   warehouseCellId String?
 
-  docType        String   // PURCHASE | SALE | ADJUSTMENT
+  docType        String   // PURCHASE | SALE | ADJUSTMENT | TRANSFER
   docId          String
 
   direction      String   // IN | OUT

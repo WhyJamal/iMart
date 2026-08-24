@@ -1,0 +1,39 @@
+model Transfer {
+  id             String   @id @default(cuid())
+  transferNumber String   @unique
+  organizationId String
+  fromPointId    String
+  toPointId      String
+  note           String?
+  totalAmount    Decimal
+  createdBy      String?
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  fromPoint      Point @relation("TransferFromPoint", fields: [fromPointId], references: [id])
+  toPoint        Point @relation("TransferToPoint", fields: [toPointId], references: [id])
+  items          TransferItem[]
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, fromPointId])
+  @@index([organizationId, toPointId])
+}
+
+model TransferItem {
+  id             String @id @default(cuid())
+  transferId     String
+  productId      String
+  fromCellId     String
+  toCellId       String
+  qty            Decimal
+  unitCost       Decimal
+
+  transfer       Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  product        Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  fromCell       WarehouseCell @relation("TransferFromCell", fields: [fromCellId], references: [id], onDelete: Restrict)
+  toCell         WarehouseCell @relation("TransferToCell", fields: [toCellId], references: [id], onDelete: Restrict)
+
+  @@index([transferId])
+  @@index([fromCellId])
+  @@index([toCellId])
+}

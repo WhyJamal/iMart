@@ -31,6 +31,8 @@ model WarehouseCell {
   itemPrices ItemPrice[]
   stockBalances StockBalance[]
   writeOffItems WriteOffItem[]
+  transferFromItems TransferItem[] @relation("TransferFromCell")
+  transferToItems TransferItem[] @relation("TransferToCell")
 
   @@index([warehouseId])
 }

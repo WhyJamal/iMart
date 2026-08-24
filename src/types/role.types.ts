@@ -26,4 +26,6 @@ export type Permission =
   | "contragents:manage"
   | "calendar:manage"
   | "schedules:manage"
-  | "timesheets:read";
+  | "timesheets:read"
+  | "transfers:create"
+  | "transfers:delete";

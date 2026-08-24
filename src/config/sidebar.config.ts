@@ -32,6 +32,7 @@ export const SIDEBARITEMS: ISidebar[] = [
       { id: "items", label: "Товары", icon: "tag", href: PAGES.PRODUCTS },
       { id: "returns", label: "Возвраты продаж", icon: "undo", href: PAGES.RETURNS, permission: "returns:create" },
       { id: "write-offs", label: "Списание товаров", icon: "file-minus", href: PAGES.WRITE_OFFS, permission: "writeoffs:create" },
+      { id: "transfers", label: "Перемещения товаров", icon: "arrow-left-right", href: PAGES.TRANSFERS, permission: "transfers:create" },
       { id: "purchase-returns", label: "Возвраты поставщикам", icon: "rotate-ccw", href: PAGES.PURCHASE_RETURNS, permission: "returns:create" },
     ],
   },

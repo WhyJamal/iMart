@@ -24,6 +24,7 @@ import {
     Clock,
     ClipboardClock,
     FileMinus,
+    ArrowLeftRight,
 } from "lucide-react";
 
 const icons = {
@@ -46,6 +47,7 @@ const icons = {
     calendar: Calendar,
     clock: Clock,
     timesheet: ClipboardClock, 
+    "arrow-left-right": ArrowLeftRight,
 };
 
 export function SidebarNavItem({
