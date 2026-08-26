@@ -20,6 +20,7 @@ export type TIcon =
     | "clock"
     | "timesheet"
     | "file-minus"
+    | "arrow-left-right"
     ;
 
     export type TItem = {
