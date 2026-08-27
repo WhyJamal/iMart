@@ -27,5 +27,7 @@ export type Permission =
   | "calendar:manage"
   | "schedules:manage"
   | "timesheets:read"
+  | "promotions:manage"
   | "transfers:create"
-  | "transfers:delete";
+  | "transfers:delete"
+  ;

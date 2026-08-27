@@ -29,10 +29,6 @@ export default async function PointsPage({
   return (
     <>
       <div className="p-6 space-y-6">
-        <DrawerBackdrop isOpen={!!edit}>
-          {editTarget && <PointForm point={editTarget} />}
-        </DrawerBackdrop>
-
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Points</h1>
@@ -53,6 +49,10 @@ export default async function PointsPage({
 
       <DrawerBackdrop isOpen={isNew === "1"}>
         <PointForm />
+      </DrawerBackdrop>
+
+      <DrawerBackdrop isOpen={!!edit}>
+        {editTarget && <PointForm point={editTarget} />}
       </DrawerBackdrop>
     </>
   );

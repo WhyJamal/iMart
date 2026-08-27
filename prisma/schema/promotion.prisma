@@ -1,0 +1,34 @@
+model Promotion {
+  id             String   @id @default(cuid())
+  organizationId String
+  pointId        String
+  warehouseId    String
+  warehouseCellId String
+  name           String
+  discountPercent Decimal
+  endsAt         DateTime
+  comment        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  point        Point        @relation(fields: [pointId], references: [id], onDelete: Cascade)
+  warehouse    Warehouse    @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  warehouseCell WarehouseCell @relation(fields: [warehouseCellId], references: [id], onDelete: Cascade)
+  items        PromotionItem[]
+
+  @@index([organizationId, pointId, warehouseId, warehouseCellId])
+  @@index([warehouseCellId, endsAt])
+}
+
+model PromotionItem {
+  id          String @id @default(cuid())
+  promotionId String
+  productId   String
+
+  promotion Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([promotionId, productId])
+  @@index([productId])
+}

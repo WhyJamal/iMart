@@ -32,4 +32,6 @@ model Organization {
   cashRegister       CashRegister?
   bankAccount        BankAccount?
   cashFlows          CashFlow[]
+  promotions Promotion[]
+
 }

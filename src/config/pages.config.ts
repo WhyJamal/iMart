@@ -20,6 +20,7 @@ export const PAGES = {
     POINTS: "/points",
     WAREHOUSES: "/warehouses",
     CONTRAGENTS: "/contragents",
+    PROMOTIONS: "/promotions",
     
     PROFILE: "/u/profile",
     USER_PROFILE: (userId: string) => `/u/profile/${userId}`,

@@ -10,6 +10,8 @@ import { createSale } from "@/actions/sale-actions";
 import { getPointStockRecord, getPointCellStock } from "@/actions/warehouse-actions";
 import type { IPointOption } from "@/types/point.types";
 import type { ICellStockOption } from "@/types/warehouse.types";
+import type { IPromotionDiscount } from "@/types/promotion.types";
+import { getActivePromotionDiscounts } from "@/actions/promotion-actions";
 import { isFractionalUnit } from "@/config/units";
 
 type Stage = "idle" | "processing" | "success";
@@ -31,6 +33,8 @@ export interface POSProduct {
 interface CartItem extends POSProduct {
   qty: number;
   warehouseCellId: string;
+  discountPercent?: number;
+  promotionName?: string;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -103,9 +107,10 @@ interface Props {
   points: IPointOption[];
   defaultPointId: string;
   initialCellStock: Record<string, ICellStockOption[]>;
+  initialPromotions: IPromotionDiscount[];
 }
 
-export default function POSTerminal({ products, points, defaultPointId, initialCellStock }: Props) {
+export default function POSTerminal({ products, points, defaultPointId, initialCellStock, initialPromotions }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isLoadingStock, startStockLoad] = useTransition();
@@ -115,6 +120,23 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
   const [stockOverride, setStockOverride] = useState<Record<string, number> | null>(null);
   // productId -> shu Point ostidagi yacheykalar (eng ko'p qoldiqlisi birinchi)
   const [cellStock, setCellStock] = useState<Record<string, ICellStockOption[]>>(initialCellStock);
+  const [promotionDiscounts, setPromotionDiscounts] = useState<IPromotionDiscount[]>(initialPromotions);
+
+  const getDiscount = (warehouseCellId: string, productId: string) =>
+    promotionDiscounts.find((p) => p.warehouseCellId === warehouseCellId && p.productId === productId);
+  const getSellPrice = (cell: ICellStockOption, productId: string) => {
+    const promo = getDiscount(cell.warehouseCellId, productId);
+    return promo ? cell.price * (1 - promo.discountPercent / 100) : cell.price;
+  };
+  const getPreferredCell = (productId: string) => {
+    const cells = cellStock[productId] ?? [];
+    return [...cells].sort((a, b) => {
+      const aPromo = getDiscount(a.warehouseCellId, productId);
+      const bPromo = getDiscount(b.warehouseCellId, productId);
+      if (Boolean(aPromo) !== Boolean(bPromo)) return aPromo ? -1 : 1;
+      return b.available - a.available;
+    })[0];
+  };
 
   const [search, setSearch] = useState("");
   const [qrInput, setQrInput] = useState("");
@@ -141,6 +163,8 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
         const cells = await getPointCellStock(newPointId);
         setStockOverride(record);
         setCellStock(cells);
+        const promos = await getActivePromotionDiscounts(newPointId);
+        setPromotionDiscounts(promos);
       })();
     });
   };
@@ -172,7 +196,7 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
       toast.error(`"${product.name}" uchun bu nuqtada yacheyka topilmadi`);
       return;
     }
-    const bestCell = cells[0]; // eng ko'p qoldiqli — avtomatik tanlanadi
+    const bestCell = getPreferredCell(product.id)!; // aksiya bor yacheyka ustun, aks holda eng ko'p qoldiqli
 
     const fractional = isFractionalUnit(product.unit);
     // Dona/quti uchun har bosishda +1 qo'shiladi. Kg/litr/metr kabi
@@ -201,7 +225,9 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
           ...product,
           qty: fractional ? Math.min(step, bestCell.available) : 1,
           warehouseCellId: bestCell.warehouseCellId,
-          price: bestCell.price, // ItemPrice — statik product.price emas
+          price: getSellPrice(bestCell, product.id),
+          discountPercent: getDiscount(bestCell.warehouseCellId, product.id)?.discountPercent,
+          promotionName: getDiscount(bestCell.warehouseCellId, product.id)?.promotionName,
         },
       ];
     });
@@ -273,7 +299,15 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
         if (qty < item.qty) {
           toast.warning(`Miqdor ${qty} taga tushirildi (yacheykada shuncha bor)`);
         }
-        return { ...item, warehouseCellId: newCellId, qty, price: cell!.price };
+        const promo = cell ? getDiscount(cell.warehouseCellId, item.id) : undefined;
+        return {
+          ...item,
+          warehouseCellId: newCellId,
+          qty,
+          price: cell ? getSellPrice(cell, item.id) : item.price,
+          discountPercent: promo?.discountPercent,
+          promotionName: promo?.promotionName,
+        };
       })
     );
   };
@@ -299,18 +333,35 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
         pointId,
         paymentMethod: method,
         totalAmount: total,
+        subtotal,
+        tipPercent: tip * 100,
         items: cart.map((item) => ({
           productId: item.id,
           qty: item.qty,
-          unitPrice: item.price,
+          unitPrice: cellStock[item.id]?.find((c) => c.warehouseCellId === item.warehouseCellId)?.price ?? item.price,
           warehouseCellId: item.warehouseCellId,
         })),
       });
 
       if (result.success) {
         setLastSaleNumber(result.data.saleNumber);
+
+        // Sotuvdan keyin POS ichidagi cellStock state'ini ham darhol
+        // yangilaymiz. router.refresh() faqat server props'larini yangilaydi,
+        // lekin useState(initialCellStock) avtomatik ravishda yangilanmaydi.
+        // Aks holda, masalan 1 kg dan 0.8 kg sotilgach, POS keyingi savdoda
+        // eski 1 kg qoldiqni ko'rsatib qolishi mumkin.
+        const [freshStock, freshCells, freshPromotions] = await Promise.all([
+          getPointStockRecord(pointId),
+          getPointCellStock(pointId),
+          getActivePromotionDiscounts(pointId),
+        ]);
+        setStockOverride(freshStock);
+        setCellStock(freshCells);
+        setPromotionDiscounts(freshPromotions);
+
         setStage("success");
-        router.refresh(); // revalidate stock counts on the page
+        router.refresh();
       } else {
         toast.error(result.error);
         setStage("idle");
@@ -362,15 +413,30 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
                             "📦"
                           )}
                         </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold">{p.name}</p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-semibold truncate">{p.name}</p>
+                            {(() => {
+                              const c = getPreferredCell(p.id);
+                              const promo = c ? getDiscount(c.warehouseCellId, p.id) : undefined;
+                              return promo ? <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600">−{promo.discountPercent}%</span> : null;
+                            })()}
+                          </div>
                           <p className="text-[11px] text-gray-400">
                             {p.category} · {p.stock} {p.unit} in stock
                           </p>
                         </div>
-                        <p className="font-bold">
-                          {fmt(cellStock[p.id]?.[0]?.price ?? p.price)}
-                        </p>
+                        {(() => {
+                          const c = getPreferredCell(p.id);
+                          const promo = c ? getDiscount(c.warehouseCellId, p.id) : undefined;
+                          const price = c ? getSellPrice(c, p.id) : p.price;
+                          return promo ? (
+                            <div className="text-right shrink-0">
+                              <p className="text-[11px] text-gray-400 line-through">{fmt(c.price)}</p>
+                              <p className="font-bold text-red-600">{fmt(price)}</p>
+                            </div>
+                          ) : <p className="font-bold">{fmt(price)}</p>;
+                        })()}
                       </button>
                     ))}
                   </div>
@@ -486,8 +552,22 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
                         </div>
                       </div>
 
-                      <div className="text-right shrink-0">
-                        <p className="font-bold text-gray-900">{fmt(item.qty * item.price)}</p>
+                      <div className="text-right shrink-0 min-w-25">
+                        {item.discountPercent && item.discountPercent > 0 && currentCell ? (
+                          <div className="leading-tight">
+                            <div className="text-[11px] text-gray-400 line-through">
+                              {fmt(item.qty * currentCell.price)}
+                            </div>
+                            <div className="text-sm font-extrabold text-red-600">
+                              {fmt(item.qty * item.price)}
+                            </div>
+                            <div className="mt-1 inline-flex rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-bold text-red-600">
+                              −{item.discountPercent}% АКЦИЯ
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="font-bold text-gray-900">{fmt(item.qty * item.price)}</p>
+                        )}
                       </div>
                     </div>
                   );

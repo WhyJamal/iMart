@@ -134,6 +134,32 @@ export async function createSale(
       };
     }
 
+    const activePromotions = await prisma.promotion.findMany({
+      where: {
+        organizationId: session.organizationId,
+        pointId,
+        warehouseCellId: { in: cellIds },
+        endsAt: { gt: new Date() },
+      },
+      include: { items: true },
+    });
+    const bestPromotion = new Map<string, number>();
+    for (const promotion of activePromotions) {
+      for (const promotionItem of promotion.items) {
+        const key = `${promotion.warehouseCellId}:${promotionItem.productId}`;
+        const pct = Number(promotion.discountPercent);
+        if (!bestPromotion.has(key) || pct > bestPromotion.get(key)!) {
+          bestPromotion.set(key, pct);
+        }
+      }
+    }
+    const effectiveItems = items.map((item) => {
+      const discount = bestPromotion.get(`${item.warehouseCellId}:${item.productId}`) ?? 0;
+      return { ...item, unitPrice: item.unitPrice * (1 - discount / 100) };
+    });
+    const effectiveSubtotal = effectiveItems.reduce((sum, item) => sum + item.qty * item.unitPrice, 0);
+    const effectiveTotal = effectiveSubtotal * (1 + 0.08 + Number(parsed.data.tipPercent ?? 0) / 100);
+
     // ── 3. Har bir tanlangan yacheykaning joriy qoldig'ini tekshiramiz ─────
     const cellStockRows = await prisma.inventoryRegister.groupBy({
       by: ["warehouseCellId", "direction"],
@@ -172,10 +198,10 @@ export async function createSale(
           organizationId: session.organizationId,
           cashierId: session.userId ?? null,
           pointId,
-          totalAmount: parsed.data.totalAmount,
+          totalAmount: effectiveTotal,
           paymentMethod: parsed.data.paymentMethod,
           items: {
-            create: items.map((item) => ({
+            create: effectiveItems.map((item) => ({
               productId: item.productId,
               qty: item.qty,
               unitPrice: item.unitPrice,
@@ -189,7 +215,7 @@ export async function createSale(
       // tanlangan) bitta yacheykadan yechiladi. Boshqa yacheykaga
       // "sakrash" yo'q. unitCost — shu yacheykadagi JORIY o'rtacha
       // tannarx (ItemPrice) — endi null qoldirilmaydi.
-      for (const item of items) {
+      for (const item of effectiveItems) {
         const currentCost = await getItemPrice(
           tx,
           item.warehouseCellId,
@@ -225,7 +251,7 @@ export async function createSale(
         docId: doc.id,
         direction: "IN",
         method: parsed.data.paymentMethod.toUpperCase() as CashMethod,
-        amount: parsed.data.totalAmount,
+        amount: effectiveTotal,
         createdBy: session.userId,
       });
 

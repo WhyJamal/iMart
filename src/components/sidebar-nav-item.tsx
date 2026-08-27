@@ -24,6 +24,7 @@ import {
     Clock,
     ClipboardClock,
     FileMinus,
+    Percent,
     ArrowLeftRight,
 } from "lucide-react";
 
@@ -42,6 +43,7 @@ const icons = {
     "badge-dollar": BadgeDollarSign,
     warehouse: Warehouse,
     "file-minus": FileMinus,
+    percent: Percent,
     "map-pin": MapPin,
     "building": Building,
     calendar: Calendar,

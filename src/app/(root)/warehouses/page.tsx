@@ -34,10 +34,6 @@ export default async function WarehousesPage({
   return (
     <>
       <div className="p-6 space-y-6">
-        <DrawerBackdrop isOpen={!!edit}>
-          {editTarget && <WarehouseForm points={points} warehouse={editTarget} />}
-        </DrawerBackdrop>
-
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Warehouses</h1>
@@ -65,6 +61,10 @@ export default async function WarehousesPage({
 
       <DrawerBackdrop isOpen={isNew === "1"}>
         <WarehouseForm points={points} />
+      </DrawerBackdrop>
+
+      <DrawerBackdrop isOpen={!!edit}>
+        {editTarget && <WarehouseForm points={points} warehouse={editTarget} />}
       </DrawerBackdrop>
 
     </>

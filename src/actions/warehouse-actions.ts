@@ -344,10 +344,10 @@ export async function getPointCellStock(
   if (cells.length === 0) return {};
 
   const cellIds = cells.map((c: (typeof cells)[number]) => c.id);
-  const cellInfo = new Map<string, { cellName: string; warehouseName: string }>(
+  const cellInfo = new Map<string, { cellName: string; warehouseName: string; warehouseId: string }>(
     cells.map((c: (typeof cells)[number]) => [
       c.id,
-      { cellName: c.name, warehouseName: c.warehouse.name },
+      { cellName: c.name, warehouseName: c.warehouse.name, warehouseId: c.warehouse.id },
     ])
   );
 
@@ -387,6 +387,7 @@ export async function getPointCellStock(
         const info = cellInfo.get(warehouseCellId);
         return {
           warehouseCellId,
+          warehouseId: info?.warehouseId ?? "",
           cellName: info?.cellName ?? "",
           warehouseName: info?.warehouseName ?? "",
           available,

@@ -32,6 +32,7 @@ export interface IWarehouseStockRow {
 // (eng ko'pidan kamiga saralangan)
 export interface ICellStockOption {
   warehouseCellId: string;
+  warehouseId: string;
   cellName: string;
   warehouseName: string;
   available: number;

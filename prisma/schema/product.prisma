@@ -23,6 +23,7 @@ model Product {
   itemPrices         ItemPrice[]
   stockBalances      StockBalance[]
   writeOffItems      WriteOffItem[]
+  promotionItems     PromotionItem[]
   transferItems      TransferItem[]
 
   @@index([categoryId])

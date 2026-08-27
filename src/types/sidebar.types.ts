@@ -20,6 +20,7 @@ export type TIcon =
     | "clock"
     | "timesheet"
     | "file-minus"
+    | "percent"
     | "arrow-left-right"
     ;
 
