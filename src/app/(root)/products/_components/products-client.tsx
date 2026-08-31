@@ -26,6 +26,7 @@ import { IProduct } from "@/types/product.types";
 import { Drawer } from "@/components/drawer";
 import { ProductFormContent } from "./product-form-content";
 import { getUnitLabel } from "@/config/units";
+import { PhotoImportButton } from "./photo-import-button";
 
 interface ICategoryOption {
   id: string;
@@ -96,10 +97,14 @@ export function ProductsClient({ initialProducts, categories }: ProductsClientPr
               </p>
             </div>
 
-            <Button onClick={handleCreate} size="sm" className="gap-1.5">
-              <Plus className="w-4 h-4" />
-              New product
-            </Button>
+            <div className="flex gap-2">
+              <PhotoImportButton />
+
+              <Button onClick={handleCreate} size="sm" className="gap-1.5">
+                <Plus className="w-4 h-4" />
+                New product
+              </Button>
+            </div>
           </div>
 
           <div className="relative max-w-sm">
