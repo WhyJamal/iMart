@@ -256,24 +256,61 @@ async function getCellIdsForPoint(pointId: string): Promise<string[]> {
  * Berilgan Point'dagi (uning skladlari/yacheykalari bo'yicha jamlangan)
  * har bir mahsulot uchun joriy qoldiq. POS'da sotish uchun ishlatiladi.
  */
+// for PostGRESQL
+// export async function getPointStockMap(
+//   pointId: string
+// ): Promise<Map<string, number>> {
+//   const cellIds = await getCellIdsForPoint(pointId);
+//   const map = new Map<string, number>();
+//   if (cellIds.length === 0) return map;
+
+//   const rows = await prisma.inventoryRegister.groupBy({
+//     by: ["productId", "direction"],
+//     where: { warehouseCellId: { in: cellIds } },
+//     _sum: { qty: true },
+//   });
+
+//   for (const row of rows) {
+//     const val = Number(row._sum.qty ?? 0);
+//     const prev = map.get(row.productId) ?? 0;
+//     map.set(row.productId, row.direction === "IN" ? prev + val : prev - val);
+//   }
+//   return map;
+// }
 export async function getPointStockMap(
   pointId: string
 ): Promise<Map<string, number>> {
   const cellIds = await getCellIdsForPoint(pointId);
+
   const map = new Map<string, number>();
+
   if (cellIds.length === 0) return map;
 
-  const rows = await prisma.inventoryRegister.groupBy({
-    by: ["productId", "direction"],
-    where: { warehouseCellId: { in: cellIds } },
-    _sum: { qty: true },
+  const rows = await prisma.inventoryRegister.findMany({
+    where: {
+      warehouseCellId: {
+        in: cellIds,
+      },
+    },
+    select: {
+      productId: true,
+      direction: true,
+      qty: true,
+    },
   });
 
   for (const row of rows) {
-    const val = Number(row._sum.qty ?? 0);
+    const val = Number(row.qty);
     const prev = map.get(row.productId) ?? 0;
-    map.set(row.productId, row.direction === "IN" ? prev + val : prev - val);
+
+    const newStock =
+      row.direction === "IN"
+        ? prev + val
+        : prev - val;
+
+    map.set(row.productId, Number(newStock.toFixed(3)));
   }
+
   return map;
 }
 
@@ -334,70 +371,197 @@ export async function getPointStockRecord(
  * mahsulot qo'shilganda avtomatik eng ko'p qoldiqli yacheyka
  * tanlanadi, kassir xohlasa boshqasiga o'zgartiradi.
  */
+//for PostGRESQL
+// export async function getPointCellStock(
+//   pointId: string
+// ): Promise<Record<string, ICellStockOption[]>> {
+//   const cells = await prisma.warehouseCell.findMany({
+//     where: { warehouse: { pointId } },
+//     include: { warehouse: { select: { name: true } } },
+//   });
+//   if (cells.length === 0) return {};
+
+//   const cellIds = cells.map((c: (typeof cells)[number]) => c.id);
+//   const cellInfo = new Map<string, { cellName: string; warehouseName: string; warehouseId: string }>(
+//     cells.map((c: (typeof cells)[number]) => [
+//       c.id,
+//       { cellName: c.name, warehouseName: c.warehouse.name, warehouseId: c.warehouse.id },
+//     ])
+//   );
+
+//   const rows = await prisma.inventoryRegister.groupBy({
+//     by: ["productId", "warehouseCellId", "direction"],
+//     where: { warehouseCellId: { in: cellIds } },
+//     _sum: { qty: true },
+//   });
+
+//   // ItemPrice — shu yacheykalardagi joriy narxlar
+//   const priceRows = await prisma.itemPrice.findMany({
+//     where: { warehouseCellId: { in: cellIds } },
+//   });
+//   const priceMap = new Map<string, number>(); // `${cellId}:${productId}` -> price
+//   for (const p of priceRows) {
+//     priceMap.set(`${p.warehouseCellId}:${p.productId}`, Number(p.price));
+//   }
+
+//   // productId -> cellId -> qty
+//   const byProduct = new Map<string, Map<string, number>>();
+//   for (const row of rows) {
+//     if (!row.warehouseCellId) continue;
+//     const val = Number(row._sum.qty ?? 0);
+//     if (!byProduct.has(row.productId)) byProduct.set(row.productId, new Map());
+//     const cellMap = byProduct.get(row.productId)!;
+//     const prev = cellMap.get(row.warehouseCellId) ?? 0;
+//     cellMap.set(
+//       row.warehouseCellId,
+//       row.direction === "IN" ? prev + val : prev - val
+//     );
+//   }
+
+//   const result: Record<string, ICellStockOption[]> = {};
+//   for (const [productId, cellMap] of byProduct.entries()) {
+//     const options = Array.from(cellMap.entries())
+//       .map(([warehouseCellId, available]) => {
+//         const info = cellInfo.get(warehouseCellId);
+//         return {
+//           warehouseCellId,
+//           warehouseId: info?.warehouseId ?? "",
+//           cellName: info?.cellName ?? "",
+//           warehouseName: info?.warehouseName ?? "",
+//           available,
+//           price: priceMap.get(`${warehouseCellId}:${productId}`) ?? 0,
+//         };
+//       })
+//       .filter((c) => c.available > 0)
+//       .sort((a, b) => b.available - a.available);
+
+//     if (options.length > 0) result[productId] = options;
+//   }
+
+//   return result;
+// }
 export async function getPointCellStock(
   pointId: string
 ): Promise<Record<string, ICellStockOption[]>> {
   const cells = await prisma.warehouseCell.findMany({
-    where: { warehouse: { pointId } },
-    include: { warehouse: { select: { name: true } } },
+    where: {
+      warehouse: { pointId },
+    },
+    include: {
+      warehouse: {
+        select: { name: true },
+      },
+    },
   });
+
   if (cells.length === 0) return {};
 
-  const cellIds = cells.map((c: (typeof cells)[number]) => c.id);
-  const cellInfo = new Map<string, { cellName: string; warehouseName: string; warehouseId: string }>(
+  const cellIds = cells.map(
+    (c: (typeof cells)[number]) => c.id
+  );
+
+  const cellInfo = new Map<
+    string,
+    {
+      cellName: string;
+      warehouseName: string;
+      warehouseId: string;
+    }
+  >(
     cells.map((c: (typeof cells)[number]) => [
       c.id,
-      { cellName: c.name, warehouseName: c.warehouse.name, warehouseId: c.warehouse.id },
+      {
+        cellName: c.name,
+        warehouseName: c.warehouse.name,
+        warehouseId: c.warehouse.id,
+      },
     ])
   );
 
-  const rows = await prisma.inventoryRegister.groupBy({
-    by: ["productId", "warehouseCellId", "direction"],
-    where: { warehouseCellId: { in: cellIds } },
-    _sum: { qty: true },
+  // groupBy ishlatmaymiz, chunki SQLite + Decimal bilan
+  // 0.8 kabi kasr qiymatlar groupBy(_sum) orqali 0 bo'lib qolishi mumkin.
+  const rows = await prisma.inventoryRegister.findMany({
+    where: {
+      warehouseCellId: { in: cellIds },
+    },
+    select: {
+      productId: true,
+      warehouseCellId: true,
+      direction: true,
+      qty: true,
+    },
   });
 
   // ItemPrice — shu yacheykalardagi joriy narxlar
   const priceRows = await prisma.itemPrice.findMany({
-    where: { warehouseCellId: { in: cellIds } },
+    where: {
+      warehouseCellId: { in: cellIds },
+    },
   });
-  const priceMap = new Map<string, number>(); // `${cellId}:${productId}` -> price
+
+  const priceMap = new Map<string, number>();
+
   for (const p of priceRows) {
-    priceMap.set(`${p.warehouseCellId}:${p.productId}`, Number(p.price));
+    priceMap.set(
+      `${p.warehouseCellId}:${p.productId}`,
+      Number(p.price)
+    );
   }
 
   // productId -> cellId -> qty
   const byProduct = new Map<string, Map<string, number>>();
+
   for (const row of rows) {
     if (!row.warehouseCellId) continue;
-    const val = Number(row._sum.qty ?? 0);
-    if (!byProduct.has(row.productId)) byProduct.set(row.productId, new Map());
+
+    const val = Number(row.qty ?? 0);
+
+    if (!byProduct.has(row.productId)) {
+      byProduct.set(row.productId, new Map());
+    }
+
     const cellMap = byProduct.get(row.productId)!;
     const prev = cellMap.get(row.warehouseCellId) ?? 0;
+
+    const newAvailable =
+      row.direction === "IN"
+        ? prev + val
+        : prev - val;
+
+    // Floating point xatoni tozalash:
+    // 1 - 0.8 = 0.19999999999999996 -> 0.2
+    const roundedAvailable =
+      Math.round((newAvailable + Number.EPSILON) * 1000) / 1000;
+
     cellMap.set(
       row.warehouseCellId,
-      row.direction === "IN" ? prev + val : prev - val
+      roundedAvailable
     );
   }
 
   const result: Record<string, ICellStockOption[]> = {};
+
   for (const [productId, cellMap] of byProduct.entries()) {
     const options = Array.from(cellMap.entries())
       .map(([warehouseCellId, available]) => {
         const info = cellInfo.get(warehouseCellId);
+
         return {
           warehouseCellId,
           warehouseId: info?.warehouseId ?? "",
           cellName: info?.cellName ?? "",
           warehouseName: info?.warehouseName ?? "",
           available,
-          price: priceMap.get(`${warehouseCellId}:${productId}`) ?? 0,
+          price:
+            priceMap.get(`${warehouseCellId}:${productId}`) ?? 0,
         };
       })
       .filter((c) => c.available > 0)
       .sort((a, b) => b.available - a.available);
 
-    if (options.length > 0) result[productId] = options;
+    if (options.length > 0) {
+      result[productId] = options;
+    }
   }
 
   return result;

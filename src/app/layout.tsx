@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "iMart",
+  title: "Vol mart",
   description: "Sale app",
 };
 

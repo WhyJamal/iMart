@@ -182,6 +182,7 @@ export default function POSTerminal({ products, points, defaultPointId, initialC
             p.code.toLowerCase().includes(q))
       )
       .slice(0, 6);
+      //alert(JSON.stringify(effectiveProducts, null, 2));
   }, [search, effectiveProducts]);
 
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);

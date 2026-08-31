@@ -14,13 +14,13 @@ export default async function Header() {
         <header className="h-14 w-full border-b border-white/10 bg-[radial-gradient(circle,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(to_right,#450a0a,#1f0a0a)] bg-size-[16px_16px,100%_100%] flex items-center shrink-0 px-5 gap-4">
             <Link href={PAGES.HOME}>
                 <div className="flex items-center gap-3 shrink-0 pr-5 h-full">
-                    <Image src="/logos/iMart-logo.png" alt="iMart" width={24} height={24} />
+                    <Image src="/logos/logo.png" alt="iMart" width={24} height={24} />
                     <div>
                         <p className="text-sm font-semibold text-white leading-none">
-                            iMart
+                            Vol
                         </p>
-                        <p className="text-[10px] text-white/50 mt-0.5 tracking-wide">
-                            Sale Pro
+                        <p className="text-[10px] text-red-300 mt-0.5 tracking-wide">
+                            Mart
                         </p>
                     </div>
                 </div>
