@@ -48,32 +48,60 @@ export async function POST(request: Request) {
     const base64Image = buffer.toString("base64")
 
     const prompt = `
-        This image contains a handwritten or printed list of products
-        (a price list or inventory sheet).
+      This image contains a handwritten or printed list of products
+      (a price list or inventory sheet).
 
-        Extract each product's name, price, and quantity.
+      Extract every visible product.
 
-        Return ONLY a raw JSON array.
+      Return ONLY a raw JSON array.
 
-        Example:
-        [
+      Example:
+      [
         {
-            "name": "Product name",
-            "price": 10000,
-            "quantity": 2
+          "name": "Хлеб белый",
+          "price": 4000,
+          "quantity": 20,
+          "unit": "dona"
         }
-        ]
+      ]
 
-        Rules:
-        - Extract every visible product.
-        - Preserve the product name as accurately as possible.
-        - If price is not visible, use 0.
-        - If quantity is not visible, use 0.
-        - price must be a number.
-        - quantity must be a number.
-        - Do not include markdown.
-        - Do not include explanations.
-        `
+      Rules:
+
+      - Extract every visible product.
+      - Preserve the product name as accurately as possible.
+      - If price is not visible, use 0.
+      - If quantity is not visible, use 0.
+      - price must be a number.
+      - quantity must be a number.
+
+      The "unit" field MUST contain exactly ONE of these values:
+      - "dona" — individual pieces/items
+      - "quti" — box/package
+      - "kg" — kilogram
+      - "litr" — liter
+      - "metr" — meter
+
+      Unit rules:
+      - Eggs, bread, individual bottles, individual items -> "dona"
+      - Products explicitly sold as boxes/packages -> "quti"
+      - Products sold by kilogram -> "kg"
+      - Products sold by liters -> "litr"
+      - Products sold by meters -> "metr"
+      - If the unit cannot be determined, use "dona".
+
+      Examples:
+      "Рис 1 кг" -> unit: "kg"
+      "Сахар 1 кг" -> unit: "kg"
+      "Масло подсолнечное 1 л" -> unit: "litr"
+      "Молоко 1 л" -> unit: "litr"
+      "Хлеб белый" -> unit: "dona"
+      "Яйца (10 шт)" -> unit: "quti" if the quantity represents packages of 10 eggs; otherwise "dona"
+      "Вода 1,5 л" -> unit: "litr"
+
+      Do not include markdown.
+      Do not include explanations.
+      Return ONLY valid JSON.
+      `;
 
     const response = await fetch(
       `${GEMINI_API_URL}?key=${apiKey}`,
@@ -137,7 +165,6 @@ export async function POST(request: Request) {
       )
     }
 
-    // 9. JSON parse
     const cleaned = textOutput
       .replace(/```json/g, "")
       .replace(/```/g, "")
