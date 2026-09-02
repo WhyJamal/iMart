@@ -7,6 +7,7 @@ declare module "next-auth" {
       id: string;
       organizationId: string | null;
       role: Role;
+      locale: string;
       pointId: string | null;
     } & DefaultSession["user"];
   }

@@ -1,0 +1,23 @@
+{
+  "dashboard": "Boshqaruv paneli",
+  "pos": "Terminal",
+  "purchases": "Xaridlar",
+  "sales": "Sotuvlar",
+  "cash": "Kassa",
+  "points": "Nuqtalar",
+  "contragents": "Kontragentlar",
+  "staffAndPayroll": "Xodimlar va ish haqi",
+  "users": "Foydalanuvchilar",
+  "calendar": "Ishlab chiqarish kalendari",
+  "workSchedules": "Ish jadvallari",
+  "timesheets": "Tabel",
+  "salary": "Xodim maoshi",
+  "payroll": "Ish haqini hisoblash",
+  "warehouses": "Omborlar",
+  "items": "Mahsulotlar",
+  "promotions": "Aksiyalar",
+  "transfers": "Mahsulotlarni ko‘chirish",
+  "writeOffs": "Mahsulotlarni hisobdan chiqarish",
+  "purchaseReturns": "Yetkazib beruvchilarga qaytarish",
+  "returns": "Sotuvlarni qaytarish"
+}

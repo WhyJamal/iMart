@@ -19,47 +19,53 @@ import {
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
 
+  const statCards = [
+    {
+      labelKey: "todaySales",
+      value: stats.todayRevenue.toLocaleString("uz-UZ"),
+      icon: TrendingUp,
+    },
+    {
+      labelKey: "monthlySales",
+      value: stats.monthRevenue.toLocaleString("uz-UZ"),
+      icon: ShoppingCart,
+    },
+    {
+      labelKey: "monthlyPurchases",
+      value: stats.monthPurchaseCost.toLocaleString("uz-UZ"),
+      icon: Package,
+    },
+    {
+      labelKey: "cash",
+      value: stats.cashBalance.toLocaleString("uz-UZ"),
+      icon: Wallet,
+    },
+    {
+      labelKey: "bank",
+      value: stats.bankBalance.toLocaleString("uz-UZ"),
+      icon: Landmark,
+    },
+    {
+      labelKey: "lowStock",
+      value: String(stats.lowStockCount),
+      icon: AlertTriangle,
+      tone: "warning" as const,
+    },
+  ];
+
   return (
     <div className="space-y-6 p-10">
-
       {/* Stat cards */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
-        <StatCard
-          label="Bugungi savdo"
-          value={stats.todayRevenue.toLocaleString("uz-UZ")}
-          icon={TrendingUp}
-        />
-
-        <StatCard
-          label="Oylik savdo"
-          value={stats.monthRevenue.toLocaleString("uz-UZ")}
-          icon={ShoppingCart}
-        />
-
-        <StatCard
-          label="Oylik xarid"
-          value={stats.monthPurchaseCost.toLocaleString("uz-UZ")}
-          icon={Package}
-        />
-
-        <StatCard
-          label="Kassa"
-          value={stats.cashBalance.toLocaleString("uz-UZ")}
-          icon={Wallet}
-        />
-
-        <StatCard
-          label="Bank"
-          value={stats.bankBalance.toLocaleString("uz-UZ")}
-          icon={Landmark}
-        />
-
-        <StatCard
-          label="Kam qolgan mahsulotlar"
-          value={String(stats.lowStockCount)}
-          icon={AlertTriangle}
-          tone="warning"
-        />
+        {statCards.map((stat) => (
+          <StatCard
+            key={stat.labelKey}
+            labelKey={stat.labelKey}
+            value={stat.value}
+            icon={stat.icon}
+            tone={stat.tone}
+          />
+        ))}
       </div>
 
       {/* Charts */}
@@ -76,7 +82,6 @@ export default async function DashboardPage() {
       <div className="grid gap-6 xl:grid-cols-1">
         <PointRevenueChart data={stats.pointRevenue} />
       </div>
-
     </div>
   );
 }

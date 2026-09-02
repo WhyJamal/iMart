@@ -16,39 +16,52 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
-const chartConfig = {
-  savdo: {
-    label: "Savdo",
-    color: "var(--color-chart-2)",
-  },
-  xarid: {
-    label: "Xarid",
-    color: "var(--color-chart-4)",
-  },
-} satisfies ChartConfig;
+import { useTranslations } from "next-intl";
 
 export function MonthlyOverviewChart({
   data,
 }: {
-  data: { label: string; savdo: number; xarid: number }[];
+  data: {
+    label: string;
+    sales: number;
+    purchases: number;
+  }[];
 }) {
+  const t = useTranslations("dashboard");
+
+  const chartConfig = {
+    sales: {
+      label: t("monthlyOverview.sales"),
+      color: "var(--color-chart-2)",
+    },
+    purchases: {
+      label: t("monthlyOverview.purchases"),
+      color: "var(--color-chart-4)",
+    },
+  } satisfies ChartConfig;
+
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Oylik ko&apos;rsatkichlar</CardTitle>
-        <CardDescription>So&apos;nggi 6 oy — savdo va xarid</CardDescription>
+        <CardTitle>{t("monthlyOverview.title")}</CardTitle>
+        <CardDescription>{t("monthlyOverview.description")}</CardDescription>
       </CardHeader>
+
       <CardContent>
         <ChartContainer config={chartConfig} className="h-70 w-full">
-          <BarChart data={data} margin={{ left: 0, right: 12, top: 8 }}>
+          <BarChart
+            data={data}
+            margin={{ left: 0, right: 12, top: 8 }}
+          >
             <CartesianGrid vertical={false} />
+
             <XAxis
               dataKey="label"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
             />
+
             <ChartTooltip
               cursor={false}
               content={
@@ -57,8 +70,11 @@ export function MonthlyOverviewChart({
                   formatter={(value, name) => (
                     <div className="flex w-full items-center justify-between gap-4">
                       <span className="text-muted-foreground">
-                        {name === "savdo" ? "Savdo" : "Xarid"}
+                        {name === "sales"
+                          ? t("monthlyOverview.sales")
+                          : t("monthlyOverview.purchases")}
                       </span>
+
                       <span className="font-mono font-medium tabular-nums text-foreground">
                         {Number(value).toLocaleString("uz-UZ")} so&apos;m
                       </span>
@@ -67,9 +83,20 @@ export function MonthlyOverviewChart({
                 />
               }
             />
+
             <ChartLegend content={<ChartLegendContent />} />
-            <Bar dataKey="savdo" fill="var(--color-savdo)" radius={4} />
-            <Bar dataKey="xarid" fill="var(--color-xarid)" radius={4} />
+
+            <Bar
+              dataKey="sales"
+              fill="var(--color-sales)"
+              radius={4}
+            />
+
+            <Bar
+              dataKey="purchases"
+              fill="var(--color-purchases)"
+              radius={4}
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>

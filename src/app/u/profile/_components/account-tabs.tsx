@@ -5,14 +5,18 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { updateProfile, changePassword } from "@/actions/user-actions";
+import { updateProfile, changePassword, updateLocale } from "@/actions/user-actions";
 import { Button } from "@/components/ui/button";
+import { LOCALE_KEYS, LOCALES, type TLocale } from "@/config/locales.config";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSession } from "next-auth/react";
 
 interface Props {
   user: {
     id: string;
     name: string;
     email: string;
+    locale: TLocale;
     organization: { id: string; name: string; logo: string | null } | null;
   };
 }
@@ -37,6 +41,24 @@ function AccountForm({ user }: Props) {
   const [firstName, setFirstName] = useState(initialFirst);
   const [lastName, setLastName] = useState(initialLast);
   const [email, setEmail] = useState(user.email);
+
+  const { update: updateSession } = useSession();
+
+  const handleLocaleChange = (locale: TLocale) => {
+    if (locale === user.locale) return;
+
+    startTransition(async () => {
+      const result = await updateLocale(locale);
+
+      if (result.success) {
+        await updateSession({ locale }); 
+        toast.success("Til yangilandi");
+        router.refresh();
+      } else {
+        toast.error(result.error);
+      }
+    });
+  };
 
   const handleSubmit = () => {
     const name = `${firstName} ${lastName}`.trim();
@@ -86,6 +108,29 @@ function AccountForm({ user }: Props) {
             disabled={isPending}
             className="h-10 rounded-lg border-[#d2d2d7] text-[15px] focus-visible:ring-[#0071e3]/25 focus-visible:border-[#0071e3]"
           />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-[13px] font-medium text-[#6e6e73]">
+            Язык
+          </Label>
+
+          <Select
+            value={user.locale}
+            onValueChange={(value) => handleLocaleChange(value as TLocale)}
+            disabled={isPending}
+          >
+            <SelectTrigger className="h-10 rounded-lg border-[#d2d2d7] text-[15px] focus:ring-[#0071e3]/25">
+              <SelectValue />
+            </SelectTrigger>
+
+            <SelectContent>
+              {LOCALE_KEYS.map((locale) => (
+                <SelectItem key={locale} value={locale}>
+                  {LOCALES[locale].nativeName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-1.5">
           <Label className="text-[13px] font-medium text-[#6e6e73]">Tashkilot</Label>

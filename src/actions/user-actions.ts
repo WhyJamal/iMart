@@ -17,6 +17,7 @@ import type { ActionResult } from "@/types/action-result.types";
 import type { IOrgUser } from "@/types/user.types";
 import type { Role } from "@/types/role.types";
 import { PAGES } from "@/config/pages.config";
+import { isLocale, type TLocale } from "@/config/locales.config";
 
 export async function getProfile() {
   const session = await getServerSession();
@@ -29,6 +30,7 @@ export async function getProfile() {
       name: true,
       email: true,
       role: true,
+      locale: true,
       organization: { select: { id: true, name: true, logo: true } },
     },
   });
@@ -352,7 +354,6 @@ export async function updateUserSchedule({
       };
     }
 
-    // Tanlangan grafik shu tashkilotga tegishlimi?
     const schedule = await prisma.workSchedule.findFirst({
       where: {
         id: workScheduleId,
@@ -388,6 +389,51 @@ export async function updateUserSchedule({
     return {
       success: false,
       error: "Не удалось изменить график пользователя.",
+    };
+  }
+}
+
+export async function updateLocale(
+  locale: TLocale
+): Promise<ActionResult<undefined>> {
+  try {
+    const session = await getServerSession();
+
+    if (!session) {
+      return {
+        success: false,
+        error: "Unauthorized",
+      };
+    }
+
+    if (!isLocale(locale)) {
+      return {
+        success: false,
+        error: "Неправильный язык.",
+      };
+    }
+
+    await prisma.user.update({
+      where: {
+        id: session.userId,
+      },
+      data: {
+        locale,
+      },
+    });
+
+    revalidatePath(PAGES.PROFILE);
+
+    return {
+      success: true,
+      data: undefined,
+    };
+  } catch (err) {
+    console.error("[updateLocale]", err);
+
+    return {
+      success: false,
+      error: "Язык не удалось обновить.",
     };
   }
 }

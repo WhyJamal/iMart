@@ -1,0 +1,38 @@
+{
+  "stats": {
+    "todaySales": "Today's Sales",
+    "monthlySales": "Monthly Sales",
+    "monthlyPurchases": "Monthly Purchases",
+    "cash": "Cash",
+    "bank": "Bank",
+    "lowStock": "Low Stock Products"
+  },
+  "revenueTrend": {
+    "title": "Sales & Purchase Trend",
+    "description": "Last 14 days",
+    "sales": "Sales",
+    "purchases": "Purchases"
+  },
+  "monthlyOverview": {
+    "title": "Monthly Overview",
+    "description": "Last 6 months — sales and purchases",
+    "sales": "Sales",
+    "purchases": "Purchases"
+  },
+  "paymentMethod": {
+    "title": "Payment Methods",
+    "description": "Share for the current month",
+    "noSales": "No sales recorded yet"
+  },
+  "topProducts": {
+    "title": "Top Products",
+    "description": "Products generating the most revenue",
+    "revenue": "Revenue"
+  },
+  "pointRevenue": {
+    "title": "Sales by Point",
+    "description": "This month — which point generated the most sales",
+    "total": "Total",
+    "noSales": "No sales this month yet"
+  }
+}

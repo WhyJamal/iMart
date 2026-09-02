@@ -28,8 +28,8 @@ export type TDashboardStats = {
   bankBalance: number;
   totalProducts: number;
   lowStockCount: number;
-  revenueTrend: { label: string; savdo: number; xarid: number }[];
-  monthlyOverview: { label: string; savdo: number; xarid: number }[];
+  revenueTrend: { label: string; sales: number; purchases: number }[];
+  monthlyOverview: { label: string; sales: number; purchases: number }[];
   paymentBreakdown: { method: string; amount: number; fill: string }[];
   topProducts: { name: string; revenue: number }[];
   pointRevenue: { name: string; revenue: number }[];
@@ -116,45 +116,45 @@ export async function getDashboardStats(): Promise<TDashboardStats> {
   ).length;
 
   // ── 14-day daily trend (savdo vs xarid) ──────────────────────────
-  const dailyBuckets = new Map<string, { label: string; savdo: number; xarid: number }>();
+  const dailyBuckets = new Map<string, { label: string; sales: number; purchases: number }>();
   for (let i = 0; i < 14; i++) {
     const d = new Date(fourteenDaysAgo);
     d.setDate(d.getDate() + i);
     dailyBuckets.set(dateKey(d), {
       label: `${d.getDate()}/${d.getMonth() + 1}`,
-      savdo: 0,
-      xarid: 0,
+      sales: 0,
+      purchases: 0,
     });
   }
   for (const sale of saleRows) {
     if (sale.createdAt < fourteenDaysAgo) continue;
     const bucket = dailyBuckets.get(dateKey(sale.createdAt));
-    if (bucket) bucket.savdo += Number(sale.totalAmount);
+    if (bucket) bucket.sales += Number(sale.totalAmount);
   }
   for (const item of purchaseItemRows) {
     if (item.receipt.createdAt < fourteenDaysAgo) continue;
     const bucket = dailyBuckets.get(dateKey(item.receipt.createdAt));
-    if (bucket) bucket.xarid += Number(item.qty) * Number(item.unitCost ?? 0);
+    if (bucket) bucket.purchases += Number(item.qty) * Number(item.unitCost ?? 0);
   }
   const revenueTrend = Array.from(dailyBuckets.values());
 
   // ── 6-month overview (savdo vs xarid) ────────────────────────────
-  const monthlyBuckets = new Map<string, { label: string; savdo: number; xarid: number }>();
+  const monthlyBuckets = new Map<string, { label: string; sales: number; purchases: number }>();
   for (let i = 0; i < 6; i++) {
     const d = new Date(sixMonthsAgo.getFullYear(), sixMonthsAgo.getMonth() + i, 1);
     monthlyBuckets.set(monthKey(d), {
       label: UZ_MONTHS[d.getMonth()],
-      savdo: 0,
-      xarid: 0,
+      sales: 0,
+      purchases: 0,
     });
   }
   for (const sale of saleRows) {
     const bucket = monthlyBuckets.get(monthKey(sale.createdAt));
-    if (bucket) bucket.savdo += Number(sale.totalAmount);
+    if (bucket) bucket.sales += Number(sale.totalAmount);
   }
   for (const item of purchaseItemRows) {
     const bucket = monthlyBuckets.get(monthKey(item.receipt.createdAt));
-    if (bucket) bucket.xarid += Number(item.qty) * Number(item.unitCost ?? 0);
+    if (bucket) bucket.purchases += Number(item.qty) * Number(item.unitCost ?? 0);
   }
   const monthlyOverview = Array.from(monthlyBuckets.values());
 

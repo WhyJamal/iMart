@@ -1,0 +1,38 @@
+{
+  "stats": {
+    "todaySales": "Bugungi savdo",
+    "monthlySales": "Oylik savdo",
+    "monthlyPurchases": "Oylik xarid",
+    "cash": "Kassa",
+    "bank": "Bank",
+    "lowStock": "Kam qolgan mahsulotlar"
+  },
+  "revenueTrend": {
+    "title": "Savdo va xarid dinamikasi",
+    "description": "So'nggi 14 kun",
+    "sales": "Savdo",
+    "purchases": "Xarid"
+  },
+  "monthlyOverview": {
+    "title": "Oylik ko'rsatkichlar",
+    "description": "So'nggi 6 oy — savdo va xarid",
+    "sales": "Savdo",
+    "purchases": "Xarid"
+  },
+  "paymentMethod": {
+    "title": "To'lov usullari",
+    "description": "Joriy oy bo'yicha ulush",
+    "noSales": "Hali savdo qayd etilmagan"
+  },
+  "topProducts": {
+    "title": "Top mahsulotlar",
+    "description": "Eng ko'p tushum keltirgan mahsulotlar",
+    "revenue": "Tushum"
+  },
+  "pointRevenue": {
+    "title": "Pointlar bo'yicha savdo",
+    "description": "Shu oy — qaysi nuqta ko'proq savdo qilgani",
+    "total": "Jami",
+    "noSales": "Shu oy hali savdo yo'q"
+  }
+}

@@ -14,59 +14,85 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
-const chartConfig = {
-  savdo: {
-    label: "Savdo",
-    color: "var(--color-chart-2)",
-  },
-  xarid: {
-    label: "Xarid",
-    color: "var(--color-chart-4)",
-  },
-} satisfies ChartConfig;
+import { useTranslations } from "next-intl";
 
 export function RevenueTrendChart({
   data,
 }: {
-  data: { label: string; savdo: number; xarid: number }[];
+  data: {
+    label: string;
+    sales: number;
+    purchases: number;
+  }[];
 }) {
+  const t = useTranslations("dashboard");
+
+  const chartConfig = {
+    sales: {
+      label: t("revenueTrend.sales"),
+      color: "var(--color-chart-2)",
+    },
+    purchases: {
+      label: t("revenueTrend.purchases"),
+      color: "var(--color-chart-4)",
+    },
+  } satisfies ChartConfig;
+
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Savdo va xarid dinamikasi</CardTitle>
-        <CardDescription>So&apos;nggi 14 kun</CardDescription>
+        <CardTitle>{t("revenueTrend.title")}</CardTitle>
+        <CardDescription>{t("revenueTrend.description")}</CardDescription>
       </CardHeader>
+
       <CardContent>
         <ChartContainer config={chartConfig} className="h-70 w-full">
-          <AreaChart data={data} margin={{ left: 0, right: 12, top: 8 }}>
+          <AreaChart
+            data={data}
+            margin={{ left: 0, right: 12, top: 8 }}
+          >
             <defs>
-              <linearGradient id="fillSavdo" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient
+                id="fillSales"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
                 <stop
                   offset="5%"
-                  stopColor="var(--color-savdo)"
+                  stopColor="var(--color-sales)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-savdo)"
+                  stopColor="var(--color-sales)"
                   stopOpacity={0.05}
                 />
               </linearGradient>
-              <linearGradient id="fillXarid" x1="0" y1="0" x2="0" y2="1">
+
+              <linearGradient
+                id="fillPurchases"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
                 <stop
                   offset="5%"
-                  stopColor="var(--color-xarid)"
+                  stopColor="var(--color-purchases)"
                   stopOpacity={0.6}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-xarid)"
+                  stopColor="var(--color-purchases)"
                   stopOpacity={0.05}
                 />
               </linearGradient>
             </defs>
+
             <CartesianGrid vertical={false} />
+
             <XAxis
               dataKey="label"
               tickLine={false}
@@ -74,6 +100,7 @@ export function RevenueTrendChart({
               tickMargin={8}
               minTickGap={24}
             />
+
             <ChartTooltip
               cursor={false}
               content={
@@ -82,8 +109,11 @@ export function RevenueTrendChart({
                   formatter={(value, name) => (
                     <div className="flex w-full items-center justify-between gap-4">
                       <span className="text-muted-foreground">
-                        {name === "savdo" ? "Savdo" : "Xarid"}
+                        {name === "sales"
+                          ? t("revenueTrend.sales")
+                          : t("revenueTrend.purchases")}
                       </span>
+
                       <span className="font-mono font-medium tabular-nums text-foreground">
                         {Number(value).toLocaleString("uz-UZ")} so&apos;m
                       </span>
@@ -92,19 +122,21 @@ export function RevenueTrendChart({
                 />
               }
             />
+
             <Area
-              dataKey="xarid"
+              dataKey="purchases"
               type="monotone"
-              fill="url(#fillXarid)"
-              stroke="var(--color-xarid)"
+              fill="url(#fillPurchases)"
+              stroke="var(--color-purchases)"
               strokeWidth={2}
               stackId="a"
             />
+
             <Area
-              dataKey="savdo"
+              dataKey="sales"
               type="monotone"
-              fill="url(#fillSavdo)"
-              stroke="var(--color-savdo)"
+              fill="url(#fillSales)"
+              stroke="var(--color-sales)"
               strokeWidth={2}
               stackId="b"
             />

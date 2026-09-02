@@ -4,6 +4,8 @@ model User {
   email          String        @unique
   password       String
   role           String        @default("CASHIER") // Role type: OWNER | ADMIN | MANAGER | CASHIER
+  locale         String        @default("ru") // Locale type: ru | en | uz
+  isActive       Boolean       @default(true)
 
   organization   Organization? @relation(fields: [organizationId], references: [id])
   organizationId String?

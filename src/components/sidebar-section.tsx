@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 import type { TItem } from "@/types/sidebar.types";
 import { SidebarNavItem } from "./sidebar-nav-item";
 
+import { useTranslations } from "next-intl";
+
 export default function SidebarSection({
     title,
     items,
@@ -16,7 +18,7 @@ export default function SidebarSection({
     items: TItem[];
     defaultOpen?: boolean;
 }) {
-    const pathname = usePathname();
+    const t = useTranslations("sidebar");
     const [open, setOpen] = useState(defaultOpen);
 
     return (
@@ -25,7 +27,7 @@ export default function SidebarSection({
                 onClick={() => setOpen(!open)}
                 className="w-full flex items-center justify-between px-3 py-3.5 text-[10px] font-bold tracking-[0.14em] uppercase text-gray-400 hover:text-gray-600 transition-colors"
             >
-                <span>{title}</span>
+                <span>{t(title)}</span>
 
                 <ChevronDown
                     size={14}

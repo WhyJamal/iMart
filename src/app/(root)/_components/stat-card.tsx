@@ -1,9 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslations } from "next-intl";
 
 interface StatCardProps {
-  label: string;
+  labelKey: string;
   value: string;
   icon: LucideIcon;
   hint?: string;
@@ -17,17 +18,19 @@ const toneStyles: Record<NonNullable<StatCardProps["tone"]>, string> = {
 };
 
 export function StatCard({
-  label,
+  labelKey,
   value,
   icon: Icon,
   hint,
   tone = "default",
 }: StatCardProps) {
+  const t = useTranslations("dashboard");
+  
   return (
     <Card>
       <CardContent className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-medium text-muted-foreground">{label}</p>
+          <p className="text-xs font-medium text-muted-foreground">{t(`stats.${labelKey}`)}</p>
           <p className="mt-1.5 truncate text-xl font-semibold tracking-tight">
             {value}
           </p>

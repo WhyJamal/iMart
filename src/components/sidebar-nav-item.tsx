@@ -27,6 +27,7 @@ import {
     Percent,
     ArrowLeftRight,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const icons = {
     dashboard: LayoutDashboard,
@@ -57,6 +58,7 @@ export function SidebarNavItem({
 }: {
     item: TItem;
 }) {
+    const t = useTranslations("sidebar");
     const pathname = usePathname();
 
     const active =
@@ -106,7 +108,7 @@ export function SidebarNavItem({
                             : "text-black/70 group-hover:text-red-500"
                     }`}
                 >
-                    {item.label}
+                    {t(item.labelKey)}
                 </span>
 
                 {item.badge && (

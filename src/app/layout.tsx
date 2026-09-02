@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -18,20 +21,24 @@ export const metadata: Metadata = {
   description: "Sale app",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  console.log("RootLayout locale:", locale);
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SessionProvider>
-          {children}
-        </SessionProvider>
+        <NextIntlClientProvider>
+          <SessionProvider>
+            {children}
+          </SessionProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

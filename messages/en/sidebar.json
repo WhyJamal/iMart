@@ -1,0 +1,23 @@
+{
+  "dashboard": "Dashboard",
+  "pos": "POS Terminal",
+  "purchases": "Purchases",
+  "sales": "Sales",
+  "cash": "Cash",
+  "points": "Locations",
+  "contragents": "Counterparties",
+  "staffAndPayroll": "Staff & Payroll",
+  "users": "Users",
+  "calendar": "Production Calendar",
+  "workSchedules": "Work Schedules",
+  "timesheets": "Timesheet",
+  "salary": "Employee Salary",
+  "payroll": "Payroll",
+  "warehouses": "Warehouses",
+  "items": "Products",
+  "promotions": "Promotions",
+  "transfers": "Product Transfers",
+  "writeOffs": "Product Write-offs",
+  "purchaseReturns": "Supplier Returns",
+  "returns": "Sales Returns"
+}

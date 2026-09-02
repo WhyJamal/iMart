@@ -26,15 +26,15 @@ export type TIcon =
 
     export type TItem = {
     id: string;
-    label: string;
+    labelKey: string;
     icon: TIcon;
     badge?: number;
     href: string;
-    permission?: Permission; // bo'lmasa — hammaga ko'rinadi
+    permission?: Permission; 
 };
 
 export interface ISidebar { 
-    group: string;
+    groupKey: string;
     defaultOpen?: boolean;
     items: TItem[];
 }

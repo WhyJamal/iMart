@@ -24,7 +24,7 @@ export default async function Sidebar() {
     return (
         <aside className="w-60 bg-white border-r border-gray-100 flex flex-col h-full shadow-[1px_0_16px_rgba(0,0,0,0.04)] shrink-0">
             <nav className="px-2 pt-4 space-y-0.5">
-                {visible(SIDEBARITEMS.find((g) => g.group === "top")?.items ?? []).map(
+                {visible(SIDEBARITEMS.find((g) => g.groupKey === "top")?.items ?? []).map(
                     (item) => (
                         <SidebarNavItem
                             key={item.id}
@@ -35,11 +35,11 @@ export default async function Sidebar() {
             </nav>
 
             <div className="flex-1 overflow-y-auto">
-                {SIDEBARITEMS.filter((g) => g.group !== "top").map(
+                {SIDEBARITEMS.filter((g) => g.groupKey !== "top").map(
                     (section) => (
                         <SidebarSection
-                            key={section.group}
-                            title={section.group}
+                            key={section.groupKey}
+                            title={section.groupKey}
                             items={visible(section.items)}
                             defaultOpen={section.defaultOpen}
                         />
