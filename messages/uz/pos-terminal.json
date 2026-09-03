@@ -1,0 +1,62 @@
+{
+    "search": {
+        "title": "Mahsulot qidirish",
+        "placeholder": "Nom, kategoriya yoki kod bo‘yicha qidiring...",
+        "qrPlaceholder": "QR / shtrix-kodni skanerlang ↵",
+        "inStock": "qoldiqda"
+    },
+    "cart": {
+        "title": "Mahsulotlar",
+        "items": "ta",
+        "lines": "qator",
+        "empty": "Hali mahsulot qo‘shilmagan",
+        "remaining": "qoldi",
+        "remove": "O‘chirish",
+        "promotion": "AKSIYA"
+    },
+    "point": {
+        "title": "Point",
+        "empty": "Pointlar mavjud emas",
+        "loading": "Qoldiq yuklanmoqda..."
+    },
+    "payment": {
+        "title": "To‘lov usuli"
+    },
+    "paymentMethods": {
+        "card": "Karta",
+        "cash": "Naqd",
+        "qr": "QR to‘lov"
+    },
+    "tips": {
+        "none": "Choychaqa yo‘q"
+    },
+    "tip": {
+        "title": "Choychaqa"
+    },
+    "summary": {
+        "subtotal": "Oraliq summa",
+        "tax": "Soliq {percent}%",
+        "tip": "Choychaqa {percent}%",
+        "total": "Jami",
+        "addProducts": "Avval mahsulot qo‘shing",
+        "charge": "To‘lash {amount}",
+        "processing": "Qayta ishlanmoqda..."
+    },
+    "overlay": {
+        "processingTitle": "To‘lov amalga oshirilmoqda",
+        "pleaseWait": "Iltimos, kuting...",
+        "approved": "To‘lov tasdiqlandi",
+        "via": "orqali",
+        "newSale": "Yangi savdo",
+        "receipt": "Chek"
+    },
+    "messages": {
+        "cellNotFound": "\"{product}\" uchun bu nuqtada yacheyka topilmadi",
+        "cellStockLimit": "Bu yacheykada faqat {quantity} {unit} mavjud",
+        "availableQuantity": "Faqat {quantity} {unit} mavjud",
+        "emptyCell": "Tanlangan yacheykada qoldiq yo‘q",
+        "quantityReduced": "Miqdor {quantity} tagacha kamaytirildi",
+        "selectPoint": "Avval Point tanlang",
+        "productNotFound": "Mahsulot topilmadi"
+    }
+}

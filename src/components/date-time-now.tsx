@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 
 type Color = "white" | "black";
 
@@ -8,7 +9,11 @@ interface DateTimeNowProps {
   color?: Color;
 }
 
-export function DateTimeNow({ color = "black" }: DateTimeNowProps) {
+export function DateTimeNow({
+  color = "black",
+}: DateTimeNowProps) {
+  const locale = useLocale();
+
   const [mounted, setMounted] = useState(false);
   const [clock, setClock] = useState<Date | null>(null);
 
@@ -16,11 +21,11 @@ export function DateTimeNow({ color = "black" }: DateTimeNowProps) {
     setMounted(true);
     setClock(new Date());
 
-    const t = setInterval(() => {
+    const timer = setInterval(() => {
       setClock(new Date());
     }, 1000);
 
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
   }, []);
 
   if (!mounted || !clock) {
@@ -32,25 +37,35 @@ export function DateTimeNow({ color = "black" }: DateTimeNowProps) {
     );
   }
 
-  const timeStr = clock.toLocaleTimeString("en-US", {
+  const timeStr = clock.toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   });
 
-  const dateStr = clock.toLocaleDateString("en-US", {
+  const dateStr = clock.toLocaleDateString(locale, {
     weekday: "short",
     month: "short",
     day: "numeric",
   });
 
-  const textColor = color === "white" ? "text-white" : "text-gray-800";
-  const subColor = color === "white" ? "text-gray-200" : "text-gray-400";
+  const textColor =
+    color === "white"
+      ? "text-white"
+      : "text-gray-800";
+
+  const subColor =
+    color === "white"
+      ? "text-gray-200"
+      : "text-gray-400";
 
   return (
-    <div className="text-right">
-      <p className={`text-[13px] font-bold tracking-tight ${textColor}`}>
+    <div className="text-right hover:bg-white/20 transition rounded-xl px-3 py-1 flex flex-col items-end">
+      <p
+        className={`text-[13px] font-bold tracking-tight ${textColor}`}
+      >
         {timeStr}
       </p>
+
       <p className={`text-[10px] ${subColor}`}>
         {dateStr}
       </p>

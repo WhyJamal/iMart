@@ -1,0 +1,62 @@
+{
+    "search": {
+        "title": "Search products",
+        "placeholder": "Search by name, category or code...",
+        "qrPlaceholder": "Scan QR / barcode ↵",
+        "inStock": "in stock"
+    },
+    "cart": {
+        "title": "Products",
+        "items": "items",
+        "lines": "lines",
+        "empty": "No products added yet",
+        "remaining": "remaining",
+        "remove": "Remove",
+        "promotion": "PROMOTION"
+    },
+    "point": {
+        "title": "Point",
+        "empty": "No points available",
+        "loading": "Loading stock..."
+    },
+    "payment": {
+        "title": "Payment method"
+    },
+    "paymentMethods": {
+        "card": "Card",
+        "cash": "Cash",
+        "qr": "QR Pay"
+    },
+    "tips": {
+        "none": "No tip"
+    },
+    "tip": {
+        "title": "Add tip"
+    },
+    "summary": {
+        "subtotal": "Subtotal",
+        "tax": "Tax {percent}%",
+        "tip": "Tip {percent}%",
+        "total": "Total",
+        "addProducts": "Add products first",
+        "charge": "Charge {amount}",
+        "processing": "Processing..."
+    },
+    "overlay": {
+        "processingTitle": "Processing payment",
+        "pleaseWait": "Please wait...",
+        "approved": "Payment approved",
+        "via": "via",
+        "newSale": "New Sale",
+        "receipt": "Receipt"
+    },
+    "messages": {
+        "cellNotFound": "\"{product}\" was not found in a warehouse cell at this point",
+        "cellStockLimit": "Only {quantity} {unit} available in this cell",
+        "availableQuantity": "Only {quantity} {unit} available",
+        "emptyCell": "The selected cell has no stock",
+        "quantityReduced": "Quantity reduced to {quantity}",
+        "selectPoint": "Please select a point first",
+        "productNotFound": "Product not found"
+    }
+}

@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+
 import { Loader2, Search } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+
 import { useDebounce } from "@/hooks/use-debounce";
 import { globalSearch } from "@/actions/search-actions";
 import type { SearchGroup } from "@/types/search.types";
@@ -10,10 +13,13 @@ import type { SearchGroup } from "@/types/search.types";
 const MIN_QUERY_LENGTH = 2;
 
 export function HeaderSearch() {
+  const t = useTranslations("header");
+
   const [query, setQuery] = useState("");
   const [groups, setGroups] = useState<SearchGroup[]>([]);
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   const debouncedQuery = useDebounce(query, 300);
@@ -37,17 +43,28 @@ export function HeaderSearch() {
   // Close the dropdown when clicking outside of it.
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const trimmedLength = query.trim().length;
-  const hasResults = groups.some((g) => g.items.length > 0);
-  const showDropdown = open && trimmedLength >= MIN_QUERY_LENGTH;
+
+  const hasResults = groups.some(
+    (group) => group.items.length > 0
+  );
+
+  const showDropdown =
+    open && trimmedLength >= MIN_QUERY_LENGTH;
 
   return (
     <div ref={containerRef} className="relative flex-1">
@@ -61,7 +78,7 @@ export function HeaderSearch() {
           setOpen(true);
         }}
         onFocus={() => setOpen(true)}
-        placeholder="Поиск..."
+        placeholder={t("placeholder")}
         className="w-full bg-white/5 border border-white/10 rounded pl-9 pr-9 py-2 text-sm
         text-white placeholder-white/40 focus:outline-none focus:ring-2
         focus:ring-red-500 focus:bg-white/10 transition-all duration-150"
@@ -78,7 +95,7 @@ export function HeaderSearch() {
         >
           {!hasResults && !isPending && (
             <p className="px-4 py-6 text-sm text-white/40 text-center">
-              Hech narsa topilmadi
+              {t("noResults")}
             </p>
           )}
 
@@ -87,6 +104,7 @@ export function HeaderSearch() {
               <p className="px-4 pt-1.5 pb-1 text-[11px] font-medium uppercase tracking-wide text-white/40">
                 {group.label}
               </p>
+
               {group.items.map((item) => (
                 <Link
                   key={`${group.type}-${item.id}`}
@@ -94,9 +112,14 @@ export function HeaderSearch() {
                   onClick={() => setOpen(false)}
                   className="flex flex-col px-4 py-2 hover:bg-white/5 transition"
                 >
-                  <span className="text-sm text-white">{item.title}</span>
+                  <span className="text-sm text-white">
+                    {item.title}
+                  </span>
+
                   {item.subtitle && (
-                    <span className="text-xs text-white/40">{item.subtitle}</span>
+                    <span className="text-xs text-white/40">
+                      {item.subtitle}
+                    </span>
                   )}
                 </Link>
               ))}

@@ -1,0 +1,62 @@
+{
+    "search": {
+        "title": "Поиск товаров",
+        "placeholder": "Поиск по названию, категории или коду...",
+        "qrPlaceholder": "Сканировать QR / штрихкод ↵",
+        "inStock": "в наличии"
+    },
+    "cart": {
+        "title": "Товары",
+        "items": "товаров",
+        "lines": "позиций",
+        "empty": "Товары ещё не добавлены",
+        "remaining": "осталось",
+        "remove": "Удалить",
+        "promotion": "АКЦИЯ"
+    },
+    "point": {
+        "title": "Точка",
+        "empty": "Нет доступных точек",
+        "loading": "Загрузка остатков..."
+    },
+    "payment": {
+        "title": "Способ оплаты"
+    },
+    "paymentMethods": {
+        "card": "Карта",
+        "cash": "Наличные",
+        "qr": "QR-оплата"
+    },
+    "tips": {
+        "none": "Без чаевых"
+    },
+    "tip": {
+        "title": "Чаевые"
+    },
+    "summary": {
+        "subtotal": "Подытог",
+        "tax": "Налог {percent}%",
+        "tip": "Чаевые {percent}%",
+        "total": "Итого",
+        "addProducts": "Сначала добавьте товары",
+        "charge": "Оплатить {amount}",
+        "processing": "Обработка..."
+    },
+    "overlay": {
+        "processingTitle": "Обработка платежа",
+        "pleaseWait": "Пожалуйста, подождите...",
+        "approved": "Платёж одобрен",
+        "via": "через",
+        "newSale": "Новая продажа",
+        "receipt": "Чек"
+    },
+    "messages": {
+        "cellNotFound": "Для товара «{product}» в этой точке не найдена ячейка",
+        "cellStockLimit": "В этой ячейке доступно только {quantity} {unit}",
+        "availableQuantity": "Доступно только {quantity} {unit}",
+        "emptyCell": "В выбранной ячейке нет остатков",
+        "quantityReduced": "Количество уменьшено до {quantity}",
+        "selectPoint": "Сначала выберите точку",
+        "productNotFound": "Товар не найден"
+    }
+}

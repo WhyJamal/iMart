@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getPurchases, getPurchaseById } from "@/actions/purchase-actions";
+import { getTranslations } from "next-intl/server";
+
+import { getPurchases } from "@/actions/purchase-actions";
 import { getProducts } from "@/actions/product-actions";
 import { getPointOptions } from "@/actions/point-actions";
 import { getWarehouses } from "@/actions/warehouse-actions";
 import { getContragentOptions } from "@/actions/contragent-actions";
 import { getServerSession } from "@/lib/auth";
+
 import { PurchaseList } from "./_components/purchase-list";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
 import { PurchaseForm } from "./_components/purchase-form";
@@ -24,8 +27,12 @@ export default async function PurchasesPage({
   const session = await getServerSession();
   const purchases = await getPurchases();
 
+  const t = await getTranslations("purchase.purchase");
+
   const editTarget = edit
-    ? purchases.find((p: TSerializedPurchase) => p.id === edit) ?? null
+    ? purchases.find(
+        (p: TSerializedPurchase) => p.id === edit
+      ) ?? null
     : null;
 
   const isOpen = !!editTarget || isNew === "1";
@@ -42,30 +49,21 @@ export default async function PurchasesPage({
   return (
     <>
       <div className="p-6 space-y-6">
-
-        {/* {editTarget && (
-        <DrawerBackdrop>
-          <PurchaseForm products={products} initialData={editTarget} />
-        </DrawerBackdrop>
-      )}
-
-      {isNew && !editTarget && (
-        <DrawerBackdrop>
-          <PurchaseForm products={products} />
-        </DrawerBackdrop>
-      )} */}
-
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Purchases</h1>
+            <h1 className="text-2xl font-bold">
+              {t("title")}
+            </h1>
+
             <p className="text-muted-foreground text-sm mt-0.5">
-              Inventory receipts — each purchase increases stock
+              {t("description")}
             </p>
           </div>
+
           <Button asChild>
             <Link href="/purchases?new=1">
               <Plus className="w-4 h-4 mr-1" />
-              New purchase
+              {t("newPurchase")}
             </Link>
           </Button>
         </div>
@@ -73,7 +71,6 @@ export default async function PurchasesPage({
         <PurchaseList purchases={purchases} />
       </div>
 
-      {/* edit & new */}
       <DrawerBackdrop isOpen={isOpen}>
         {editTarget ? (
           <PurchaseForm

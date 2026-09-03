@@ -2,7 +2,7 @@ import { getRequestConfig } from "next-intl/server";
 import { auth } from "@/auth";
 import { cookies } from "next/headers";
 
-const NAMESPACES = ["common", "sidebar", "dashboard"] as const;
+const NAMESPACES = ["common", "header", "sidebar", "dashboard", "pos-terminal", "purchase"] as const;
 
 export default getRequestConfig(async () => {
   const session = await auth();
