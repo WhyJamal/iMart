@@ -1,0 +1,35 @@
+{
+  "title": "Kontragentlar",
+  "description": "Sotuvchilar va xaridorlar",
+  "newContragent": "Yangi kontragent",
+  "form": {
+    "editContragent": "Kontragentni tahrirlash",
+    "newContragent": "Yangi kontragent",
+    "name": "Nomi",
+    "namePlaceholder": "masalan: ABC Distributors",
+    "inn": "INN",
+    "phone": "Telefon (ixtiyoriy)",
+    "phonePlaceholder": "+998 XX XXX XX XX",
+    "type": "Turi",
+    "supplier": "Sotuvchi (Supplier)",
+    "buyer": "Xaridor (Buyer)",
+    "cancel": "Bekor qilish",
+    "saving": "Saqlanmoqda…",
+    "save": "Saqlash"
+  },
+  "list": {
+    "name": "Nomi",
+    "inn": "INN",
+    "type": "Turi",
+    "phone": "Telefon",
+    "purchases": "Kirimlar",
+    "actions": "Amallar",
+    "empty": "Hali kontragentlar mavjud emas",
+    "supplier": "Sotuvchi",
+    "buyer": "Xaridor",
+    "deleteTitle": "Kontragentni o‘chirish?",
+    "deleteDescription": "{name} o‘chiriladi. Agar unga bog‘liq kirimlar bo‘lsa, o‘chirib bo‘lmaydi.",
+    "cancel": "Bekor qilish",
+    "delete": "O‘chirish"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "title": "Контрагенты",
+  "description": "Поставщики и покупатели",
+  "newContragent": "Новый контрагент",
+  "form": {
+    "editContragent": "Редактировать контрагента",
+    "newContragent": "Новый контрагент",
+    "name": "Название",
+    "namePlaceholder": "например: ABC Distributors",
+    "inn": "ИНН",
+    "phone": "Телефон (необязательно)",
+    "phonePlaceholder": "+998 XX XXX XX XX",
+    "type": "Тип",
+    "supplier": "Поставщик (Supplier)",
+    "buyer": "Покупатель (Buyer)",
+    "cancel": "Отмена",
+    "saving": "Сохранение…",
+    "save": "Сохранить"
+  },
+  "list": {
+    "name": "Название",
+    "inn": "ИНН",
+    "type": "Тип",
+    "phone": "Телефон",
+    "purchases": "Приходы",
+    "actions": "Действия",
+    "empty": "Контрагентов пока нет",
+    "supplier": "Поставщик",
+    "buyer": "Покупатель",
+    "deleteTitle": "Удалить контрагента?",
+    "deleteDescription": "{name} будет удалён. Если есть связанные приходы, удалить его невозможно.",
+    "cancel": "Отмена",
+    "delete": "Удалить"
+  }
+}

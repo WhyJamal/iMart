@@ -1,0 +1,35 @@
+{
+  "title": "Contragents",
+  "description": "Suppliers and buyers",
+  "newContragent": "New contragent",
+  "form": {
+    "editContragent": "Edit contragent",
+    "newContragent": "New contragent",
+    "name": "Name",
+    "namePlaceholder": "e.g. ABC Distributors",
+    "inn": "TIN",
+    "phone": "Phone (optional)",
+    "phonePlaceholder": "+998 XX XXX XX XX",
+    "type": "Type",
+    "supplier": "Supplier",
+    "buyer": "Buyer",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "save": "Save"
+  },
+  "list": {
+    "name": "Name",
+    "inn": "TIN",
+    "type": "Type",
+    "phone": "Phone",
+    "purchases": "Purchases",
+    "actions": "Actions",
+    "empty": "No contragents yet",
+    "supplier": "Supplier",
+    "buyer": "Buyer",
+    "deleteTitle": "Delete contragent?",
+    "deleteDescription": "{name} will be deleted. If there are related purchases, it cannot be deleted.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  }
+}

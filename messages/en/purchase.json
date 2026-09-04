@@ -1,10 +1,9 @@
 {
-    "purchase": {
-        "title": "Purchases",
-        "description": "Inventory receipts — each purchase increases stock",
-        "newPurchase": "New purchase"
-    },
-    "purchases-list": {
+    "title": "Purchases",
+    "description": "Inventory receipts — each purchase increases stock",
+    "newPurchase": "New purchase",
+    
+    "list": {
         "receiptNumber": "Receipt #",
         "contragent": "Contragent",
         "items": "Items",
@@ -27,7 +26,7 @@
         "note": "Note",
         "deleted": "Purchase deleted"
     },
-    "purchase-form": {
+    "form": {
         "editPurchaseReceipt": "Edit Purchase Receipt",
         "newPurchaseReceipt": "New Purchase Receipt",
         "point": "Point",

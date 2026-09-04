@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
@@ -18,28 +20,34 @@ export default async function ContragentsPage({
   searchParams: Promise<{ new?: string; edit?: string }>;
 }) {
   const session = await getServerSession();
+
   if (!session || !hasPermission(session.role, "contragents:manage")) {
     redirect(PAGES.HOME);
   }
 
   const { new: isNew, edit } = await searchParams;
   const contragents = await getContragents();
-  const editTarget = edit ? contragents.find((c) => c.id === edit) : undefined;
+  const editTarget = edit
+    ? contragents.find((c) => c.id === edit)
+    : undefined;
+
+  const t = await getTranslations("contragent");
 
   return (
     <>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Contragents</h1>
+            <h1 className="text-2xl font-bold">{t("title")}</h1>
             <p className="text-muted-foreground text-sm mt-0.5">
-              Sotuvchilar va xaridorlar
+              {t("description")}
             </p>
           </div>
+
           <Button asChild>
             <Link href={`${PAGES.CONTRAGENTS}?new=1`}>
               <Plus className="w-4 h-4 mr-1" />
-              New contragent
+              {t("newContragent")}
             </Link>
           </Button>
         </div>

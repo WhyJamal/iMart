@@ -74,7 +74,7 @@ const fmtDate = (d: Date) =>
 
 function PurchaseRow({ purchase }: { purchase: Purchase }) {
   const router = useRouter();
-  const t = useTranslations("purchase.purchases-list");
+  const t = useTranslations("purchase.list");
 
   const [expanded, setExpanded] = useState(false);
   const [isPending, startTransition] = useTransition();

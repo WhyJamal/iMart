@@ -1,0 +1,27 @@
+{
+  "title": "Nuqtalar",
+  "description": "Tashkilotdagi nuqtalar (filiallar, foyda markazlari)",
+  "newPoint": "Yangi nuqta",
+
+  "form": {
+    "editPoint": "Nuqtani tahrirlash",
+    "newPoint": "Yangi nuqta",
+    "name": "Nomi",
+    "namePlaceholder": "masalan: Markaziy filial",
+    "cancel": "Bekor qilish",
+    "saving": "Saqlanmoqda…",
+    "save": "Saqlash"
+  },
+
+  "list": {
+    "name": "Nomi",
+    "warehouses": "Skladlar",
+    "employees": "Xodimlar",
+    "actions": "Amallar",
+    "empty": "Hali nuqtalar mavjud emas",
+    "deleteTitle": "Nuqtani o‘chirish?",
+    "deleteDescription": "{name} o‘chiriladi. Agar unda skladlar bo‘lsa, avval ularni o‘chiring.",
+    "cancel": "Bekor qilish",
+    "delete": "O‘chirish"
+  }
+}

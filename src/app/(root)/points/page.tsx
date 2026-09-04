@@ -10,6 +10,8 @@ import { DrawerBackdrop } from "@/components/drawer-backdrop";
 import { PointForm } from "./_components/point-form";
 import { PAGES } from "@/config/pages.config";
 
+import { getTranslations } from "next-intl/server";
+
 export const dynamic = "force-dynamic";
 
 export default async function PointsPage({
@@ -18,28 +20,42 @@ export default async function PointsPage({
   searchParams: Promise<{ new?: string; edit?: string }>;
 }) {
   const session = await getServerSession();
-  if (!session || !hasPermission(session.role, "warehouses:manage")) {
+
+  if (
+    !session ||
+    !hasPermission(session.role, "warehouses:manage")
+  ) {
     redirect(PAGES.HOME);
   }
 
   const { new: isNew, edit } = await searchParams;
+
   const points = await getPoints();
-  const editTarget = edit ? points.find((p) => p.id === edit) : undefined;
+
+  const editTarget = edit
+    ? points.find((p) => p.id === edit)
+    : undefined;
+
+  const t = await getTranslations("point");
 
   return (
     <>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Points</h1>
+            <h1 className="text-2xl font-bold">
+              {t("title")}
+            </h1>
+
             <p className="text-muted-foreground text-sm mt-0.5">
-              Tashkilotdagi nuqtalar (filiallar, foyda markazlari)
+              {t("description")}
             </p>
           </div>
+
           <Button asChild>
             <Link href={`${PAGES.POINTS}?new=1`}>
               <Plus className="w-4 h-4 mr-1" />
-              New point
+              {t("newPoint")}
             </Link>
           </Button>
         </div>

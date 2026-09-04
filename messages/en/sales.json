@@ -1,0 +1,25 @@
+{
+    "title": "Sales",
+    "description": "All completed transactions",
+    
+    "list": {
+        "saleNumber": "Sale #",
+        "items": "Items",
+        "total": "Total",
+        "date": "Date",
+        "actions": "Actions",
+        "itemCount": "{count} items",
+        "noSales": "No sales yet — charge a customer from the POS",
+        "deleteSale": "Delete sale?",
+        "deleteDescription": "This will reverse inventory movements for {saleNumber} — stock will be restored. This action cannot be undone.",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "product": "Product",
+        "code": "Code",
+        "qty": "Qty",
+        "unitPrice": "Unit price",
+        "saleTotal": "Total",
+        "currency": "sum",
+        "deleted": "Sale deleted and stock restored"
+    }
+}

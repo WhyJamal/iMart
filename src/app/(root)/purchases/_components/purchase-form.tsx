@@ -88,7 +88,7 @@ export function PurchaseForm({
 }: Props) {
   const router = useRouter();
 
-  const t = useTranslations("purchase.purchase-form");
+  const t = useTranslations("purchase.form");
 
   const [isPending, startTransition] = useTransition();
 

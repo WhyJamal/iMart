@@ -1,0 +1,25 @@
+{
+    "title": "Sotuvlar",
+    "description": "Barcha yakunlangan operatsiyalar",
+    
+    "list": {
+        "saleNumber": "Sotuv raqami",
+        "items": "Mahsulotlar",
+        "total": "Jami",
+        "date": "Sana",
+        "actions": "Amallar",
+        "itemCount": "{count} ta",
+        "noSales": "Hali sotuvlar mavjud emas — POS orqali mijozga sotuv amalga oshiring",
+        "deleteSale": "Sotuvni o‘chirish?",
+        "deleteDescription": "{saleNumber} raqamli sotuv bo‘yicha mahsulot harakatlari bekor qilinadi va qoldiq tiklanadi. Bu amalni ortga qaytarib bo‘lmaydi.",
+        "cancel": "Bekor qilish",
+        "delete": "O‘chirish",
+        "product": "Mahsulot",
+        "code": "Kod",
+        "qty": "Miqdor",
+        "unitPrice": "Birlik narxi",
+        "saleTotal": "Jami",
+        "currency": "so‘m",
+        "deleted": "Sotuv o‘chirildi va qoldiq tiklandi"
+    }
+}

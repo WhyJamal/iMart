@@ -27,7 +27,7 @@ export default async function PurchasesPage({
   const session = await getServerSession();
   const purchases = await getPurchases();
 
-  const t = await getTranslations("purchase.purchase");
+  const t = await getTranslations("purchase");
 
   const editTarget = edit
     ? purchases.find(

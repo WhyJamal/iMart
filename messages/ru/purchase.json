@@ -1,10 +1,9 @@
 {
-    "purchase": {
-        "title": "Покупки",
-        "description": "Поступления на склад — каждая покупка увеличивает остаток",
-        "newPurchase": "Новая покупка"
-    },
-    "purchases-list": {
+    "title": "Покупки",
+    "description": "Поступления на склад — каждая покупка увеличивает остаток",
+    "newPurchase": "Новая покупка",
+    
+    "list": {
         "receiptNumber": "Номер накладной",
         "contragent": "Контрагент",
         "items": "Товары",
@@ -27,7 +26,7 @@
         "note": "Примечание",
         "deleted": "Покупка удалена"
     },
-    "purchase-form": {
+    "form": {
         "editPurchaseReceipt": "Редактировать накладную",
         "newPurchaseReceipt": "Новая накладная",
         "point": "Точка",

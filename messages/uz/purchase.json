@@ -1,10 +1,9 @@
 {
-    "purchase": {
-        "title": "Xaridlar",
-        "description": "Omborga kirimlar — har bir xarid mahsulot qoldig‘ini oshiradi",
-        "newPurchase": "Yangi xarid"
-    },
-    "purchases-list": {
+    "title": "Xaridlar",
+    "description": "Omborga kirimlar — har bir xarid mahsulot qoldig‘ini oshiradi",
+    "newPurchase": "Yangi xarid",
+    
+    "list": {
         "receiptNumber": "Kirim raqami",
         "contragent": "Kontragent",
         "items": "Mahsulotlar",
@@ -27,7 +26,7 @@
         "note": "Izoh",
         "deleted": "Xarid o‘chirildi"
     },
-    "purchase-form": {
+    "form": {
         "editPurchaseReceipt": "Xarid kirimini tahrirlash",
         "newPurchaseReceipt": "Yangi xarid kirimi",
         "point": "Nuqta",

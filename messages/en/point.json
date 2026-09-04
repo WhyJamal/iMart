@@ -1,0 +1,27 @@
+{
+  "title": "Points",
+  "description": "Organization points (branches, profit centers)",
+  "newPoint": "New point",
+
+  "form": {
+    "editPoint": "Edit point",
+    "newPoint": "New point",
+    "name": "Name",
+    "namePlaceholder": "e.g. Central branch",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "save": "Save"
+  },
+
+  "list": {
+    "name": "Name",
+    "warehouses": "Warehouses",
+    "employees": "Employees",
+    "actions": "Actions",
+    "empty": "No points yet",
+    "deleteTitle": "Delete point?",
+    "deleteDescription": "{name} will be deleted. If it has warehouses, delete them first.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  }
+}

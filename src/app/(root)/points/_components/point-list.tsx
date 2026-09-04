@@ -28,20 +28,36 @@ import type { IPoint } from "@/types/point.types";
 import { PAGES } from "@/config/pages.config";
 import { useDeletePoint } from "../_hooks/use-point-mutations";
 
+import { useTranslations } from "next-intl";
+
 interface Props {
   points: IPoint[];
   canManage: boolean;
 }
 
-export function PointList({ points, canManage }: Props) {
+export function PointList({
+  points,
+  canManage,
+}: Props) {
   const router = useRouter();
-  const { mutate: remove, isPending } = useDeletePoint(() => router.refresh());
+
+  const t = useTranslations("point.list");
+
+  const {
+    mutate: remove,
+    isPending,
+  } = useDeletePoint(() =>
+    router.refresh()
+  );
 
   if (points.length === 0) {
     return (
       <div className="text-center py-16 text-muted-foreground">
         <MapPin className="w-10 h-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">No points yet</p>
+
+        <p className="text-sm">
+          {t("empty")}
+        </p>
       </div>
     );
   }
@@ -50,29 +66,59 @@ export function PointList({ points, canManage }: Props) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Nomi</TableHead>
-          <TableHead>Skladlar</TableHead>
-          <TableHead>Xodimlar</TableHead>
-          {canManage && <TableHead className="text-right">Actions</TableHead>}
+          <TableHead>
+            {t("name")}
+          </TableHead>
+
+          <TableHead>
+            {t("warehouses")}
+          </TableHead>
+
+          <TableHead>
+            {t("employees")}
+          </TableHead>
+
+          {canManage && (
+            <TableHead className="text-right">
+              {t("actions")}
+            </TableHead>
+          )}
         </TableRow>
       </TableHeader>
+
       <TableBody>
         {points.map((p) => (
           <TableRow key={p.id}>
-            <TableCell className="font-medium">{p.name}</TableCell>
-            <TableCell>
-              <Badge variant="secondary">{p.warehouseCount}</Badge>
+            <TableCell className="font-medium">
+              {p.name}
             </TableCell>
+
             <TableCell>
-              <Badge variant="secondary">{p.userCount}</Badge>
+              <Badge variant="secondary">
+                {p.warehouseCount}
+              </Badge>
             </TableCell>
+
+            <TableCell>
+              <Badge variant="secondary">
+                {p.userCount}
+              </Badge>
+            </TableCell>
+
             {canManage && (
               <TableCell className="text-right space-x-1">
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href={`${PAGES.POINTS}?edit=${p.id}`}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                >
+                  <Link
+                    href={`${PAGES.POINTS}?edit=${p.id}`}
+                  >
                     <Pencil className="w-3.5 h-3.5" />
                   </Link>
                 </Button>
+
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
@@ -84,21 +130,32 @@ export function PointList({ points, canManage }: Props) {
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </AlertDialogTrigger>
+
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Nuqtani o'chirish?</AlertDialogTitle>
+                      <AlertDialogTitle>
+                        {t("deleteTitle")}
+                      </AlertDialogTitle>
+
                       <AlertDialogDescription>
-                        <strong>{p.name}</strong> o'chiriladi. Agar unda
-                        skladlar bo'lsa, avval ularni o'chiring.
+                        {t("deleteDescription", {
+                          name: p.name,
+                        })}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
+
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>
+                        {t("cancel")}
+                      </AlertDialogCancel>
+
                       <AlertDialogAction
-                        onClick={() => remove(p.id)}
+                        onClick={() =>
+                          remove(p.id)
+                        }
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        Delete
+                        {t("delete")}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

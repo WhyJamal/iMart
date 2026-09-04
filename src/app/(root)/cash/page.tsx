@@ -1,10 +1,20 @@
 import Link from "next/link";
+
 import { Plus, Wallet, Landmark } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { getCashRegister, getBankAccount, getCashFlows } from "@/actions/cash-actions";
+
+import {
+  getCashRegister,
+  getBankAccount,
+  getCashFlows,
+} from "@/actions/cash-actions";
+
 import { CashFlowList } from "./_components/cash-flow-list";
 import { CashFlowForm } from "./_components/cash-flow-form";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
+
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +27,8 @@ export default async function CashPage({
 }) {
   const { new: isNew } = await searchParams;
 
+  const t = await getTranslations("cash");
+
   const [register, bank, flows] = await Promise.all([
     getCashRegister(),
     getBankAccount(),
@@ -28,15 +40,19 @@ export default async function CashPage({
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Kassa</h1>
+            <h1 className="text-2xl font-bold">
+              {t("title")}
+            </h1>
+
             <p className="text-muted-foreground text-sm mt-0.5">
-              Naqd pul qoldig'i va barcha pul aylanmalari
+              {t("description")}
             </p>
           </div>
+
           <Button asChild>
             <Link href="/cash?new=1">
               <Plus className="w-4 h-4 mr-1" />
-              Yangi harakat
+              {t("newMovement")}
             </Link>
           </Button>
         </div>
@@ -46,8 +62,12 @@ export default async function CashPage({
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
               <Wallet className="w-6 h-6 text-primary" />
             </div>
+
             <div>
-              <p className="text-sm text-muted-foreground">Naqd (kassa)</p>
+              <p className="text-sm text-muted-foreground">
+                {t("cash")}
+              </p>
+
               <p className="text-3xl font-bold tabular-nums">
                 {fmt(register.balance)}
               </p>
@@ -58,9 +78,15 @@ export default async function CashPage({
             <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
               <Landmark className="w-6 h-6 text-blue-600" />
             </div>
+
             <div>
-              <p className="text-sm text-muted-foreground">Bank (karta/QR)</p>
-              <p className="text-3xl font-bold tabular-nums">{fmt(bank.balance)}</p>
+              <p className="text-sm text-muted-foreground">
+                {t("bank")}
+              </p>
+
+              <p className="text-3xl font-bold tabular-nums">
+                {fmt(bank.balance)}
+              </p>
             </div>
           </div>
         </div>
@@ -68,7 +94,6 @@ export default async function CashPage({
         <CashFlowList flows={flows} />
       </div>
 
-      {/* is new */}
       <DrawerBackdrop isOpen={isNew === "1"}>
         <CashFlowForm />
       </DrawerBackdrop>

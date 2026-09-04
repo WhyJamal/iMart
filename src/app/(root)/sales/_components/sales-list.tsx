@@ -1,15 +1,22 @@
 "use client";
- 
+
 import { useState, useTransition } from "react";
+
+import { useTranslations } from "next-intl";
+
 import { useRouter } from "next/navigation";
+
 import { toast } from "sonner";
+
 import {
   ChevronDown,
   ChevronRight,
   ShoppingCart,
   Trash2,
 } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
+
 import {
   Table,
   TableBody,
@@ -18,7 +25,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import { Button } from "@/components/ui/button";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,37 +39,46 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
 import { deleteSale } from "@/actions/sale-actions";
+
 import { TSerializedSale } from "@/types/sale.types";
-  
+
 interface Props {
   sales: TSerializedSale[];
 }
- 
+
 const fmt = (n: number) => Number(n).toFixed(2) + " сум";
+
 const fmtDate = (d: Date) =>
   new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(d));
- 
+
 function SaleRow({ sale }: { sale: TSerializedSale }) {
   const router = useRouter();
+
+  const t = useTranslations("sales.list");
+
   const [expanded, setExpanded] = useState(false);
+
   const [isPending, startTransition] = useTransition();
- 
+
   const handleDelete = () => {
     startTransition(async () => {
       const result = await deleteSale(sale.id);
+
       if (result.success) {
-        toast.success("Sale deleted and stock restored");
+        toast.success(t("deleted"));
+
         router.refresh();
       } else {
         toast.error(result.error);
       }
     });
   };
- 
+
   return (
     <>
       <TableRow
@@ -74,15 +92,31 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
             <ChevronRight className="w-4 h-4" />
           )}
         </TableCell>
-        <TableCell className="font-mono text-sm">{sale.saleNumber}</TableCell>
-        <TableCell>
-          <Badge variant="secondary">{sale.items.length} items</Badge>
+
+        <TableCell className="font-mono text-sm">
+          {sale.saleNumber}
         </TableCell>
-        <TableCell className="font-semibold">{fmt(sale.totalAmount)}</TableCell>
+
+        <TableCell>
+          <Badge variant="secondary">
+            {t("itemCount", {
+              count: sale.items.length,
+            })}
+          </Badge>
+        </TableCell>
+
+        <TableCell className="font-semibold">
+          {fmt(sale.totalAmount)}
+        </TableCell>
+
         <TableCell className="text-muted-foreground text-sm">
           {fmtDate(sale.createdAt)}
         </TableCell>
-        <TableCell onClick={(e) => e.stopPropagation()} className="text-right">
+
+        <TableCell
+          onClick={(e) => e.stopPropagation()}
+          className="text-right"
+        >
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
@@ -94,29 +128,37 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
                 <Trash2 className="w-4 h-4" />
               </Button>
             </AlertDialogTrigger>
+
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete sale?</AlertDialogTitle>
+                <AlertDialogTitle>
+                  {t("deleteSale")}
+                </AlertDialogTitle>
+
                 <AlertDialogDescription>
-                  This will reverse inventory movements for{" "}
-                  <strong>{sale.saleNumber}</strong> — stock will be restored.
-                  This action cannot be undone.
+                  {t("deleteDescription", {
+                    saleNumber: sale.saleNumber,
+                  })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
+
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>
+                  {t("cancel")}
+                </AlertDialogCancel>
+
                 <AlertDialogAction
                   onClick={handleDelete}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Delete
+                  {t("delete")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </TableCell>
       </TableRow>
- 
+
       {expanded && (
         <TableRow className="bg-muted/30">
           <TableCell colSpan={6} className="py-0">
@@ -124,26 +166,55 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-xs text-muted-foreground border-b">
-                    <th className="text-left pb-1 font-medium">Product</th>
-                    <th className="text-left pb-1 font-medium">Code</th>
-                    <th className="text-right pb-1 font-medium">Qty</th>
-                    <th className="text-right pb-1 font-medium">Unit price</th>
-                    <th className="text-right pb-1 font-medium">Total</th>
+                    <th className="text-left pb-1 font-medium">
+                      {t("product")}
+                    </th>
+
+                    <th className="text-left pb-1 font-medium">
+                      {t("code")}
+                    </th>
+
+                    <th className="text-right pb-1 font-medium">
+                      {t("qty")}
+                    </th>
+
+                    <th className="text-right pb-1 font-medium">
+                      {t("unitPrice")}
+                    </th>
+
+                    <th className="text-right pb-1 font-medium">
+                      {t("saleTotal")}
+                    </th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {sale.items.map((item) => (
-                    <tr key={item.id} className="border-b last:border-0">
-                      <td className="py-1.5">{item.product.name}</td>
+                    <tr
+                      key={item.id}
+                      className="border-b last:border-0"
+                    >
+                      <td className="py-1.5">
+                        {item.product.name}
+                      </td>
+
                       <td className="py-1.5 font-mono text-xs text-muted-foreground">
                         {item.product.code}
                       </td>
-                      <td className="py-1.5 text-right">{Number(item.qty)}</td>
+
+                      <td className="py-1.5 text-right">
+                        {Number(item.qty)}
+                      </td>
+
                       <td className="py-1.5 text-right">
                         {fmt(Number(item.unitPrice))}
                       </td>
+
                       <td className="py-1.5 text-right font-medium">
-                        {fmt(Number(item.qty) * Number(item.unitPrice))}
+                        {fmt(
+                          Number(item.qty) *
+                            Number(item.unitPrice)
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -156,34 +227,59 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
     </>
   );
 }
- 
+
 export function SaleList({ sales }: Props) {
+  const t = useTranslations("sales.sales-list");
+
   if (sales.length === 0) {
     return (
       <div className="text-center py-24 text-muted-foreground">
         <ShoppingCart className="w-10 h-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">No sales yet — charge a customer from the POS</p>
+
+        <p className="text-sm">
+          {t("noSales")}
+        </p>
       </div>
     );
   }
- 
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead className="w-6" />
-          <TableHead>Sale #</TableHead>
-          <TableHead>Items</TableHead>
-          <TableHead>Total</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+
+          <TableHead>
+            {t("saleNumber")}
+          </TableHead>
+
+          <TableHead>
+            {t("items")}
+          </TableHead>
+
+          <TableHead>
+            {t("total")}
+          </TableHead>
+
+          <TableHead>
+            {t("date")}
+          </TableHead>
+
+          <TableHead className="text-right">
+            {t("actions")}
+          </TableHead>
         </TableRow>
       </TableHeader>
+
       <TableBody>
         {sales.map((s) => (
-          <SaleRow key={s.id} sale={s} />
+          <SaleRow
+            key={s.id}
+            sale={s}
+          />
         ))}
       </TableBody>
     </Table>
   );
 }
+
