@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+
 import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
+
 import { EmployeeSalaryList } from "./_components/employee-salary-list";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
 import { PAGES } from "@/config/pages.config";
@@ -17,14 +20,20 @@ export default async function SalaryPage({
 }: {
   searchParams: Promise<{ setSalary?: string }>;
 }) {
+  const t = await getTranslations("salary");
+
   const session = await getServerSession();
+
   if (!session || !hasPermission(session.role, "payroll:read")) {
     redirect(PAGES.HOME);
   }
+
   const canManage = hasPermission(session.role, "payroll:manage");
 
   const { setSalary } = await searchParams;
-  const setSalaryUserId = setSalary && setSalary !== "1" ? setSalary : undefined;
+
+  const setSalaryUserId =
+    setSalary && setSalary !== "1" ? setSalary : undefined;
 
   const employees = await getEmployeeSalaries();
 
@@ -33,9 +42,10 @@ export default async function SalaryPage({
       <div className="p-6 space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Salary</h1>
+            <h1 className="text-2xl font-bold">{t("title")}</h1>
+
             <p className="text-muted-foreground text-sm mt-0.5">
-              Xodimlar stavkasi — bitta joyda
+              {t("description")}
             </p>
           </div>
 
@@ -43,7 +53,7 @@ export default async function SalaryPage({
             <Button asChild>
               <Link href={`${PAGES.SALARY}?setSalary=1`}>
                 <Wallet2 className="w-4 h-4 mr-1" />
-                Set salary
+                {t("setSalary")}
               </Link>
             </Button>
           </div>
@@ -51,10 +61,14 @@ export default async function SalaryPage({
 
         <section className="space-y-3">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Employees
+            {t("employees")}
           </h2>
+
           <div className="rounded-xl border bg-white overflow-hidden">
-            <EmployeeSalaryList employees={employees} canManage={canManage} />
+            <EmployeeSalaryList
+              employees={employees}
+              canManage={canManage}
+            />
           </div>
         </section>
       </div>

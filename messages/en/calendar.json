@@ -1,0 +1,42 @@
+{
+  "title": "Work Calendar",
+  "description": "Work calendar — holidays, weekends, schedules and timesheets are calculated based on it",
+  "newYear": "New year",
+  "notCreated": "Calendar for {year} has not been created yet",
+  "dayDialog": {
+    "dayType": "Day type",
+    "default": "Default (by weekday)",
+    "holiday": "Holiday / day off",
+    "short": "Shortened workday",
+    "workday": "Moved workday",
+    "name": "Name (optional)",
+    "namePlaceholder": "e.g. Navruz holiday",
+    "shortenedBy": "Hours to shorten",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "save": "Save"
+  },
+  "grid": {
+    "workingDays": "Working days: {count}",
+    "holidays": "Holidays: {count}",
+    "weekends": "Days off: {count}",
+    "confirmed": "Confirmed",
+    "draft": "Draft (editable)",
+    "reopen": "Reopen",
+    "confirm": "Confirm"
+  },
+  "legend": {
+    "workday": "Workday",
+    "weekend": "Day off",
+    "holiday": "Holiday",
+    "short": "Shortened day",
+    "movedWorkday": "Moved workday"
+  },
+  "yearBar": {
+    "newYear": "New year",
+    "year": "Year",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "create": "Create"
+  }
+}

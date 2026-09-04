@@ -1,0 +1,38 @@
+{
+  "title": "Зарплата",
+  "description": "Ставки сотрудников — в одном месте",
+  "setSalary": "Установить зарплату",
+  "employees": "Сотрудники",
+
+  "list": {
+    "employee": "Сотрудник",
+    "role": "Роль",
+    "salaryType": "Тип зарплаты",
+    "rate": "Ставка",
+    "effectiveFrom": "Действует с",
+    "actions": "Действия",
+    "noEmployees": "Сотрудников пока нет",
+    "notSet": "Не указано",
+    "update": "Изменить",
+    "set": "Установить"
+  },
+
+  "form": {
+    "title": "Установить зарплату",
+    "employee": "Сотрудник",
+    "selectEmployee": "Выберите сотрудника",
+    "salaryType": "Тип зарплаты",
+    "fixed": "Месячная (FIXED)",
+    "daily": "Подённая (DAILY)",
+    "hourly": "Почасовая (HOURLY)",
+    "monthlyAmount": "Месячная сумма",
+    "dailyRate": "Стоимость 1 дня",
+    "hourlyRate": "Стоимость 1 часа",
+    "effectiveFrom": "Действует с",
+    "reason": "Причина (необязательно)",
+    "reasonPlaceholder": "например, Ежегодное повышение",
+    "cancel": "Отмена",
+    "saving": "Сохранение…",
+    "save": "Сохранить"
+  }
+}

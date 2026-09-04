@@ -1,0 +1,73 @@
+{
+  "title": "Payroll",
+  "description": "Payroll documents by month — automatically calculated based on the timesheet",
+  "newDocument": "New document",
+
+  "form": {
+    "title": "New payroll document",
+    "point": "Point",
+    "selectPoint": "Select a point",
+    "year": "Year",
+    "month": "Month",
+    "note": "Note: multiple documents can be created for the same month (for example, a separate advance and end-of-month payment) — each time only the remaining unpaid amount is calculated.",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "create": "Create"
+  },
+
+  "detail": {
+    "confirmed": "Confirmed",
+    "draft": "Draft"
+  },
+
+  "list": {
+    "point": "Point",
+    "period": "Period",
+    "employees": "Employees",
+    "amount": "Amount",
+    "status": "Status",
+    "actions": "Actions",
+    "empty": "No documents yet",
+    "confirmed": "Confirmed",
+    "draft": "Draft",
+    "deleteTitle": "Delete document?",
+    "confirmedDelete": "This document is confirmed — deleting it will reverse the money withdrawn from the cash/bank balance.",
+    "draftDelete": "This is a draft document, so there are no money movements.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+
+  "table": {
+    "fill": "Fill",
+    "confirmAndClose": "Post and close",
+    "confirmTitle": "Confirm document?",
+    "confirmDescription": "A total of <strong>{amount} UZS</strong> will be deducted from the cash/bank balance. This action cannot be undone (it can only be reversed by deleting the document).",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "noLines": "No lines yet — click “Fill”",
+    "employee": "Employee",
+    "type": "Type",
+    "rate": "Rate",
+    "worked": "Worked",
+    "calculated": "Calculated",
+    "alreadyPaid": "Already paid",
+    "payable": "Payable",
+    "total": "Total",
+    "filling": "Filling…"
+  },
+
+  "months": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  }
+}

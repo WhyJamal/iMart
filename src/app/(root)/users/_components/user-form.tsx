@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { UserPlus } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { ROLES, type Role } from "@/types/role.types";
 import type { IPointOption } from "@/types/point.types";
 import { useCreateUser } from "../_hooks/use-user-mutations";
@@ -24,6 +27,7 @@ interface Props {
 
 export function UserForm({ points, onClose }: Props) {
   const router = useRouter();
+  const t = useTranslations("users.form");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -33,6 +37,7 @@ export function UserForm({ points, onClose }: Props) {
 
   const { mutate, isPending } = useCreateUser(() => {
     router.refresh();
+
     if (onClose) {
       onClose();
     } else {
@@ -46,7 +51,13 @@ export function UserForm({ points, onClose }: Props) {
   };
 
   const handleSubmit = () => {
-    mutate({ name, email, password, role, pointId: pointId || undefined });
+    mutate({
+      name,
+      email,
+      password,
+      role,
+      pointId: pointId || undefined,
+    });
   };
 
   return (
@@ -54,38 +65,49 @@ export function UserForm({ points, onClose }: Props) {
       <div className="px-6 py-4 border-b flex items-center justify-between">
         <h2 className="text-base font-semibold flex items-center gap-2">
           <UserPlus className="w-4 h-4" />
-          New User
+          {t("newUser")}
         </h2>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         <div className="space-y-1.5">
-          <Label>Name</Label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
+          <Label>{t("name")}</Label>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </div>
+
         <div className="space-y-1.5">
-          <Label>Email</Label>
+          <Label>{t("email")}</Label>
           <Input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
+
         <div className="space-y-1.5">
-          <Label>Password</Label>
+          <Label>{t("password")}</Label>
           <Input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Kamida 8 belgi"
+            placeholder={t("passwordPlaceholder")}
           />
         </div>
+
         <div className="space-y-1.5">
-          <Label>Role</Label>
-          <Select value={role} onValueChange={(v) => setRole(v as Role)}>
+          <Label>{t("role")}</Label>
+
+          <Select
+            value={role}
+            onValueChange={(v) => setRole(v as Role)}
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
+
             <SelectContent>
               {ROLES.map((r) => (
                 <SelectItem key={r} value={r}>
@@ -99,13 +121,19 @@ export function UserForm({ points, onClose }: Props) {
 
       <div className="p-4 border-t flex justify-end gap-2">
         <Button variant="ghost" onClick={handleClose}>
-          Cancel
+          {t("cancel")}
         </Button>
+
         <Button
           onClick={handleSubmit}
-          disabled={isPending || !name || !email || password.length < 8}
+          disabled={
+            isPending ||
+            !name ||
+            !email ||
+            password.length < 8
+          }
         >
-          {isPending ? "Creating…" : "Create user"}
+          {isPending ? t("creating") : t("createUser")}
         </Button>
       </div>
     </div>

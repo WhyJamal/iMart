@@ -1,0 +1,38 @@
+{
+  "title": "Salary",
+  "description": "Employee salary rates — all in one place",
+  "setSalary": "Set salary",
+  "employees": "Employees",
+
+  "list": {
+    "employee": "Employee",
+    "role": "Role",
+    "salaryType": "Salary type",
+    "rate": "Rate",
+    "effectiveFrom": "Effective from",
+    "actions": "Actions",
+    "noEmployees": "No employees yet",
+    "notSet": "Not set",
+    "update": "Update",
+    "set": "Set"
+  },
+
+  "form": {
+    "title": "Set salary",
+    "employee": "Employee",
+    "selectEmployee": "Select an employee",
+    "salaryType": "Salary type",
+    "fixed": "Monthly (FIXED)",
+    "daily": "Daily (DAILY)",
+    "hourly": "Hourly (HOURLY)",
+    "monthlyAmount": "Monthly amount",
+    "dailyRate": "1 day rate",
+    "hourlyRate": "1 hour rate",
+    "effectiveFrom": "Effective from",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "e.g. Annual increase",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "save": "Save"
+  }
+}

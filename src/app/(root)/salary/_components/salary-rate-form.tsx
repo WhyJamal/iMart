@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Wallet2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import {
   Select,
   SelectContent,
@@ -13,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import type { IOrgUser } from "@/types/user.types";
 import { useSetSalaryRate } from "../_hooks/use-salary-mutations";
 
@@ -21,26 +25,43 @@ interface Props {
   onClose?: () => void;
 }
 
-const todayStr = () => new Date().toISOString().slice(0, 10);
+const todayStr = () =>
+  new Date().toISOString().slice(0, 10);
 
-export function SalaryRateForm({ users, onClose }: Props) {
+export function SalaryRateForm({
+  users,
+  onClose,
+}: Props) {
+  const t = useTranslations("salary.form");
+
   const router = useRouter();
 
   const [userId, setUserId] = useState("");
-  const [salaryType, setSalaryType] = useState<"FIXED" | "DAILY" | "HOURLY">("FIXED");
+  const [salaryType, setSalaryType] =
+    useState<"FIXED" | "DAILY" | "HOURLY">("FIXED");
+
   const [rate, setRate] = useState("");
-  const [effectiveFrom, setEffectiveFrom] = useState(todayStr());
+  const [effectiveFrom, setEffectiveFrom] =
+    useState(todayStr());
+
   const [reason, setReason] = useState("");
 
   const { mutate, isPending } = useSetSalaryRate(() => {
     router.refresh();
-    if (onClose) onClose();
-    else router.push("/payroll");
+
+    if (onClose) {
+      onClose();
+    } else {
+      router.push("/payroll");
+    }
   });
 
   const handleClose = () => {
-    if (onClose) onClose();
-    else router.push("/payroll");
+    if (onClose) {
+      onClose();
+    } else {
+      router.push("/payroll");
+    }
   };
 
   const handleSubmit = () => {
@@ -54,27 +75,41 @@ export function SalaryRateForm({ users, onClose }: Props) {
   };
 
   const rateLabel =
-    salaryType === "FIXED" ? "Oylik summa" : salaryType === "DAILY" ? "1 kun narxi" : "1 soat narxi";
+    salaryType === "FIXED"
+      ? t("monthlyAmount")
+      : salaryType === "DAILY"
+        ? t("dailyRate")
+        : t("hourlyRate");
 
   return (
     <div className="h-full flex flex-col">
       <div className="px-6 py-4 border-b flex items-center justify-between">
         <h2 className="text-base font-semibold flex items-center gap-2">
           <Wallet2 className="w-4 h-4" />
-          Set salary
+          {t("title")}
         </h2>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         <div className="space-y-1.5">
-          <Label>Employee</Label>
-          <Select value={userId} onValueChange={setUserId}>
+          <Label>{t("employee")}</Label>
+
+          <Select
+            value={userId}
+            onValueChange={setUserId}
+          >
             <SelectTrigger>
-              <SelectValue placeholder="Xodimni tanlang" />
+              <SelectValue
+                placeholder={t("selectEmployee")}
+              />
             </SelectTrigger>
+
             <SelectContent>
               {users.map((u) => (
-                <SelectItem key={u.id} value={u.id}>
+                <SelectItem
+                  key={u.id}
+                  value={u.id}
+                >
                   {u.name} ({u.role})
                 </SelectItem>
               ))}
@@ -83,61 +118,95 @@ export function SalaryRateForm({ users, onClose }: Props) {
         </div>
 
         <div className="space-y-1.5">
-          <Label>Salary type</Label>
+          <Label>{t("salaryType")}</Label>
+
           <Select
             value={salaryType}
-            onValueChange={(v) => setSalaryType(v as "FIXED" | "DAILY" | "HOURLY")}
+            onValueChange={(v) =>
+              setSalaryType(
+                v as "FIXED" | "DAILY" | "HOURLY"
+              )
+            }
           >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
+
             <SelectContent>
-              <SelectItem value="FIXED">Oylik (FIXED)</SelectItem>
-              <SelectItem value="DAILY">Kunbay (DAILY)</SelectItem>
-              <SelectItem value="HOURLY">Soatbay (HOURLY)</SelectItem>
+              <SelectItem value="FIXED">
+                {t("fixed")}
+              </SelectItem>
+
+              <SelectItem value="DAILY">
+                {t("daily")}
+              </SelectItem>
+
+              <SelectItem value="HOURLY">
+                {t("hourly")}
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-1.5">
           <Label>{rateLabel}</Label>
+
           <Input
             type="number"
             min={0}
             step={0.01}
             value={rate}
-            onChange={(e) => setRate(e.target.value)}
+            onChange={(e) =>
+              setRate(e.target.value)
+            }
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label>Effective from</Label>
+          <Label>{t("effectiveFrom")}</Label>
+
           <Input
             type="date"
             value={effectiveFrom}
-            onChange={(e) => setEffectiveFrom(e.target.value)}
+            onChange={(e) =>
+              setEffectiveFrom(e.target.value)
+            }
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label>Reason (optional)</Label>
+          <Label>{t("reason")}</Label>
+
           <Input
-            placeholder="e.g. Yillik oshirish"
+            placeholder={t("reasonPlaceholder")}
             value={reason}
-            onChange={(e) => setReason(e.target.value)}
+            onChange={(e) =>
+              setReason(e.target.value)
+            }
           />
         </div>
       </div>
 
       <div className="p-4 border-t flex justify-end gap-2">
-        <Button variant="ghost" onClick={handleClose}>
-          Cancel
+        <Button
+          variant="ghost"
+          onClick={handleClose}
+        >
+          {t("cancel")}
         </Button>
+
         <Button
           onClick={handleSubmit}
-          disabled={isPending || !userId || !rate || Number(rate) <= 0}
+          disabled={
+            isPending ||
+            !userId ||
+            !rate ||
+            Number(rate) <= 0
+          }
         >
-          {isPending ? "Saving…" : "Save"}
+          {isPending
+            ? t("saving")
+            : t("save")}
         </Button>
       </div>
     </div>

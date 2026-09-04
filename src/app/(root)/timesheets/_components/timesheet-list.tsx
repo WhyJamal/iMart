@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { FileSpreadsheet, Trash2 } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -12,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,29 +26,34 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
 import type { ITimesheetSummary } from "@/types/timesheet.types";
 import { PAGES } from "@/config/pages.config";
 import { useDeleteTimesheet } from "../_hooks/use-timesheet-mutations";
-
-const MONTH_LABELS = [
-  "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
-  "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr",
-];
 
 interface Props {
   timesheets: ITimesheetSummary[];
   canManage: boolean;
 }
 
-export function TimesheetList({ timesheets, canManage }: Props) {
+export function TimesheetList({
+  timesheets,
+  canManage,
+}: Props) {
+  const t = useTranslations("timesheet.list");
+  const months = useTranslations("timesheet.months");
+
   const router = useRouter();
-  const { mutate: remove, isPending } = useDeleteTimesheet(() => router.refresh());
+
+  const { mutate: remove, isPending } =
+    useDeleteTimesheet(() => router.refresh());
 
   if (timesheets.length === 0) {
     return (
       <div className="text-center py-16 text-muted-foreground">
         <FileSpreadsheet className="w-10 h-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">No timesheets yet</p>
+
+        <p className="text-sm">{t("empty")}</p>
       </div>
     );
   }
@@ -54,70 +62,113 @@ export function TimesheetList({ timesheets, canManage }: Props) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Point</TableHead>
-          <TableHead>Davr</TableHead>
-          <TableHead>Xodimlar</TableHead>
-          <TableHead>Holat</TableHead>
-          {canManage && <TableHead className="text-right">Actions</TableHead>}
+          <TableHead>{t("point")}</TableHead>
+          <TableHead>{t("period")}</TableHead>
+          <TableHead>{t("employees")}</TableHead>
+          <TableHead>{t("status")}</TableHead>
+
+          {canManage && (
+            <TableHead className="text-right">
+              {t("actions")}
+            </TableHead>
+          )}
         </TableRow>
       </TableHeader>
+
       <TableBody>
-        {timesheets.map((t) => (
-          <TableRow
-            key={t.id}
-            className="cursor-pointer hover:bg-muted/50"
-            onClick={() => router.push(`${PAGES.TIMESHEETS}/${t.id}`)}
-          >
-            <TableCell className="font-medium">{t.pointName}</TableCell>
-            <TableCell>
-              {MONTH_LABELS[t.month - 1]} {t.year}
-            </TableCell>
-            <TableCell>
-              <Badge variant="secondary">{t.userCount}</Badge>
-            </TableCell>
-            <TableCell>
-              <Badge variant={t.status === "CONFIRMED" ? "default" : "secondary"}>
-                {t.status === "CONFIRMED" ? "Tasdiqlangan" : "Qoralama"}
-              </Badge>
-            </TableCell>
-            {canManage && (
-              <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive"
-                      disabled={isPending}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Tabelni o'chirish?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        <strong>
-                          {t.pointName} — {MONTH_LABELS[t.month - 1]} {t.year}
-                        </strong>{" "}
-                        o'chiriladi.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => remove(t.id)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+        {timesheets.map((timesheet) => {
+          const period = `${months(
+            String(timesheet.month - 1)
+          )} ${timesheet.year}`;
+
+          return (
+            <TableRow
+              key={timesheet.id}
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() =>
+                router.push(
+                  `${PAGES.TIMESHEETS}/${timesheet.id}`
+                )
+              }
+            >
+              <TableCell className="font-medium">
+                {timesheet.pointName}
               </TableCell>
-            )}
-          </TableRow>
-        ))}
+
+              <TableCell>{period}</TableCell>
+
+              <TableCell>
+                <Badge variant="secondary">
+                  {timesheet.userCount}
+                </Badge>
+              </TableCell>
+
+              <TableCell>
+                <Badge
+                  variant={
+                    timesheet.status === "CONFIRMED"
+                      ? "default"
+                      : "secondary"
+                  }
+                >
+                  {timesheet.status === "CONFIRMED"
+                    ? t("confirmed")
+                    : t("draft")}
+                </Badge>
+              </TableCell>
+
+              {canManage && (
+                <TableCell
+                  className="text-right"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive"
+                        disabled={isPending}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          {t("deleteTitle")}
+                        </AlertDialogTitle>
+
+                        <AlertDialogDescription>
+                          {t("deleteDescription", {
+                            point: timesheet.pointName,
+                            period,
+                          })}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>
+                          {t("cancel")}
+                        </AlertDialogCancel>
+
+                        <AlertDialogAction
+                          onClick={() =>
+                            remove(timesheet.id)
+                          }
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {t("delete")}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </TableCell>
+              )}
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );

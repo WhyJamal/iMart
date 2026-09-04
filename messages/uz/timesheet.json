@@ -1,0 +1,60 @@
+{
+  "title": "Tabel",
+  "description": "Nuqta + oy bo‘yicha davomat — ish grafigi asosida avtomatik to‘ldiriladi",
+  "newTimesheet": "Yangi tabel",
+
+  "form": {
+    "title": "Yangi tabel",
+    "point": "Nuqta",
+    "selectPoint": "Nuqtani tanlang",
+    "year": "Yil",
+    "month": "Oy",
+    "cancel": "Bekor qilish",
+    "saving": "Saqlanmoqda…",
+    "create": "Yaratish"
+  },
+
+  "list": {
+    "point": "Nuqta",
+    "period": "Davr",
+    "employees": "Xodimlar",
+    "status": "Holat",
+    "actions": "Amallar",
+    "empty": "Hali tabel mavjud emas",
+    "confirmed": "Tasdiqlangan",
+    "draft": "Qoralama",
+    "deleteTitle": "Tabelni o‘chirish?",
+    "deleteDescription": "{point} — {period} o‘chiriladi.",
+    "cancel": "Bekor qilish",
+    "delete": "O‘chirish"
+  },
+
+  "detail": {
+    "employee": "Xodim",
+    "schedule": "Grafik",
+    "days": "Kun",
+    "hours": "Soat",
+    "fillEmployees": "Xodimlarni to‘ldirish",
+    "addingEmployees": "Qo‘shilmoqda…",
+    "fillTimesheet": "Tabelni to‘ldirish",
+    "filling": "To‘ldirilmoqda…",
+    "emptyEmployees": "Hali xodimlar qo‘shilmagan — \"Xodimlarni to‘ldirish\" tugmasini bosing",
+    "totalPerDay": "Jami (kuniga)",
+    "note": "Qizil katak — bayram/dam kuni. Katak ustiga bosib qo‘lda tuzatish mumkin (masalan xodim kelmagan) — tuzatilgan kunlar keyingi \"Tabelni to‘ldirish\"da qayta yozilmaydi."
+  },
+
+  "months": [
+    "Yanvar",
+    "Fevral",
+    "Mart",
+    "Aprel",
+    "May",
+    "Iyun",
+    "Iyul",
+    "Avgust",
+    "Sentabr",
+    "Oktabr",
+    "Noyabr",
+    "Dekabr"
+  ]
+}

@@ -1,18 +1,17 @@
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+
 import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
 import { getTimesheetDetail } from "@/actions/timesheet-actions";
+
 import { TimesheetTable } from "./_components/timesheet-table";
 import { PAGES } from "@/config/pages.config";
+
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
 export const dynamic = "force-dynamic";
-
-const MONTH_LABELS = [
-  "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
-  "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr",
-];
 
 export default async function TimesheetDetailPage({
   params,
@@ -20,13 +19,25 @@ export default async function TimesheetDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const session = await getServerSession();
-  if (!session || !hasPermission(session.role, "schedules:manage")) {
+
+  if (
+    !session ||
+    !hasPermission(session.role, "schedules:manage")
+  ) {
     redirect(PAGES.HOME);
   }
 
   const { id } = await params;
+
   const timesheet = await getTimesheetDetail(id);
+
   if (!timesheet) notFound();
+
+  const months = await getTranslations("timesheet.months");
+
+  const monthName = months(
+    String(timesheet.month - 1)
+  );
 
   return (
     <div className="p-6 space-y-6">
@@ -39,14 +50,20 @@ export default async function TimesheetDetailPage({
         </Link>
 
         <div>
-          <h1 className="text-2xl font-bold">{timesheet.pointName}</h1>
+          <h1 className="text-2xl font-bold">
+            {timesheet.pointName}
+          </h1>
+
           <p className="text-muted-foreground text-sm mt-0.5">
-            {MONTH_LABELS[timesheet.month - 1]} {timesheet.year}
+            {monthName} {timesheet.year}
           </p>
         </div>
       </div>
 
-      <TimesheetTable timesheet={timesheet} canManage />
+      <TimesheetTable
+        timesheet={timesheet}
+        canManage
+      />
     </div>
   );
 }

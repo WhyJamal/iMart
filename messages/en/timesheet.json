@@ -1,0 +1,60 @@
+{
+  "title": "Timesheets",
+  "description": "Attendance by point and month — automatically filled based on the work schedule",
+  "newTimesheet": "New timesheet",
+
+  "form": {
+    "title": "New timesheet",
+    "point": "Point",
+    "selectPoint": "Select a point",
+    "year": "Year",
+    "month": "Month",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "create": "Create"
+  },
+
+  "list": {
+    "point": "Point",
+    "period": "Period",
+    "employees": "Employees",
+    "status": "Status",
+    "actions": "Actions",
+    "empty": "No timesheets yet",
+    "confirmed": "Confirmed",
+    "draft": "Draft",
+    "deleteTitle": "Delete timesheet?",
+    "deleteDescription": "{point} — {period} will be deleted.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+
+  "detail": {
+    "employee": "Employee",
+    "schedule": "Schedule",
+    "days": "Days",
+    "hours": "Hours",
+    "fillEmployees": "Fill employees",
+    "addingEmployees": "Adding…",
+    "fillTimesheet": "Fill timesheet",
+    "filling": "Filling…",
+    "emptyEmployees": "No employees have been added yet — click “Fill employees”",
+    "totalPerDay": "Total (per day)",
+    "note": "A red cell indicates a holiday/day off. Click a cell to edit it manually (for example, if an employee was absent) — manually changed days will not be overwritten by the next timesheet fill."
+  },
+
+  "months": [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ]
+}

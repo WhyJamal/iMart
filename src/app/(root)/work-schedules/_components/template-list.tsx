@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { CalendarClock, Pencil, Trash2 } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
+
 import {
   Table,
   TableBody,
@@ -12,7 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import { Button } from "@/components/ui/button";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +29,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
 import type { IWorkScheduleTemplate } from "@/types/work-schedule.types";
+
 import { PAGES } from "@/config/pages.config";
 import { useDeleteTemplate } from "../_hooks/use-work-schedule-mutations";
 
@@ -34,14 +41,20 @@ interface Props {
 }
 
 export function TemplateList({ templates, canManage }: Props) {
+  const t = useTranslations("work-schedules.templateList");
+
   const router = useRouter();
-  const { mutate: remove, isPending } = useDeleteTemplate(() => router.refresh());
+
+  const { mutate: remove, isPending } = useDeleteTemplate(() =>
+    router.refresh()
+  );
 
   if (templates.length === 0) {
     return (
       <div className="text-center py-10 text-muted-foreground">
         <CalendarClock className="w-8 h-8 mx-auto mb-2 opacity-30" />
-        <p className="text-sm">No templates yet</p>
+
+        <p className="text-sm">{t("empty")}</p>
       </div>
     );
   }
@@ -50,29 +63,47 @@ export function TemplateList({ templates, canManage }: Props) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Nomi</TableHead>
-          <TableHead>Ish kunlari (soat)</TableHead>
-          <TableHead>Grafiklar</TableHead>
-          {canManage && <TableHead className="text-right">Actions</TableHead>}
+          <TableHead>{t("name")}</TableHead>
+          <TableHead>{t("workingDays")}</TableHead>
+          <TableHead>{t("schedules")}</TableHead>
+
+          {canManage && (
+            <TableHead className="text-right">
+              {t("actions")}
+            </TableHead>
+          )}
         </TableRow>
       </TableHeader>
+
       <TableBody>
-        {templates.map((t) => (
-          <TableRow key={t.id}>
-            <TableCell className="font-medium">{t.name}</TableCell>
+        {templates.map((template) => (
+          <TableRow key={template.id}>
+            <TableCell className="font-medium">
+              {template.name}
+            </TableCell>
+
             <TableCell className="text-sm text-muted-foreground">
-              {t.days.map((d) => d.workHours).join(" / ")}
+              {template.days
+                .map((d) => d.workHours)
+                .join(" / ")}
             </TableCell>
+
             <TableCell>
-              <Badge variant="secondary">{t.scheduleCount}</Badge>
+              <Badge variant="secondary">
+                {template.scheduleCount}
+              </Badge>
             </TableCell>
+
             {canManage && (
               <TableCell className="text-right space-x-1">
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href={`${PAGES.WORK_SCHEDULES}?editTemplate=${t.id}`}>
+                  <Link
+                    href={`${PAGES.WORK_SCHEDULES}?editTemplate=${template.id}`}
+                  >
                     <Pencil className="w-3.5 h-3.5" />
                   </Link>
                 </Button>
+
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
@@ -84,20 +115,30 @@ export function TemplateList({ templates, canManage }: Props) {
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </AlertDialogTrigger>
+
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Shablonni o'chirish?</AlertDialogTitle>
+                      <AlertDialogTitle>
+                        {t("deleteTitle")}
+                      </AlertDialogTitle>
+
                       <AlertDialogDescription>
-                        <strong>{t.name}</strong> o'chiriladi.
+                        {t("deleteDescription", {
+                          name: template.name,
+                        })}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
+
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>
+                        {t("cancel")}
+                      </AlertDialogCancel>
+
                       <AlertDialogAction
-                        onClick={() => remove(t.id)}
+                        onClick={() => remove(template.id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        Delete
+                        {t("delete")}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

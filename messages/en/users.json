@@ -1,0 +1,33 @@
+{
+  "title": "Users",
+  "description": "Manage employees and their roles",
+  "newUser": "New user",
+  "form": {
+    "newUser": "New user",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "role": "Role",
+    "cancel": "Cancel",
+    "creating": "Creating…",
+    "createUser": "Create user"
+  },
+  "list": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "point": "Point",
+    "schedule": "Schedule",
+    "joined": "Joined",
+    "actions": "Actions",
+    "empty": "No users yet",
+    "you": "You",
+    "notAssigned": "Not assigned",
+    "notScheduled": "Not assigned",
+    "deleteTitle": "Delete user?",
+    "deleteDescription": "{name} ({email}) will be deleted. This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  }
+}

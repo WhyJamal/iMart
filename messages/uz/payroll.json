@@ -1,0 +1,73 @@
+{
+  "title": "Payroll",
+  "description": "Oy bo‘yicha oylik hujjatlari — tabel asosida avtomatik hisoblanadi",
+  "newDocument": "Yangi hujjat",
+
+  "form": {
+    "title": "Yangi oylik hujjati",
+    "point": "Nuqta",
+    "selectPoint": "Nuqtani tanlang",
+    "year": "Yil",
+    "month": "Oy",
+    "note": "Eslatma: bir oy uchun bir necha marta hujjat yaratish mumkin (masalan avans va oy oxiri uchun alohida) — har safar faqat qolgan (hali to‘lanmagan) summa hisoblanadi.",
+    "cancel": "Bekor qilish",
+    "saving": "Saqlanmoqda…",
+    "create": "Yaratish"
+  },
+
+  "list": {
+    "point": "Nuqta",
+    "period": "Davr",
+    "employees": "Xodimlar",
+    "amount": "Summa",
+    "status": "Holat",
+    "actions": "Amallar",
+    "empty": "Hali hujjatlar mavjud emas",
+    "confirmed": "Tasdiqlangan",
+    "draft": "Qoralama",
+    "deleteTitle": "Hujjatni o‘chirish?",
+    "confirmedDelete": "Bu hujjat tasdiqlangan — o‘chirilsa kassadan chiqqan pul teskari qaytariladi.",
+    "draftDelete": "Bu qoralama hujjat, hech qanday pul harakati yo‘q.",
+    "cancel": "Bekor qilish",
+    "delete": "O‘chirish"
+  },
+
+  "table": {
+    "fill": "To‘ldirish",
+    "confirmAndClose": "Yozish va yopish",
+    "confirmTitle": "Hujjatni tasdiqlash?",
+    "confirmDescription": "Jami <strong>{amount} so‘m</strong> kassa/bank balansidan chiqariladi. Bu amalni bekor qilib bo‘lmaydi (faqat hujjatni o‘chirish orqali qaytarish mumkin).",
+    "cancel": "Bekor qilish",
+    "confirm": "Tasdiqlash",
+    "noLines": "Hali qatorlar yo‘q — «To‘ldirish»ni bosing",
+    "employee": "Xodim",
+    "type": "Tur",
+    "rate": "Stavka",
+    "worked": "Ishlagan",
+    "calculated": "Hisoblangan",
+    "alreadyPaid": "Oldin to‘langan",
+    "payable": "To‘lanadi",
+    "total": "Jami",
+    "filling": "To‘ldirilmoqda…"
+  },
+
+  "detail": {
+    "confirmed": "Tasdiqlangan",
+    "draft": "Qoralama"
+  },
+
+  "months": {
+    "january": "Yanvar",
+    "february": "Fevral",
+    "march": "Mart",
+    "april": "Aprel",
+    "may": "May",
+    "june": "Iyun",
+    "july": "Iyul",
+    "august": "Avgust",
+    "september": "Sentabr",
+    "october": "Oktabr",
+    "november": "Noyabr",
+    "december": "Dekabr"
+  }
+}   

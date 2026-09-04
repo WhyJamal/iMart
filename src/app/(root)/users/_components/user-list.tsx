@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Users as UsersIcon, Trash2 } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -30,9 +32,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
 import { ROLES, type Role } from "@/types/role.types";
 import type { IOrgUser } from "@/types/user.types";
 import type { IPointOption } from "@/types/point.types";
+
 import {
   useUpdateUserRole,
   useUpdateUserPoint,
@@ -53,22 +57,32 @@ interface Props {
 }
 
 const fmtDate = (d: Date) =>
-  new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(d));
+  new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+  }).format(new Date(d));
 
 const NO_POINT = "__none__";
 const NO_SCHEDULE = "**none**";
 
-export function UserList({ users, points, schedules, currentUserId, currentRole }: Props) {
+export function UserList({
+  users,
+  points,
+  schedules,
+  currentUserId,
+  currentRole,
+}: Props) {
   const router = useRouter();
-  const { mutate: changeRole, isPending: isChangingRole } = useUpdateUserRole(
-    () => router.refresh()
-  );
-  const { mutate: changePoint, isPending: isChangingPoint } = useUpdateUserPoint(
-    () => router.refresh()
-  );
-  const { mutate: removeUser, isPending: isDeleting } = useDeleteUser(() =>
-    router.refresh()
-  );
+  const t = useTranslations("users.list");
+
+  const { mutate: changeRole, isPending: isChangingRole } =
+    useUpdateUserRole(() => router.refresh());
+
+  const { mutate: changePoint, isPending: isChangingPoint } =
+    useUpdateUserPoint(() => router.refresh());
+
+  const { mutate: removeUser, isPending: isDeleting } =
+    useDeleteUser(() => router.refresh());
+
   const {
     mutate: changeSchedule,
     isPending: isChangingSchedule,
@@ -78,45 +92,62 @@ export function UserList({ users, points, schedules, currentUserId, currentRole 
     return (
       <div className="text-center py-24 text-muted-foreground">
         <UsersIcon className="w-10 h-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">No users yet</p>
+        <p className="text-sm">{t("empty")}</p>
       </div>
     );
   }
 
-  // OWNER'ni faqat OWNER tayinlashi mumkin (privilege escalation'ning oldini olish)
-  const assignableRoles = ROLES.filter((r) => r !== "OWNER" || currentRole === "OWNER");
+  const assignableRoles = ROLES.filter(
+    (r) => r !== "OWNER" || currentRole === "OWNER"
+  );
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead>Point</TableHead>
-          <TableHead>Schedule</TableHead>
-          <TableHead>Joined</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+          <TableHead>{t("name")}</TableHead>
+          <TableHead>{t("email")}</TableHead>
+          <TableHead>{t("role")}</TableHead>
+          <TableHead>{t("point")}</TableHead>
+          <TableHead>{t("schedule")}</TableHead>
+          <TableHead>{t("joined")}</TableHead>
+          <TableHead className="text-right">
+            {t("actions")}
+          </TableHead>
         </TableRow>
       </TableHeader>
+
       <TableBody>
         {users.map((u) => {
           const isSelf = u.id === currentUserId;
+
           return (
             <TableRow key={u.id}>
               <TableCell className="font-medium">
-                {u.name} {isSelf && <Badge variant="secondary" className="ml-1">You</Badge>}
+                {u.name}{" "}
+                {isSelf && (
+                  <Badge variant="secondary" className="ml-1">
+                    {t("you")}
+                  </Badge>
+                )}
               </TableCell>
-              <TableCell className="text-muted-foreground text-sm">{u.email}</TableCell>
+
+              <TableCell className="text-muted-foreground text-sm">
+                {u.email}
+              </TableCell>
+
               <TableCell>
                 <Select
                   value={u.role}
                   disabled={isSelf || isChangingRole}
-                  onValueChange={(v) => changeRole(u.id, v as Role)}
+                  onValueChange={(v) =>
+                    changeRole(u.id, v as Role)
+                  }
                 >
                   <SelectTrigger className="w-35">
                     <SelectValue />
                   </SelectTrigger>
+
                   <SelectContent>
                     {assignableRoles.map((r) => (
                       <SelectItem key={r} value={r}>
@@ -126,19 +157,27 @@ export function UserList({ users, points, schedules, currentUserId, currentRole 
                   </SelectContent>
                 </Select>
               </TableCell>
+
               <TableCell>
                 <Select
                   value={u.pointId ?? NO_POINT}
                   disabled={isChangingPoint}
                   onValueChange={(v) =>
-                    changePoint(u.id, v === NO_POINT ? null : v)
+                    changePoint(
+                      u.id,
+                      v === NO_POINT ? null : v
+                    )
                   }
                 >
                   <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Belgilanmagan" />
+                    <SelectValue placeholder={t("notAssigned")} />
                   </SelectTrigger>
+
                   <SelectContent>
-                    <SelectItem value={NO_POINT}>Belgilanmagan</SelectItem>
+                    <SelectItem value={NO_POINT}>
+                      {t("notAssigned")}
+                    </SelectItem>
+
                     {points.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
                         {p.name}
@@ -147,6 +186,7 @@ export function UserList({ users, points, schedules, currentUserId, currentRole 
                   </SelectContent>
                 </Select>
               </TableCell>
+
               <TableCell>
                 <Select
                   value={u.workScheduleId ?? NO_SCHEDULE}
@@ -159,12 +199,12 @@ export function UserList({ users, points, schedules, currentUserId, currentRole 
                   }
                 >
                   <SelectTrigger className="w-45">
-                    <SelectValue placeholder="График" />
+                    <SelectValue placeholder={t("schedule")} />
                   </SelectTrigger>
 
                   <SelectContent>
                     <SelectItem value={NO_SCHEDULE}>
-                      Не назначен
+                      {t("notScheduled")}
                     </SelectItem>
 
                     {schedules.map((schedule) => (
@@ -178,9 +218,11 @@ export function UserList({ users, points, schedules, currentUserId, currentRole 
                   </SelectContent>
                 </Select>
               </TableCell>
+
               <TableCell className="text-muted-foreground text-sm">
                 {fmtDate(u.createdAt)}
               </TableCell>
+
               <TableCell className="text-right">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -193,21 +235,31 @@ export function UserList({ users, points, schedules, currentUserId, currentRole 
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </AlertDialogTrigger>
+
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete user?</AlertDialogTitle>
+                      <AlertDialogTitle>
+                        {t("deleteTitle")}
+                      </AlertDialogTitle>
+
                       <AlertDialogDescription>
-                        <strong>{u.name}</strong> ({u.email}) o'chiriladi. Bu
-                        amalni bekor qilib bo'lmaydi.
+                        {t("deleteDescription", {
+                          name: u.name,
+                          email: u.email,
+                        })}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
+
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>
+                        {t("cancel")}
+                      </AlertDialogCancel>
+
                       <AlertDialogAction
                         onClick={() => removeUser(u.id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        Delete
+                        {t("delete")}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

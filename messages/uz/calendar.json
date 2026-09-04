@@ -1,0 +1,42 @@
+{
+  "title": "Ish kalendari",
+  "description": "Ish kalendari — bayram va dam olish kunlari, grafik va tabel shunga tayanib hisoblanadi",
+  "newYear": "Yangi yil",
+  "notCreated": "{year}-yil uchun kalendar hali yaratilmagan",
+  "dayDialog": {
+    "dayType": "Kun turi",
+    "default": "Odatiy (hafta kuni bo‘yicha)",
+    "holiday": "Bayram / dam olish kuni",
+    "short": "Qisqartirilgan ish kuni",
+    "workday": "Ish kuniga ko‘chirilgan",
+    "name": "Nomi (ixtiyoriy)",
+    "namePlaceholder": "masalan: Navro‘z bayrami",
+    "shortenedBy": "Necha soatga qisqaradi",
+    "cancel": "Bekor qilish",
+    "saving": "Saqlanmoqda…",
+    "save": "Saqlash"
+  },
+  "grid": {
+    "workingDays": "Ish kunlari: {count}",
+    "holidays": "Bayramlar: {count}",
+    "weekends": "Dam olish: {count}",
+    "confirmed": "Tasdiqlangan",
+    "draft": "Loyiha (tahrirlash mumkin)",
+    "reopen": "Qayta ochish",
+    "confirm": "Tasdiqlash"
+  },
+  "legend": {
+    "workday": "Ish kuni",
+    "weekend": "Dam olish kuni",
+    "holiday": "Bayram",
+    "short": "Qisqartirilgan kun",
+    "movedWorkday": "Ko‘chirilgan ish kuni"
+  },
+  "yearBar": {
+    "newYear": "Yangi yil",
+    "year": "Yil",
+    "cancel": "Bekor qilish",
+    "saving": "Saqlanmoqda…",
+    "create": "Yaratish"
+  }
+}

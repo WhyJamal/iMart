@@ -1,0 +1,81 @@
+{
+  "title": "Ish grafiklari",
+  "description": "Smena shablonlari va yillik grafiklar — ish kalendari asosida avtomatik to‘ldiriladi",
+  "templates": "Shablonlar",
+  "schedules": "Grafiklar",
+  "newTemplate": "Yangi shablon",
+  "newSchedule": "Yangi grafik",
+
+  "scheduleForm": {
+    "title": "Yangi grafik",
+    "name": "Nomi",
+    "namePlaceholder": "masalan: A Smena 2026",
+    "year": "Yil",
+    "template": "Shablon",
+    "selectTemplate": "Shablonni tanlang",
+    "workCalendar": "Ish kalendari",
+    "selectCalendar": "Kalendarni tanlang",
+    "calendarRequired": "Avval /calendar sahifasida shu yil uchun kalendar yarating",
+    "cancel": "Bekor qilish",
+    "saving": "Saqlanmoqda…",
+    "create": "Yaratish"
+  },
+
+  "scheduleList": {
+    "name": "Nomi",
+    "year": "Yil",
+    "template": "Shablon",
+    "employees": "Xodimlar",
+    "filledDays": "To‘ldirilgan kunlar",
+    "actions": "Amallar",
+    "empty": "Hali grafiklar mavjud emas",
+    "deleteTitle": "Grafikni o‘chirish?",
+    "deleteDescription": "{name} va uning barcha kunlik yozuvlari o‘chiriladi.",
+    "cancel": "Bekor qilish",
+    "delete": "O‘chirish"
+  },
+
+  "templateForm": {
+    "editTitle": "Shablonni tahrirlash",
+    "newTitle": "Yangi shablon",
+    "name": "Nomi",
+    "namePlaceholder": "masalan: Standart 5/2",
+    "weekday": "Hafta kuni",
+    "start": "Boshi",
+    "end": "Oxiri",
+    "hours": "Soat",
+    "break": "Tanaffus",
+    "note": "Eslatma: ish kuni bo‘lish-bo‘lmasligini bu yerda emas, \"Ish kalendari\" hal qiladi (standart Dush-Juma qoidasi + bayramlar). Bu yerdagi soat — agar shu hafta kuni ish kuni bo‘lib chiqsa, necha soat ishlanishi.",
+    "cancel": "Bekor qilish",
+    "saving": "Saqlanmoqda…",
+    "save": "Saqlash",
+    "monday": "Dushanba",
+    "tuesday": "Seshanba",
+    "wednesday": "Chorshanba",
+    "thursday": "Payshanba",
+    "friday": "Juma",
+    "saturday": "Shanba",
+    "sunday": "Yakshanba"
+  },
+
+  "templateList": {
+    "name": "Nomi",
+    "workingDays": "Ish kunlari (soat)",
+    "schedules": "Grafiklar",
+    "actions": "Amallar",
+    "empty": "Hali shablonlar mavjud emas",
+    "deleteTitle": "Shablonni o‘chirish?",
+    "deleteDescription": "{name} o‘chiriladi.",
+    "cancel": "Bekor qilish",
+    "delete": "O‘chirish"
+  },
+
+  "scheduleTable": {
+    "fill": "To‘ldirish",
+    "filling": "To‘ldirilmoqda…",
+    "month": "Oy",
+    "days": "Kun",
+    "hours": "Soat",
+    "note": "Qizil katak — bayram/dam kuni (Ish kalendaridan). Katak ustiga bosib qo‘lda tuzatish mumkin — tuzatilgan kunlar keyingi \"To‘ldirish\"da qayta yozilmaydi."
+  }
+}

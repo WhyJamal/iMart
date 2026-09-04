@@ -1,0 +1,33 @@
+{
+  "title": "Пользователи",
+  "description": "Управление сотрудниками и их ролями",
+  "newUser": "Новый пользователь",
+  "form": {
+    "newUser": "Новый пользователь",
+    "name": "Имя",
+    "email": "Email",
+    "password": "Пароль",
+    "passwordPlaceholder": "Минимум 8 символов",
+    "role": "Роль",
+    "cancel": "Отмена",
+    "creating": "Создание…",
+    "createUser": "Создать пользователя"
+  },
+  "list": {
+    "name": "Имя",
+    "email": "Email",
+    "role": "Роль",
+    "point": "Точка",
+    "schedule": "График",
+    "joined": "Дата добавления",
+    "actions": "Действия",
+    "empty": "Пользователей пока нет",
+    "you": "Вы",
+    "notAssigned": "Не назначен",
+    "notScheduled": "Не назначен",
+    "deleteTitle": "Удалить пользователя?",
+    "deleteDescription": "{name} ({email}) будет удалён. Это действие нельзя отменить.",
+    "cancel": "Отмена",
+    "delete": "Удалить"
+  }
+}

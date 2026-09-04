@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+
 import {
   Dialog,
   DialogContent,
@@ -18,7 +20,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { IResolvedDay, CalendarExceptionType } from "@/types/calendar.types";
+
+import type {
+  IResolvedDay,
+  CalendarExceptionType,
+} from "@/types/calendar.types";
+
 import { useSetCalendarDay } from "../_hooks/use-calendar-mutations";
 
 type OptionValue = "DEFAULT" | CalendarExceptionType;
@@ -29,13 +36,6 @@ interface Props {
   onClose: () => void;
 }
 
-const OPTION_LABELS: Record<OptionValue, string> = {
-  DEFAULT: "Odatiy (hafta kuni bo'yicha)",
-  HOLIDAY: "Bayram / dam olish kuni",
-  SHORT: "Qisqartirilgan ish kuni",
-  WORKDAY: "Ish kuniga ko'chirilgan",
-};
-
 function toOptionValue(day: IResolvedDay): OptionValue {
   if (day.kind === "holiday") return "HOLIDAY";
   if (day.kind === "short") return "SHORT";
@@ -43,13 +43,20 @@ function toOptionValue(day: IResolvedDay): OptionValue {
   return "DEFAULT";
 }
 
-export function CalendarDayDialog({ calendarId, day, onClose }: Props) {
+export function CalendarDayDialog({
+  calendarId,
+  day,
+  onClose,
+}: Props) {
+  const t = useTranslations("calendar.dayDialog");
+
   const [option, setOption] = useState<OptionValue>("DEFAULT");
   const [title, setTitle] = useState("");
   const [shortenedBy, setShortenedBy] = useState("1");
 
   useEffect(() => {
     if (!day) return;
+
     setOption(toOptionValue(day));
     setTitle(day.title ?? "");
     setShortenedBy(day.shortenedBy ? String(day.shortenedBy) : "1");
@@ -65,45 +72,68 @@ export function CalendarDayDialog({ calendarId, day, onClose }: Props) {
       date: day.date,
       type: option === "DEFAULT" ? null : option,
       title: option === "HOLIDAY" ? title : undefined,
-      shortenedBy: option === "SHORT" ? Number(shortenedBy) : undefined,
+      shortenedBy:
+        option === "SHORT" ? Number(shortenedBy) : undefined,
     });
   };
 
+  const OPTION_LABELS: Record<OptionValue, string> = {
+    DEFAULT: t("default"),
+    HOLIDAY: t("holiday"),
+    SHORT: t("short"),
+    WORKDAY: t("workday"),
+  };
+
   return (
-    <Dialog open={!!day} onOpenChange={(open) => !open && onClose()}>
+    <Dialog
+      open={!!day}
+      onOpenChange={(open) => !open && onClose()}
+    >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {new Date(`${day.date}T00:00:00`).toLocaleDateString("ru-RU", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
+            {new Date(`${day.date}T00:00:00`).toLocaleDateString(
+              "ru-RU",
+              {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }
+            )}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label>Kun turi</Label>
-            <Select value={option} onValueChange={(v) => setOption(v as OptionValue)}>
+            <Label>{t("dayType")}</Label>
+
+            <Select
+              value={option}
+              onValueChange={(v) =>
+                setOption(v as OptionValue)
+              }
+            >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
+
               <SelectContent>
-                {(Object.keys(OPTION_LABELS) as OptionValue[]).map((key) => (
-                  <SelectItem key={key} value={key}>
-                    {OPTION_LABELS[key]}
-                  </SelectItem>
-                ))}
+                {(Object.keys(OPTION_LABELS) as OptionValue[]).map(
+                  (key) => (
+                    <SelectItem key={key} value={key}>
+                      {OPTION_LABELS[key]}
+                    </SelectItem>
+                  )
+                )}
               </SelectContent>
             </Select>
           </div>
 
           {option === "HOLIDAY" && (
             <div className="space-y-1.5">
-              <Label>Nomi (ixtiyoriy)</Label>
+              <Label>{t("name")}</Label>
               <Input
-                placeholder="masalan: Navro'z bayrami"
+                placeholder={t("namePlaceholder")}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
@@ -112,14 +142,16 @@ export function CalendarDayDialog({ calendarId, day, onClose }: Props) {
 
           {option === "SHORT" && (
             <div className="space-y-1.5">
-              <Label>Necha soatga qisqaradi</Label>
+              <Label>{t("shortenedBy")}</Label>
               <Input
                 type="number"
                 min={0}
                 max={8}
                 step="0.5"
                 value={shortenedBy}
-                onChange={(e) => setShortenedBy(e.target.value)}
+                onChange={(e) =>
+                  setShortenedBy(e.target.value)
+                }
               />
             </div>
           )}
@@ -127,10 +159,11 @@ export function CalendarDayDialog({ calendarId, day, onClose }: Props) {
 
         <DialogFooter>
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            {t("cancel")}
           </Button>
+
           <Button onClick={handleSave} disabled={isPending}>
-            {isPending ? "Saving…" : "Save"}
+            {isPending ? t("saving") : t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>

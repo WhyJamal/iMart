@@ -2,19 +2,28 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Lock, LockOpen } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { IWorkCalendarDetail, IResolvedDay } from "@/types/calendar.types";
+
+import type {
+  IWorkCalendarDetail,
+  IResolvedDay,
+} from "@/types/calendar.types";
+
 import {
   countCalendarDays,
   groupByMonth,
   MONTH_NAMES_UZ,
   resolveYearDays,
 } from "@/utils/calendar.util";
+
 import { CalendarMonth } from "./calendar-month";
 import { CalendarDayDialog } from "./calendar-day-dialog";
 import { CalendarLegend } from "./calendar-legend";
+
 import {
   useConfirmWorkCalendar,
   useReopenWorkCalendar,
@@ -27,51 +36,76 @@ interface Props {
 
 export function CalendarGrid({ calendar, canManage }: Props) {
   const router = useRouter();
-  const [selectedDay, setSelectedDay] = useState<IResolvedDay | null>(null);
+  const t = useTranslations("calendar.grid");
+
+  const [selectedDay, setSelectedDay] =
+    useState<IResolvedDay | null>(null);
 
   const days = useMemo(
-    () => resolveYearDays(calendar.year, calendar.exceptions),
+    () =>
+      resolveYearDays(calendar.year, calendar.exceptions),
     [calendar.year, calendar.exceptions]
   );
+
   const months = useMemo(() => groupByMonth(days), [days]);
   const counts = useMemo(() => countCalendarDays(days), [days]);
 
   const canEdit = canManage && !calendar.isConfirmed;
 
-  const { mutate: confirm, isPending: isConfirming } = useConfirmWorkCalendar(() =>
-    router.refresh()
-  );
-  const { mutate: reopen, isPending: isReopening } = useReopenWorkCalendar(() =>
-    router.refresh()
-  );
+  const { mutate: confirm, isPending: isConfirming } =
+    useConfirmWorkCalendar(() => router.refresh());
+
+  const { mutate: reopen, isPending: isReopening } =
+    useReopenWorkCalendar(() => router.refresh());
 
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary">Ish kunlari: {counts.workingDays}</Badge>
-          <Badge variant="secondary">Bayramlar: {counts.holidays}</Badge>
-          <Badge variant="secondary">Dam olish: {counts.weekends}</Badge>
+          <Badge variant="secondary">
+            {t("workingDays", { count: counts.workingDays })}
+          </Badge>
+
+          <Badge variant="secondary">
+            {t("holidays", { count: counts.holidays })}
+          </Badge>
+
+          <Badge variant="secondary">
+            {t("weekends", { count: counts.weekends })}
+          </Badge>
+
           {calendar.isConfirmed ? (
-            <Badge variant="outline" className="border-green-300 text-green-700">
-              Tasdiqlangan
+            <Badge
+              variant="outline"
+              className="border-green-300 text-green-700"
+            >
+              {t("confirmed")}
             </Badge>
           ) : (
-            <Badge variant="outline">Loyiha (tahrirlash mumkin)</Badge>
+            <Badge variant="outline">
+              {t("draft")}
+            </Badge>
           )}
         </div>
 
         {canManage && (
           <div>
             {calendar.isConfirmed ? (
-              <Button variant="outline" onClick={() => reopen(calendar.id)} disabled={isReopening}>
+              <Button
+                variant="outline"
+                onClick={() => reopen(calendar.id)}
+                disabled={isReopening}
+              >
                 <LockOpen className="w-4 h-4 mr-1" />
-                {isReopening ? "..." : "Qayta ochish"}
+                {isReopening ? "..." : t("reopen")}
               </Button>
             ) : (
-              <Button onClick={() => confirm(calendar.id)} disabled={isConfirming}>
+              <Button
+                onClick={() => confirm(calendar.id)}
+                disabled={isConfirming}
+              >
                 <Lock className="w-4 h-4 mr-1" />
-                {isConfirming ? "..." : "Tasdiqlash"}
+                {isConfirming ? "..." : t("confirm")}
               </Button>
             )}
           </div>

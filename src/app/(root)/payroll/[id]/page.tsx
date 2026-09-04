@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ChevronLeft } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
@@ -10,26 +12,48 @@ import { PAGES } from "@/config/pages.config";
 
 export const dynamic = "force-dynamic";
 
-const MONTH_LABELS = [
-  "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
-  "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr",
-];
+const MONTH_KEYS = [
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
+] as const;
 
 export default async function PayrollAccrualDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const months = await getTranslations(
+    "payroll.months"
+  );
+  const t = await getTranslations("payroll.detail");
   const session = await getServerSession();
 
-  if (!session || !hasPermission(session.role, "payroll:read")) {
+  if (
+    !session ||
+    !hasPermission(session.role, "payroll:read")
+  ) {
     redirect(PAGES.HOME);
   }
 
-  const canManage = hasPermission(session.role, "payroll:manage");
+  const canManage = hasPermission(
+    session.role,
+    "payroll:manage"
+  );
 
   const { id } = await params;
-  const accrual = await getPayrollAccrualDetail(id);
+
+  const accrual =
+    await getPayrollAccrualDetail(id);
 
   if (!accrual) notFound();
 
@@ -44,22 +68,35 @@ export default async function PayrollAccrualDetailPage({
         </Link>
 
         <div>
-          <h1 className="text-2xl font-bold">{accrual.pointName}</h1>
+          <h1 className="text-2xl font-bold">
+            {accrual.pointName}
+          </h1>
+
           <p className="text-muted-foreground text-sm mt-0.5">
-            {MONTH_LABELS[accrual.month - 1]} {accrual.year}
+            {months(
+              MONTH_KEYS[accrual.month - 1]
+            )}{" "}
+            {accrual.year}
           </p>
         </div>
 
         <Badge
           variant={
-            accrual.status === "CONFIRMED" ? "default" : "secondary"
+            accrual.status === "CONFIRMED"
+              ? "default"
+              : "secondary"
           }
         >
-          {accrual.status === "CONFIRMED" ? "Tasdiqlangan" : "Qoralama"}
+          {accrual.status === "CONFIRMED"
+            ? t("confirmed")
+            : t("draft")}
         </Badge>
       </div>
 
-      <AccrualTable accrual={accrual} canManage={canManage} />
+      <AccrualTable
+        accrual={accrual}
+        canManage={canManage}
+      />
     </div>
   );
 }

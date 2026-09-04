@@ -1,0 +1,38 @@
+{
+  "title": "Maosh",
+  "description": "Xodimlar stavkasi — bitta joyda",
+  "setSalary": "Maosh belgilash",
+  "employees": "Xodimlar",
+
+  "list": {
+    "employee": "Xodim",
+    "role": "Rol",
+    "salaryType": "Maosh turi",
+    "rate": "Stavka",
+    "effectiveFrom": "Amal qilish sanasi",
+    "actions": "Amallar",
+    "noEmployees": "Hali xodimlar mavjud emas",
+    "notSet": "Belgilanmagan",
+    "update": "Yangilash",
+    "set": "Belgilash"
+  },
+
+  "form": {
+    "title": "Maosh belgilash",
+    "employee": "Xodim",
+    "selectEmployee": "Xodimni tanlang",
+    "salaryType": "Maosh turi",
+    "fixed": "Oylik (FIXED)",
+    "daily": "Kunbay (DAILY)",
+    "hourly": "Soatbay (HOURLY)",
+    "monthlyAmount": "Oylik summa",
+    "dailyRate": "1 kun narxi",
+    "hourlyRate": "1 soat narxi",
+    "effectiveFrom": "Amal qilish sanasi",
+    "reason": "Sabab (ixtiyoriy)",
+    "reasonPlaceholder": "masalan, Yillik oshirish",
+    "cancel": "Bekor qilish",
+    "saving": "Saqlanmoqda…",
+    "save": "Saqlash"
+  }
+}

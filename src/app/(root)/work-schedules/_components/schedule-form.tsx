@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { CalendarRange } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,8 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import type { IWorkScheduleTemplateOption } from "@/types/work-schedule.types";
 import type { IWorkCalendarSummary } from "@/types/calendar.types";
+
 import { useCreateWorkSchedule } from "../_hooks/use-work-schedule-mutations";
 
 interface Props {
@@ -24,6 +28,8 @@ interface Props {
 }
 
 export function ScheduleForm({ templates, calendars, onClose }: Props) {
+  const t = useTranslations("work-schedules.scheduleForm");
+
   const router = useRouter();
   const [name, setName] = useState("");
   const [year, setYear] = useState(new Date().getFullYear());
@@ -49,22 +55,22 @@ export function ScheduleForm({ templates, calendars, onClose }: Props) {
       <div className="px-6 py-4 border-b flex items-center justify-between">
         <h2 className="text-base font-semibold flex items-center gap-2">
           <CalendarRange className="w-4 h-4" />
-          Yangi grafik
+          {t("title")}
         </h2>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         <div className="space-y-1.5">
-          <Label>Nomi</Label>
+          <Label>{t("name")}</Label>
           <Input
-            placeholder="e.g. A Smena 2026"
+            placeholder={t("namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label>Yil</Label>
+          <Label>{t("year")}</Label>
           <Input
             type="number"
             value={year}
@@ -73,11 +79,13 @@ export function ScheduleForm({ templates, calendars, onClose }: Props) {
         </div>
 
         <div className="space-y-1.5">
-          <Label>Shablon</Label>
+          <Label>{t("template")}</Label>
+
           <Select value={templateId} onValueChange={setTemplateId}>
             <SelectTrigger>
-              <SelectValue placeholder="Shablonni tanlang" />
+              <SelectValue placeholder={t("selectTemplate")} />
             </SelectTrigger>
+
             <SelectContent>
               {templates.map((t) => (
                 <SelectItem key={t.id} value={t.id}>
@@ -89,11 +97,16 @@ export function ScheduleForm({ templates, calendars, onClose }: Props) {
         </div>
 
         <div className="space-y-1.5">
-          <Label>Ish kalendari</Label>
-          <Select value={workCalendarId} onValueChange={setWorkCalendarId}>
+          <Label>{t("workCalendar")}</Label>
+
+          <Select
+            value={workCalendarId}
+            onValueChange={setWorkCalendarId}
+          >
             <SelectTrigger>
-              <SelectValue placeholder="Kalendarni tanlang" />
+              <SelectValue placeholder={t("selectCalendar")} />
             </SelectTrigger>
+
             <SelectContent>
               {calendars.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
@@ -102,9 +115,10 @@ export function ScheduleForm({ templates, calendars, onClose }: Props) {
               ))}
             </SelectContent>
           </Select>
+
           {calendars.length === 0 && (
             <p className="text-xs text-destructive">
-              Avval /calendar sahifasida shu yil uchun kalendar yarating
+              {t("calendarRequired")}
             </p>
           )}
         </div>
@@ -112,13 +126,19 @@ export function ScheduleForm({ templates, calendars, onClose }: Props) {
 
       <div className="p-4 border-t flex justify-end gap-2">
         <Button variant="ghost" onClick={handleClose}>
-          Cancel
+          {t("cancel")}
         </Button>
+
         <Button
           onClick={handleSubmit}
-          disabled={isPending || !name.trim() || !templateId || !workCalendarId}
+          disabled={
+            isPending ||
+            !name.trim() ||
+            !templateId ||
+            !workCalendarId
+          }
         >
-          {isPending ? "Saving…" : "Create"}
+          {isPending ? t("saving") : t("create")}
         </Button>
       </div>
     </div>

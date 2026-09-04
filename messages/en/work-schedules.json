@@ -1,0 +1,81 @@
+{
+  "title": "Work Schedules",
+  "description": "Shift templates and yearly schedules — automatically filled based on the work calendar",
+  "templates": "Templates",
+  "schedules": "Schedules",
+  "newTemplate": "New template",
+  "newSchedule": "New schedule",
+
+  "scheduleForm": {
+    "title": "New schedule",
+    "name": "Name",
+    "namePlaceholder": "e.g. Shift A 2026",
+    "year": "Year",
+    "template": "Template",
+    "selectTemplate": "Select a template",
+    "workCalendar": "Work calendar",
+    "selectCalendar": "Select a calendar",
+    "calendarRequired": "First create a calendar for this year on the /calendar page",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "create": "Create"
+  },
+
+  "scheduleList": {
+    "name": "Name",
+    "year": "Year",
+    "template": "Template",
+    "employees": "Employees",
+    "filledDays": "Filled days",
+    "actions": "Actions",
+    "empty": "No schedules yet",
+    "deleteTitle": "Delete schedule?",
+    "deleteDescription": "{name} and all of its daily records will be deleted.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+
+  "templateForm": {
+    "editTitle": "Edit template",
+    "newTitle": "New template",
+    "name": "Name",
+    "namePlaceholder": "e.g. Standard 5/2",
+    "weekday": "Weekday",
+    "start": "Start",
+    "end": "End",
+    "hours": "Hours",
+    "break": "Break",
+    "note": "Note: whether a day is a workday is determined by the Work Calendar, not here (standard Mon–Fri rule + holidays). The hours specified here are the number of working hours if this weekday is a working day.",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "save": "Save",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+
+  "templateList": {
+    "name": "Name",
+    "workingDays": "Working days (hours)",
+    "schedules": "Schedules",
+    "actions": "Actions",
+    "empty": "No templates yet",
+    "deleteTitle": "Delete template?",
+    "deleteDescription": "{name} will be deleted.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+
+  "scheduleTable": {
+    "fill": "Fill",
+    "filling": "Filling…",
+    "month": "Month",
+    "days": "Days",
+    "hours": "Hours",
+    "note": "A red cell indicates a holiday/day off (from the Work Calendar). Click a cell to edit it manually — manually changed days will not be overwritten by the next fill."
+  }
+}

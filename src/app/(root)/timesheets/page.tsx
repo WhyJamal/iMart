@@ -1,60 +1,78 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+
 import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
+
 import { getTimesheets } from "@/actions/timesheet-actions";
 import { getPointOptions } from "@/actions/point-actions";
+
 import { TimesheetList } from "./_components/timesheet-list";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
 import { TimesheetForm } from "./_components/timesheet-form";
+
 import { PAGES } from "@/config/pages.config";
 
 export const dynamic = "force-dynamic";
 
 export default async function TimesheetsPage({
-    searchParams,
+  searchParams,
 }: {
-    searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{ new?: string }>;
 }) {
-    const session = await getServerSession();
-    if (!session || !hasPermission(session.role, "schedules:manage")) {
-        redirect(PAGES.HOME);
-    }
+  const session = await getServerSession();
 
-    const { new: isNew } = await searchParams;
+  if (
+    !session ||
+    !hasPermission(session.role, "schedules:manage")
+  ) {
+    redirect(PAGES.HOME);
+  }
 
-    const [timesheets, points] = await Promise.all([
-        getTimesheets(),
-        getPointOptions(),
-    ]);
+  const { new: isNew } = await searchParams;
 
-    return (
-        <>
-            <div className="p-6 space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">Timesheets (Tabel)</h1>
-                        <p className="text-muted-foreground text-sm mt-0.5">
-                            Point + oy bo'yicha davomat — Grafik rabota asosida avtomatik
-                            to'ldiriladi
-                        </p>
-                    </div>
-                    <Button asChild disabled={points.length === 0}>
-                        <Link href={`${PAGES.TIMESHEETS}?new=1`}>
-                            <Plus className="w-4 h-4 mr-1" />
-                            New timesheet
-                        </Link>
-                    </Button>
-                </div>
+  const [timesheets, points] = await Promise.all([
+    getTimesheets(),
+    getPointOptions(),
+  ]);
 
-                <TimesheetList timesheets={timesheets} canManage />
-            </div>
+  const t = await getTranslations("timesheet");
 
-            <DrawerBackdrop isOpen={isNew === "1"}>
-                <TimesheetForm points={points} />
-            </DrawerBackdrop>
-        </>
-    );
+  return (
+    <>
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">
+              {t("title")}
+            </h1>
+
+            <p className="text-muted-foreground text-sm mt-0.5">
+              {t("description")}
+            </p>
+          </div>
+
+          <Button asChild disabled={points.length === 0}>
+            <Link href={`${PAGES.TIMESHEETS}?new=1`}>
+              <Plus className="w-4 h-4 mr-1" />
+              {t("newTimesheet")}
+            </Link>
+          </Button>
+        </div>
+
+        <TimesheetList
+          timesheets={timesheets}
+          canManage
+        />
+      </div>
+
+      <DrawerBackdrop isOpen={isNew === "1"}>
+        <TimesheetForm points={points} />
+      </DrawerBackdrop>
+    </>
+  );
 }
