@@ -1,0 +1,42 @@
+{
+  "title": "Warehouses",
+  "description": "Manage warehouses and their cells",
+  "newWarehouse": "New warehouse",
+  "form": {
+    "editWarehouse": "Edit warehouse",
+    "newWarehouse": "New warehouse",
+    "name": "Name",
+    "namePlaceholder": "e.g. Main warehouse",
+    "point": "Point",
+    "selectPoint": "Select a point",
+    "cells": "Cells",
+    "add": "Add",
+    "cellsDescription": "Sections inside the warehouse — for example \"Regular bread\", \"Black bread\", etc.",
+    "cellNamePlaceholder": "Cell name",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "save": "Save"
+  },
+  "list": {
+    "name": "Name",
+    "point": "Point",
+    "cells": "Cells",
+    "actions": "Actions",
+    "empty": "No warehouses yet",
+    "clickDescription": "Click the name to view the products inside",
+    "createPointFirst": "Please create at least one point first.",
+    "cellCount": "{count} cells",
+    "deleteTitle": "Delete warehouse?",
+    "deleteDescription": "{name} and its cells will be deleted. This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "loading": "Loading…",
+    "noStock": "There is currently no product stock in this warehouse",
+    "stock": {
+      "cell": "Cell",
+      "product": "Product",
+      "code": "Code",
+      "quantity": "Stock"
+    }
+  }
+}

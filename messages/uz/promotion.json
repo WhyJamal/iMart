@@ -1,0 +1,46 @@
+{
+  "title": "Aksiyalar",
+  "description": "Tanlangan sklad va belgilangan sanagacha amal qiladigan mahsulot chegirmalari",
+  "newPromotion": "Yangi aksiya",
+  "form": {
+    "title": "Yangi aksiya",
+    "point": "Nuqta",
+    "selectPoint": "Nuqtani tanlang",
+    "warehouse": "Sklad",
+    "selectWarehouse": "Skladni tanlang",
+    "cell": "Yacheyka",
+    "loading": "Yuklanmoqda…",
+    "selectCell": "Yacheykani tanlang",
+    "promotionName": "Aksiya nomi",
+    "promotionNamePlaceholder": "Masalan, Qora non -30%",
+    "discount": "Chegirma",
+    "endsAt": "Amal qilish muddati",
+    "comment": "Izoh",
+    "commentPlaceholder": "Ixtiyoriy",
+    "productsTitle": "Aksiyadagi mahsulotlar",
+    "productsDescription": "Faqat tanlangan yacheykada qoldig‘i mavjud mahsulotlar ko‘rsatiladi.",
+    "addLine": "Qator qo‘shish",
+    "productPlaceholder": "{number}-mahsulot",
+    "noAvailableProducts": "Tanlangan yacheykada aksiya uchun mavjud mahsulotlar yo‘q.",
+    "cancel": "Bekor qilish",
+    "saving": "Saqlanmoqda…",
+    "create": "Aksiya yaratish",
+    "validation": {
+      "required": "Nuqta, sklad, yacheyka, nomni to‘ldiring va mahsulot qo‘shing",
+      "duplicate": "Bitta mahsulotni bitta aksiyaga ikki marta qo‘shib bo‘lmaydi",
+      "unavailable": "Faqat tanlangan yacheykada mavjud mahsulotlarni tanlang",
+      "discount": "Chegirma 0.01 dan 100% gacha bo‘lishi kerak"
+    },
+    "success": "Aksiya yaratildi"
+  },
+  "list": {
+    "empty": "Hozircha aksiyalar mavjud emas",
+    "until": "gacha",
+    "finished": "Tugagan",
+    "daysShort": "k",
+    "hoursShort": "s",
+    "minutesShort": "d",
+    "secondsShort": "s",
+    "deleted": "Aksiya o‘chirildi"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "title": "Promotions",
+  "description": "Discounts on products only in the selected warehouse and until the specified date",
+  "newPromotion": "New promotion",
+  "form": {
+    "title": "New promotion",
+    "point": "Point",
+    "selectPoint": "Select point",
+    "warehouse": "Warehouse",
+    "selectWarehouse": "Select warehouse",
+    "cell": "Cell",
+    "loading": "Loading…",
+    "selectCell": "Select cell",
+    "promotionName": "Promotion name",
+    "promotionNamePlaceholder": "For example, Black bread -30%",
+    "discount": "Discount",
+    "endsAt": "Ends at",
+    "comment": "Comment",
+    "commentPlaceholder": "Optional",
+    "productsTitle": "Products in promotion",
+    "productsDescription": "Only products with stock in the selected cell are shown.",
+    "addLine": "Add line",
+    "productPlaceholder": "Product {number}",
+    "noAvailableProducts": "There are no available products for the promotion in the selected cell.",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "create": "Create promotion",
+    "validation": {
+      "required": "Fill in the point, warehouse, cell, name and add products",
+      "duplicate": "A product cannot be added twice to the same promotion",
+      "unavailable": "Select only products available in the selected cell",
+      "discount": "Discount must be between 0.01 and 100%"
+    },
+    "success": "Promotion created"
+  },
+  "list": {
+    "empty": "No promotions yet",
+    "until": "until",
+    "finished": "Finished",
+    "daysShort": "d",
+    "hoursShort": "h",
+    "minutesShort": "m",
+    "secondsShort": "s",
+    "deleted": "Promotion deleted"
+  }
+}

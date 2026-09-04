@@ -1,0 +1,41 @@
+{
+    "tabs": {
+        "account": "Account information",
+        "security": "Security"
+    },
+    "fields": {
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email",
+        "language": "Language",
+        "organization": "Organization"
+    },
+    "organization": {
+        "unassigned": "Unassigned",
+        "adminHint": "Contact an administrator to change the organization."
+    },
+    "security": {
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm password"
+    },
+    "buttons": {
+        "update": "Update",
+        "updating": "Updating…",
+        "logout": "Log out"
+    },
+    "status": {
+        "active": "Active"
+    },
+    "avatar": {
+        "comingSoon": "Coming soon"
+    },
+    "messages": {
+        "languageUpdated": "Language updated",
+        "nameRequired": "Please enter your name",
+        "profileUpdated": "Profile updated",
+        "allFieldsRequired": "Please fill in all fields",
+        "passwordMismatch": "New passwords do not match",
+        "passwordUpdated": "Password updated"
+    }
+}

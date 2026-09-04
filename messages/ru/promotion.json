@@ -1,0 +1,46 @@
+{
+  "title": "Акции",
+  "description": "Скидки на товары только в выбранном складе и до указанной даты",
+  "newPromotion": "Новая акция",
+  "form": {
+    "title": "Новая акция",
+    "point": "Точка",
+    "selectPoint": "Выберите точку",
+    "warehouse": "Склад",
+    "selectWarehouse": "Выберите склад",
+    "cell": "Ячейка",
+    "loading": "Загрузка…",
+    "selectCell": "Выберите ячейку",
+    "promotionName": "Название акции",
+    "promotionNamePlaceholder": "Например, Черный хлеб -30%",
+    "discount": "Скидка",
+    "endsAt": "Действует до",
+    "comment": "Комментарий",
+    "commentPlaceholder": "Необязательно",
+    "productsTitle": "Товары в акции",
+    "productsDescription": "Показываются только товары с остатком в выбранной ячейке.",
+    "addLine": "Добавить строку",
+    "productPlaceholder": "Товар {number}",
+    "noAvailableProducts": "В выбранной ячейке нет доступных товаров для акции.",
+    "cancel": "Отмена",
+    "saving": "Сохранение…",
+    "create": "Создать акцию",
+    "validation": {
+      "required": "Заполните точку, склад, ячейку, название и добавьте товары",
+      "duplicate": "Один товар нельзя добавить дважды в одну акцию",
+      "unavailable": "Выберите только товары, которые есть в выбранной ячейке",
+      "discount": "Скидка должна быть от 0.01 до 100%"
+    },
+    "success": "Акция создана"
+  },
+  "list": {
+    "empty": "Акций пока нет",
+    "until": "до",
+    "finished": "Завершена",
+    "daysShort": "д",
+    "hoursShort": "ч",
+    "minutesShort": "м",
+    "secondsShort": "с",
+    "deleted": "Акция удалена"
+  }
+}

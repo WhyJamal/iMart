@@ -15,9 +15,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-
 import { findSaleForReturn, createSaleReturn } from "@/actions/return-actions";
 import type { ISaleForReturn } from "@/types/return.types";
+import { useTranslations } from "next-intl";
 
 interface Props {
   onClose?: () => void;
@@ -25,6 +25,8 @@ interface Props {
 
 export function ReturnForm({ onClose }: Props) {
   const router = useRouter();
+  const t = useTranslations("sale-return.form");
+
   const [isSearching, startSearch] = useTransition();
   const [isSubmitting, startSubmit] = useTransition();
 
@@ -34,12 +36,15 @@ export function ReturnForm({ onClose }: Props) {
 
   // saleItemId -> qty to return
   const [qtyMap, setQtyMap] = useState<Record<string, number>>({});
+
   // saleItemId -> qaytarish narxi (default — asl sotuv narxi, o'zgartirsa bo'ladi)
   const [priceMap, setPriceMap] = useState<Record<string, number>>({});
+
   const [reason, setReason] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "qr">(
-    "cash"
-  );
+
+  const [paymentMethod, setPaymentMethod] = useState<
+    "cash" | "card" | "qr"
+  >("cash");
 
   const handleClose = () => {
     if (onClose) {
@@ -54,13 +59,19 @@ export function ReturnForm({ onClose }: Props) {
 
     startSearch(async () => {
       const result = await findSaleForReturn(saleNumber.trim());
+
       setNotFound(!result);
       setSale(result);
       setQtyMap({});
+
       // Har bir item uchun default narx — asl sotuv narxi
       if (result) {
         const defaults: Record<string, number> = {};
-        for (const item of result.items) defaults[item.id] = item.unitPrice;
+
+        for (const item of result.items) {
+          defaults[item.id] = item.unitPrice;
+        }
+
         setPriceMap(defaults);
       } else {
         setPriceMap({});
@@ -70,11 +81,18 @@ export function ReturnForm({ onClose }: Props) {
 
   const setQty = (saleItemId: string, value: number, max: number) => {
     const clamped = Math.max(0, Math.min(value, max));
-    setQtyMap((prev) => ({ ...prev, [saleItemId]: clamped }));
+
+    setQtyMap((prev) => ({
+      ...prev,
+      [saleItemId]: clamped,
+    }));
   };
 
   const setPrice = (saleItemId: string, value: number) => {
-    setPriceMap((prev) => ({ ...prev, [saleItemId]: Math.max(0, value) }));
+    setPriceMap((prev) => ({
+      ...prev,
+      [saleItemId]: Math.max(0, value),
+    }));
   };
 
   const selectedItems = sale
@@ -96,7 +114,7 @@ export function ReturnForm({ onClose }: Props) {
     if (!sale) return;
 
     if (selectedItems.length === 0) {
-      toast.error("Select at least one item to return");
+      toast.error(t("validation.items"));
       return;
     }
 
@@ -113,9 +131,11 @@ export function ReturnForm({ onClose }: Props) {
       });
 
       if (result.success) {
-        toast.success(`Return ${result.data.returnNumber} created`);
+        toast.success(t("success", { number: result.data.returnNumber }));
+
         router.refresh();
         onClose?.();
+
         if (!onClose) router.push("/returns");
       } else {
         toast.error(result.error);
@@ -129,7 +149,7 @@ export function ReturnForm({ onClose }: Props) {
       <div className="px-6 py-4 border-b flex items-center justify-between">
         <h2 className="text-base font-semibold flex items-center gap-2">
           <Undo2 className="w-4 h-4" />
-          New Return
+          {t("title")}
         </h2>
       </div>
 
@@ -137,14 +157,16 @@ export function ReturnForm({ onClose }: Props) {
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {/* Sale search */}
         <div className="space-y-1.5">
-          <Label>Sale # (chek raqami)</Label>
+          <Label>{t("saleNumber")}</Label>
+
           <div className="flex gap-2">
             <Input
-              placeholder="e.g. SALE-XXXXX-XXXX"
+              placeholder={t("salePlaceholder")}
               value={saleNumber}
               onChange={(e) => setSaleNumber(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
+
             <Button
               type="button"
               variant="outline"
@@ -152,11 +174,14 @@ export function ReturnForm({ onClose }: Props) {
               disabled={isSearching || !saleNumber.trim()}
             >
               <Search className="w-4 h-4 mr-1" />
-              {isSearching ? "Searching…" : "Find"}
+              {isSearching ? t("searching") : t("find")}
             </Button>
           </div>
+
           {notFound && (
-            <p className="text-sm text-destructive">Sale not found</p>
+            <p className="text-sm text-destructive">
+              {t("saleNotFound")}
+            </p>
           )}
         </div>
 
@@ -167,11 +192,11 @@ export function ReturnForm({ onClose }: Props) {
             {/* Items */}
             <div className="space-y-3">
               <div className="grid grid-cols-[1fr_80px_90px_90px_100px] gap-2 text-xs font-medium text-muted-foreground px-1">
-                <span>Product</span>
-                <span className="text-right">Sold</span>
-                <span className="text-right">Returnable</span>
-                <span className="text-right">Return qty</span>
-                <span className="text-right">Return price</span>
+                <span>{t("product")}</span>
+                <span className="text-right">{t("sold")}</span>
+                <span className="text-right">{t("returnable")}</span>
+                <span className="text-right">{t("returnQty")}</span>
+                <span className="text-right">{t("returnPrice")}</span>
               </div>
 
               {sale.items.map((item) => (
@@ -183,14 +208,18 @@ export function ReturnForm({ onClose }: Props) {
                     <div className="text-sm font-medium">
                       {item.product.name}
                     </div>
+
                     <div className="text-xs text-muted-foreground font-mono">
                       {item.product.code}
                     </div>
                   </div>
+
                   <span className="text-right text-sm">{item.qty}</span>
+
                   <span className="text-right text-sm">
                     {item.returnableQty}
                   </span>
+
                   <Input
                     type="number"
                     min={0}
@@ -206,13 +235,16 @@ export function ReturnForm({ onClose }: Props) {
                       )
                     }
                   />
+
                   <Input
                     type="number"
                     min={0}
                     step={0.01}
                     value={priceMap[item.id] ?? item.unitPrice}
                     disabled={item.returnableQty === 0}
-                    onChange={(e) => setPrice(item.id, Number(e.target.value))}
+                    onChange={(e) =>
+                      setPrice(item.id, Number(e.target.value))
+                    }
                   />
                 </div>
               ))}
@@ -223,15 +255,18 @@ export function ReturnForm({ onClose }: Props) {
             {/* Reason & payment method */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label>Reason (optional)</Label>
+                <Label>{t("reason")}</Label>
+
                 <Input
-                  placeholder="e.g. Defective item"
+                  placeholder={t("reasonPlaceholder")}
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                 />
               </div>
+
               <div className="space-y-1.5">
-                <Label>Refund method</Label>
+                <Label>{t("refundMethod")}</Label>
+
                 <Select
                   value={paymentMethod}
                   onValueChange={(v) =>
@@ -241,10 +276,11 @@ export function ReturnForm({ onClose }: Props) {
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
+
                   <SelectContent>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="card">Card</SelectItem>
-                    <SelectItem value="qr">QR</SelectItem>
+                    <SelectItem value="cash">{t("cash")}</SelectItem>
+                    <SelectItem value="card">{t("card")}</SelectItem>
+                    <SelectItem value="qr">{t("qr")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -256,12 +292,15 @@ export function ReturnForm({ onClose }: Props) {
             <div className="flex justify-end">
               <dl className="space-y-1 text-sm text-right">
                 <div className="flex gap-16 justify-between">
-                  <dt className="text-muted-foreground">Items</dt>
+                  <dt className="text-muted-foreground">{t("items")}</dt>
                   <dd>{selectedItems.length}</dd>
                 </div>
+
                 <div className="flex gap-16 justify-between font-semibold text-base">
-                  <dt>Refund amount</dt>
-                  <dd>{totalAmount.toFixed(2)} сум</dd>
+                  <dt>{t("refundAmount")}</dt>
+                  <dd>
+                    {totalAmount.toFixed(2)} {t("currency")}
+                  </dd>
                 </div>
               </dl>
             </div>
@@ -272,13 +311,16 @@ export function ReturnForm({ onClose }: Props) {
       {/* Footer */}
       <div className="p-4 border-t flex justify-end gap-2">
         <Button variant="ghost" onClick={handleClose}>
-          Cancel
+          {t("cancel")}
         </Button>
+
         <Button
           onClick={handleSubmit}
-          disabled={isSubmitting || !sale || selectedItems.length === 0}
+          disabled={
+            isSubmitting || !sale || selectedItems.length === 0
+          }
         >
-          {isSubmitting ? "Processing…" : "Create return"}
+          {isSubmitting ? t("processing") : t("create")}
         </Button>
       </div>
     </div>

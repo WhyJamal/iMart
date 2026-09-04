@@ -6,6 +6,7 @@ import { ReturnList } from "./_components/return-list";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
 import { ReturnForm } from "./_components/return-form";
 import { PAGES } from "@/config/pages.config";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -15,23 +16,25 @@ export default async function ReturnsPage({
   searchParams: Promise<{ new?: string }>;
 }) {
   const { new: isNew } = await searchParams;
-
   const returns = await getSaleReturns();
+  const t = await getTranslations("sale-return");
 
   return (
     <>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Returns</h1>
+            <h1 className="text-2xl font-bold">{t("title")}</h1>
+
             <p className="text-muted-foreground text-sm mt-0.5">
-              Возврат товара — chekni topib, tovarni qaytaring
+              {t("description")}
             </p>
           </div>
+
           <Button asChild>
             <Link href={`${PAGES.RETURNS}?new=1`}>
               <Plus className="w-4 h-4 mr-1" />
-              New return
+              {t("newReturn")}
             </Link>
           </Button>
         </div>

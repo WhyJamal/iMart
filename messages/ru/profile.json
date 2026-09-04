@@ -1,0 +1,41 @@
+{
+    "tabs": {
+        "account": "Данные аккаунта",
+        "security": "Безопасность"
+    },
+    "fields": {
+        "firstName": "Имя",
+        "lastName": "Фамилия",
+        "email": "Email",
+        "language": "Язык",
+        "organization": "Организация"
+    },
+    "organization": {
+        "unassigned": "Не назначена",
+        "adminHint": "Чтобы изменить организацию, обратитесь к администратору."
+    },
+    "security": {
+        "currentPassword": "Текущий пароль",
+        "newPassword": "Новый пароль",
+        "confirmPassword": "Подтверждение"
+    },
+    "buttons": {
+        "update": "Обновить",
+        "updating": "Обновление…",
+        "logout": "Выйти"
+    },
+    "status": {
+        "active": "Активен"
+    },
+    "avatar": {
+        "comingSoon": "Скоро будет доступно"
+    },
+    "messages": {
+        "languageUpdated": "Язык обновлён",
+        "nameRequired": "Введите имя",
+        "profileUpdated": "Данные обновлены",
+        "allFieldsRequired": "Заполните все поля",
+        "passwordMismatch": "Новые пароли не совпадают",
+        "passwordUpdated": "Пароль обновлён"
+    }
+}

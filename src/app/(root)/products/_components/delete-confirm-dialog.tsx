@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslations } from "next-intl";
 import { useDeleteProduct } from "../_hooks/use-product-mutations";
 
 interface DeleteConfirmDialogProps {
@@ -23,6 +24,8 @@ export function DeleteConfirmDialog({
   productName,
   onOpenChange,
 }: DeleteConfirmDialogProps) {
+  const t = useTranslations("product.delete");
+
   const { mutate: deleteProduct, isPending } = useDeleteProduct(() =>
     onOpenChange(false)
   );
@@ -31,21 +34,26 @@ export function DeleteConfirmDialog({
     <AlertDialog open={!!productId} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete product?</AlertDialogTitle>
+          <AlertDialogTitle>{t("title")}</AlertDialogTitle>
+
           <AlertDialogDescription>
-            <span className="font-medium text-foreground">{productName}</span>{" "}
-            will be permanently deleted. This action cannot be undone.
+            {t("description", {
+              name: productName ?? "",
+            })}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>
+            {t("cancel")}
+          </AlertDialogCancel>
+
           <AlertDialogAction
             onClick={() => productId && deleteProduct(productId)}
             disabled={isPending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isPending ? "Deleting…" : "Delete"}
+            {isPending ? t("deleting") : t("delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileMinus, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getWriteOffs } from "@/actions/write-off-actions";
 import { getWarehouses } from "@/actions/warehouse-actions";
@@ -9,6 +9,8 @@ import { WriteOffForm } from "./_components/write-off-form";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
 import { PAGES } from "@/config/pages.config";
 
+import { getTranslations } from "next-intl/server";
+
 export const dynamic = "force-dynamic";
 
 export default async function WriteOffsPage({
@@ -16,14 +18,17 @@ export default async function WriteOffsPage({
 }: {
   searchParams: Promise<{ new?: string }>;
 }) {
+  const t = await getTranslations("write-off");
+
   const { new: isNew } = await searchParams;
   const writeOffs = await getWriteOffs();
 
   const points = isNew === "1" ? await getPointOptions() : [];
   const defaultPointId = isNew === "1" ? await getCurrentUserPointId() : null;
+
   const warehouses =
     isNew === "1" && defaultPointId
-      ? await getWarehouses(defaultPointId)
+      ? await getWarehouses()
       : [];
 
   return (
@@ -31,15 +36,16 @@ export default async function WriteOffsPage({
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Списание товаров</h1>
+            <h1 className="text-2xl font-bold">{t("title")}</h1>
             <p className="text-muted-foreground text-sm mt-0.5">
-              Списание товаров со склада по причине порчи, брака, недостачи и т. д.
+              {t("description")}
             </p>
           </div>
+
           <Button asChild>
             <Link href={`${PAGES.WRITE_OFFS}?new=1`}>
               <Plus className="w-4 h-4 mr-1" />
-              Новое списание
+              {t("newWriteOff")}
             </Link>
           </Button>
         </div>

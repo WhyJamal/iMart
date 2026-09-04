@@ -2,10 +2,20 @@
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
-import { Plus, Search, MoreHorizontal, Pencil, Trash2, Package } from "lucide-react";
+import {
+  Plus,
+  Search,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Package,
+} from "lucide-react";
+import { useTranslations } from "next-intl";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import {
   Table,
   TableBody,
@@ -21,6 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { IProduct } from "@/types/product.types";
 import { Drawer } from "@/components/drawer";
@@ -39,17 +51,30 @@ interface ProductsClientProps {
 }
 
 const fmt = (n: number) =>
-  new Intl.NumberFormat("ru-RU", { style: "currency", currency: "UZS" }).format(n);
+  new Intl.NumberFormat("ru-RU", {
+    style: "currency",
+    currency: "UZS",
+  }).format(n);
 
-export function ProductsClient({ initialProducts, categories }: ProductsClientProps) {
+export function ProductsClient({
+  initialProducts,
+  categories,
+}: ProductsClientProps) {
+  const t = useTranslations("product");
+  const tl = useTranslations("product.list");
+
   const [search, setSearch] = useState("");
   const [formOpen, setFormOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<IProduct | null>(null);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [editTarget, setEditTarget] =
+    useState<IProduct | null>(null);
+  const [deleteId, setDeleteId] =
+    useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
+
     if (!q) return initialProducts;
+
     return initialProducts.filter(
       (p) =>
         p.name.toLowerCase().includes(q) ||
@@ -59,7 +84,13 @@ export function ProductsClient({ initialProducts, categories }: ProductsClientPr
   }, [initialProducts, search]);
 
   const usedCategories = useMemo(
-    () => [...new Set(initialProducts.map((p) => p.categoryName))],
+    () => [
+      ...new Set(
+        initialProducts.map(
+          (p) => p.categoryName
+        )
+      ),
+    ],
     [initialProducts]
   );
 
@@ -73,13 +104,17 @@ export function ProductsClient({ initialProducts, categories }: ProductsClientPr
     setFormOpen(true);
   };
 
-  const deleteTarget = initialProducts.find((p) => p.id === deleteId);
+  const deleteTarget = initialProducts.find(
+    (p) => p.id === deleteId
+  );
 
   return (
     <>
       <div className="relative h-full">
-
-        <Drawer open={formOpen} onClose={() => setFormOpen(false)}>
+        <Drawer
+          open={formOpen}
+          onClose={() => setFormOpen(false)}
+        >
           <ProductFormContent
             editTarget={editTarget}
             categories={categories}
@@ -90,53 +125,81 @@ export function ProductsClient({ initialProducts, categories }: ProductsClientPr
         <div className="flex flex-col gap-6 p-6">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-xl font-semibold tracking-tight">Products</h1>
+              <h1 className="text-xl font-semibold tracking-tight">
+                {t("title")}
+              </h1>
+
               <p className="text-sm text-muted-foreground mt-0.5">
-                {initialProducts.length} product{initialProducts.length !== 1 ? "s" : ""} across{" "}
-                {usedCategories.length} categor{usedCategories.length !== 1 ? "ies" : "y"}
+                {t("description", {
+                  count: initialProducts.length,
+                  categories: usedCategories.length,
+                })}
               </p>
             </div>
 
             <div className="flex gap-2">
               <PhotoImportButton />
 
-              <Button onClick={handleCreate} size="sm" className="gap-1.5">
+              <Button
+                onClick={handleCreate}
+                size="sm"
+                className="gap-1.5"
+              >
                 <Plus className="w-4 h-4" />
-                New product
+                {t("newProduct")}
               </Button>
             </div>
           </div>
 
           <div className="relative max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+
             <Input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, code or category…"
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              placeholder={tl("searchPlaceholder")}
               className="pl-9 h-9"
             />
           </div>
 
           <div className="rounded-xl border bg-white overflow-hidden">
             {filtered.length === 0 ? (
-              <EmptyState hasSearch={!!search} onCreate={handleCreate} />
+              <EmptyState
+                hasSearch={!!search}
+                onCreate={handleCreate}
+              />
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50/70 hover:bg-gray-50/70">
                     <TableHead className="w-12" />
-                    <TableHead>Product</TableHead>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Unit</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
+                    <TableHead>
+                      {tl("product")}
+                    </TableHead>
+                    <TableHead>
+                      {tl("code")}
+                    </TableHead>
+                    <TableHead>
+                      {tl("category")}
+                    </TableHead>
+                    <TableHead>
+                      {tl("unit")}
+                    </TableHead>
+                    <TableHead className="text-right">
+                      {tl("price")}
+                    </TableHead>
                     <TableHead className="w-10" />
                   </TableRow>
                 </TableHeader>
 
                 <TableBody>
                   {filtered.map((product) => (
-                    <TableRow key={product.id} className="group">
+                    <TableRow
+                      key={product.id}
+                      className="group"
+                    >
                       <TableCell className="py-3">
                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
                           {product.image ? (
@@ -155,7 +218,9 @@ export function ProductsClient({ initialProducts, categories }: ProductsClientPr
                         </div>
                       </TableCell>
 
-                      <TableCell className="font-medium">{product.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {product.name}
+                      </TableCell>
 
                       <TableCell>
                         <span className="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md">
@@ -164,7 +229,10 @@ export function ProductsClient({ initialProducts, categories }: ProductsClientPr
                       </TableCell>
 
                       <TableCell>
-                        <Badge variant="secondary" className="font-normal">
+                        <Badge
+                          variant="secondary"
+                          className="font-normal"
+                        >
                           {product.categoryName}
                         </Badge>
                       </TableCell>
@@ -179,7 +247,9 @@ export function ProductsClient({ initialProducts, categories }: ProductsClientPr
 
                       <TableCell>
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                          <DropdownMenuTrigger
+                            asChild
+                          >
                             <Button
                               variant="ghost"
                               size="icon"
@@ -188,18 +258,30 @@ export function ProductsClient({ initialProducts, categories }: ProductsClientPr
                               <MoreHorizontal className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem onClick={() => handleEdit(product)}>
-                              <Pencil className="w-3.5 h-3.5 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
+
+                          <DropdownMenuContent
+                            align="end"
+                            className="w-40"
+                          >
                             <DropdownMenuItem
-                              onClick={() => setDeleteId(product.id)}
+                              onClick={() =>
+                                handleEdit(product)
+                              }
+                            >
+                              <Pencil className="w-3.5 h-3.5 mr-2" />
+                              {tl("edit")}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setDeleteId(product.id)
+                              }
                               className="text-destructive focus:text-destructive"
                             >
                               <Trash2 className="w-3.5 h-3.5 mr-2" />
-                              Delete
+                              {tl("delete")}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -215,7 +297,9 @@ export function ProductsClient({ initialProducts, categories }: ProductsClientPr
         <DeleteConfirmDialog
           productId={deleteId}
           productName={deleteTarget?.name}
-          onOpenChange={(open) => !open && setDeleteId(null)}
+          onOpenChange={(open) =>
+            !open && setDeleteId(null)
+          }
         />
       </div>
     </>
@@ -229,23 +313,34 @@ function EmptyState({
   hasSearch: boolean;
   onCreate: () => void;
 }) {
+  const t = useTranslations("product.list");
+
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center px-4">
       <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-4">
         <Package className="w-5 h-5 text-gray-400" />
       </div>
+
       <p className="text-sm font-medium text-gray-900">
-        {hasSearch ? "No products found" : "No products yet"}
+        {hasSearch
+          ? t("emptySearch")
+          : t("empty")}
       </p>
+
       <p className="text-sm text-muted-foreground mt-1 max-w-xs">
         {hasSearch
-          ? "Try adjusting your search term."
-          : "Add your first product to get started."}
+          ? t("emptySearchDescription")
+          : t("emptyDescription")}
       </p>
+
       {!hasSearch && (
-        <Button onClick={onCreate} size="sm" className="mt-4 gap-1.5">
+        <Button
+          onClick={onCreate}
+          size="sm"
+          className="mt-4 gap-1.5"
+        >
           <Plus className="w-4 h-4" />
-          New product
+          {t("newProduct")}
         </Button>
       )}
     </div>

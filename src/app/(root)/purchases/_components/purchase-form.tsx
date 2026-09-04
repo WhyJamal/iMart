@@ -1,21 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-
 import { useRouter } from "next/navigation";
-
 import { useTranslations } from "next-intl";
-
 import { toast } from "sonner";
-
 import { Plus, Trash2, PackagePlus } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-
 import { Input } from "@/components/ui/input";
-
 import { Label } from "@/components/ui/label";
-
 import {
   Select,
   SelectContent,
@@ -23,24 +15,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { Separator } from "@/components/ui/separator";
-
 import {
   createPurchase,
   updatePurchase,
 } from "@/actions/purchase-actions";
-
 import type { PurchaseItemInput } from "@/schema/purchase.schema";
-
 import { PAGES } from "@/config/pages.config";
-
 import type { CashMethod } from "@/types/cash.types";
-
 import type { IPointOption } from "@/types/point.types";
-
 import type { IWarehouse } from "@/types/warehouse.types";
-
 import type { IContragentOption } from "@/types/contragent.types";
 
 interface ProductOption {

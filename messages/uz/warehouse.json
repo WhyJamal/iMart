@@ -1,0 +1,42 @@
+{
+  "title": "Skladlar",
+  "description": "Skladlar va ularning yacheykalarini boshqarish",
+  "newWarehouse": "Yangi sklad",
+  "form": {
+    "editWarehouse": "Skladni tahrirlash",
+    "newWarehouse": "Yangi sklad",
+    "name": "Nomi",
+    "namePlaceholder": "masalan: Asosiy sklad",
+    "point": "Nuqta",
+    "selectPoint": "Nuqtani tanlang",
+    "cells": "Yacheykalar",
+    "add": "Qo‘shish",
+    "cellsDescription": "Sklad ichidagi bo‘limlar — masalan \"Oddiy non\", \"Qora non\" va h.k.",
+    "cellNamePlaceholder": "Yacheyka nomi",
+    "cancel": "Bekor qilish",
+    "saving": "Saqlanmoqda…",
+    "save": "Saqlash"
+  },
+  "list": {
+    "name": "Nomi",
+    "point": "Nuqta",
+    "cells": "Yacheykalar",
+    "actions": "Amallar",
+    "empty": "Hali skladlar mavjud emas",
+    "clickDescription": "Nomiga bosing, ichidagi tovarlarni ko‘ring",
+    "createPointFirst": "Avval kamida bitta nuqta yarating.",
+    "cellCount": "{count} ta yacheyka",
+    "deleteTitle": "Skladni o‘chirish?",
+    "deleteDescription": "{name} va uning yacheykalari o‘chiriladi. Bu amalni bekor qilib bo‘lmaydi.",
+    "cancel": "Bekor qilish",
+    "delete": "O‘chirish",
+    "loading": "Yuklanmoqda…",
+    "noStock": "Bu skladda hozircha tovar qoldig‘i yo‘q",
+    "stock": {
+      "cell": "Yacheyka",
+      "product": "Mahsulot",
+      "code": "Kod",
+      "quantity": "Qoldiq"
+    }
+  }
+}

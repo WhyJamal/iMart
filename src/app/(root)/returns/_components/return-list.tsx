@@ -3,7 +3,12 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ChevronDown, ChevronRight, Undo2, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Undo2,
+  Trash2,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -27,12 +32,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteSaleReturn } from "@/actions/return-actions";
 import type { TSerializedSaleReturn } from "@/types/return.types";
+import { useTranslations } from "next-intl";
 
 interface Props {
   returns: TSerializedSaleReturn[];
 }
 
-const fmt = (n: number) => Number(n).toFixed(2) + " сум";
 const fmtDate = (d: Date) =>
   new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
@@ -41,14 +46,20 @@ const fmtDate = (d: Date) =>
 
 function ReturnRow({ ret }: { ret: TSerializedSaleReturn }) {
   const router = useRouter();
+  const t = useTranslations("sale-return.list");
+
   const [expanded, setExpanded] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  const fmt = (n: number) =>
+    Number(n).toFixed(2) + ` ${t("currency")}`;
 
   const handleDelete = () => {
     startTransition(async () => {
       const result = await deleteSaleReturn(ret.id);
+
       if (result.success) {
-        toast.success("Return deleted and stock/cash reversed");
+        toast.success(t("deleted"));
         router.refresh();
       } else {
         toast.error(result.error);
@@ -69,21 +80,37 @@ function ReturnRow({ ret }: { ret: TSerializedSaleReturn }) {
             <ChevronRight className="w-4 h-4" />
           )}
         </TableCell>
-        <TableCell className="font-mono text-sm">{ret.returnNumber}</TableCell>
+
+        <TableCell className="font-mono text-sm">
+          {ret.returnNumber}
+        </TableCell>
+
         <TableCell className="font-mono text-sm text-muted-foreground">
           {ret.sale.saleNumber}
         </TableCell>
+
         <TableCell>
-          <Badge variant="secondary">{ret.items.length} items</Badge>
+          <Badge variant="secondary">
+            {ret.items.length} {t("itemsShort")}
+          </Badge>
         </TableCell>
-        <TableCell className="font-semibold">{fmt(ret.totalAmount)}</TableCell>
-        <TableCell className="text-muted-foreground text-sm max-w-[200px] truncate">
+
+        <TableCell className="font-semibold">
+          {fmt(ret.totalAmount)}
+        </TableCell>
+
+        <TableCell className="text-muted-foreground text-sm max-w-50 truncate">
           {ret.reason || "—"}
         </TableCell>
+
         <TableCell className="text-muted-foreground text-sm">
           {fmtDate(ret.createdAt)}
         </TableCell>
-        <TableCell onClick={(e) => e.stopPropagation()} className="text-right">
+
+        <TableCell
+          onClick={(e) => e.stopPropagation()}
+          className="text-right"
+        >
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
@@ -95,22 +122,30 @@ function ReturnRow({ ret }: { ret: TSerializedSaleReturn }) {
                 <Trash2 className="w-4 h-4" />
               </Button>
             </AlertDialogTrigger>
+
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete return?</AlertDialogTitle>
+                <AlertDialogTitle>
+                  {t("deleteTitle")}
+                </AlertDialogTitle>
+
                 <AlertDialogDescription>
-                  This will reverse inventory and cash movements for{" "}
-                  <strong>{ret.returnNumber}</strong> — returned stock and
-                  refunded cash will be undone. This action cannot be undone.
+                  {t("deleteDescriptionBefore")}{" "}
+                  <strong>{ret.returnNumber}</strong>{" "}
+                  {t("deleteDescriptionAfter")}
                 </AlertDialogDescription>
               </AlertDialogHeader>
+
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>
+                  {t("cancel")}
+                </AlertDialogCancel>
+
                 <AlertDialogAction
                   onClick={handleDelete}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Delete
+                  {t("delete")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -125,26 +160,55 @@ function ReturnRow({ ret }: { ret: TSerializedSaleReturn }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-xs text-muted-foreground border-b">
-                    <th className="text-left pb-1 font-medium">Product</th>
-                    <th className="text-left pb-1 font-medium">Code</th>
-                    <th className="text-right pb-1 font-medium">Qty</th>
-                    <th className="text-right pb-1 font-medium">Unit price</th>
-                    <th className="text-right pb-1 font-medium">Total</th>
+                    <th className="text-left pb-1 font-medium">
+                      {t("product")}
+                    </th>
+
+                    <th className="text-left pb-1 font-medium">
+                      {t("code")}
+                    </th>
+
+                    <th className="text-right pb-1 font-medium">
+                      {t("quantity")}
+                    </th>
+
+                    <th className="text-right pb-1 font-medium">
+                      {t("unitPrice")}
+                    </th>
+
+                    <th className="text-right pb-1 font-medium">
+                      {t("total")}
+                    </th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {ret.items.map((item) => (
-                    <tr key={item.id} className="border-b last:border-0">
-                      <td className="py-1.5">{item.product.name}</td>
+                    <tr
+                      key={item.id}
+                      className="border-b last:border-0"
+                    >
+                      <td className="py-1.5">
+                        {item.product.name}
+                      </td>
+
                       <td className="py-1.5 font-mono text-xs text-muted-foreground">
                         {item.product.code}
                       </td>
-                      <td className="py-1.5 text-right">{Number(item.qty)}</td>
+
+                      <td className="py-1.5 text-right">
+                        {Number(item.qty)}
+                      </td>
+
                       <td className="py-1.5 text-right">
                         {fmt(Number(item.unitPrice))}
                       </td>
+
                       <td className="py-1.5 text-right font-medium">
-                        {fmt(Number(item.qty) * Number(item.unitPrice))}
+                        {fmt(
+                          Number(item.qty) *
+                            Number(item.unitPrice)
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -159,11 +223,14 @@ function ReturnRow({ ret }: { ret: TSerializedSaleReturn }) {
 }
 
 export function ReturnList({ returns }: Props) {
+  const t = useTranslations("sale-return.list");
+
   if (returns.length === 0) {
     return (
       <div className="text-center py-24 text-muted-foreground">
         <Undo2 className="w-10 h-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">No returns yet</p>
+
+        <p className="text-sm">{t("empty")}</p>
       </div>
     );
   }
@@ -173,15 +240,18 @@ export function ReturnList({ returns }: Props) {
       <TableHeader>
         <TableRow>
           <TableHead className="w-6" />
-          <TableHead>Return #</TableHead>
-          <TableHead>Sale #</TableHead>
-          <TableHead>Items</TableHead>
-          <TableHead>Total</TableHead>
-          <TableHead>Reason</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+          <TableHead>{t("returnNumber")}</TableHead>
+          <TableHead>{t("saleNumber")}</TableHead>
+          <TableHead>{t("items")}</TableHead>
+          <TableHead>{t("total")}</TableHead>
+          <TableHead>{t("reason")}</TableHead>
+          <TableHead>{t("date")}</TableHead>
+          <TableHead className="text-right">
+            {t("actions")}
+          </TableHead>
         </TableRow>
       </TableHeader>
+
       <TableBody>
         {returns.map((r) => (
           <ReturnRow key={r.id} ret={r} />

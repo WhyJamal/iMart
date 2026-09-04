@@ -1,75 +1,71 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Camera, Loader2 } from "lucide-react"
-import { ProductImportPreview } from "./product-import-preview"
+import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Camera, Loader2 } from "lucide-react";
+import { ProductImportPreview } from "./product-import-preview";
 
 type ExtractedProduct = {
-  name: string
-  price: number
-  quantity: number
-}
+  name: string;
+  price: number;
+  unit: "dona" | "quti" | "kg" | "litr" | "metr";
+  quantity: number;
+};
 
 export function PhotoImportButton() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [extracted, setExtracted] = useState<ExtractedProduct[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const t = useTranslations("product.photoImport");
 
-  // Обработка выбора файла — фото уже сделано на телефоне заранее,
-  // здесь просто выбираем файл из галереи/файловой системы
+  const [isLoading, setIsLoading] = useState(false);
+  const [extracted, setExtracted] =
+    useState<ExtractedProduct[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   async function handleFileChange(
-  e: React.ChangeEvent<HTMLInputElement>
-) {
-  const file = e.target.files?.[0]
+    e: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = e.target.files?.[0];
 
-  if (!file) return
+    if (!file) return;
 
-  setIsLoading(true)
-  setError(null)
+    setIsLoading(true);
+    setError(null);
 
-  try {
-    const formData = new FormData()
-    formData.append("file", file)
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    const response = await fetch(
-      "/api/products/extract",
-      {
+      const response = await fetch("/api/products/extract", {
         method: "POST",
         body: formData,
+      });
+
+      const result = await response.json();
+
+      console.log(result);
+
+      if (!response.ok || !result.success) {
+        setError(result.error || t("error"));
+        return;
       }
-    )
 
-    const result = await response.json()
+      setExtracted(result.data);
+    } catch (err) {
+      console.error("Image processing error:", err);
 
-    console.log(result)
-
-    if (!response.ok || !result.success) {
       setError(
-        result.error ||
-          "Произошла ошибка при обработке изображения."
-      )
-      return
-    }
+        err instanceof Error ? err.message : t("error")
+      );
+    } finally {
+      setIsLoading(false);
 
-    setExtracted(result.data)
-  } catch (err) {
-    console.error("Image processing error:", err)
-
-    setError(
-      err instanceof Error
-        ? err.message
-        : "Произошла ошибка при обработке изображения."
-    )
-  } finally {
-    setIsLoading(false)
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   }
-}
 
   return (
     <>
@@ -81,6 +77,7 @@ export function PhotoImportButton() {
         className="hidden"
         id="photo-import-input"
       />
+
       <Button
         variant="outline"
         disabled={isLoading}
@@ -91,10 +88,15 @@ export function PhotoImportButton() {
         ) : (
           <Camera className="mr-2 h-4 w-4" />
         )}
-        {isLoading ? "Чтение..." : "Загрузка через изображение"}
+
+        {isLoading ? t("reading") : t("upload")}
       </Button>
 
-      {error && <p className="text-sm text-destructive mt-2">{error}</p>}
+      {error && (
+        <p className="text-sm text-destructive mt-2">
+          {error}
+        </p>
+      )}
 
       {extracted && (
         <ProductImportPreview
@@ -103,5 +105,5 @@ export function PhotoImportButton() {
         />
       )}
     </>
-  )
+  );
 }

@@ -1,25 +1,18 @@
 "use client";
 
 import { useState, useTransition } from "react";
-
 import Link from "next/link";
-
 import { useRouter } from "next/navigation";
-
 import { useTranslations } from "next-intl";
-
 import { toast } from "sonner";
-
 import {
   PackagePlus,
   Trash2,
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
 import {
   Table,
   TableBody,
@@ -28,7 +21,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,7 +32,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
 import { deletePurchase } from "@/actions/purchase-actions";
 
 interface PurchaseItem {
@@ -256,7 +247,7 @@ function PurchaseRow({ purchase }: { purchase: Purchase }) {
 }
 
 export function PurchaseList({ purchases }: Props) {
-  const t = useTranslations("purchase.purchases-list");
+  const t = useTranslations("purchase.list");
 
   if (purchases.length === 0) {
     return (

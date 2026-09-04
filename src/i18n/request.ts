@@ -5,7 +5,9 @@ import { cookies } from "next/headers";
 const NAMESPACES = [
   "common", "header", "sidebar", "dashboard", "pos-terminal", 
   "purchase", "sales", "cash", "point", "contragent", "users",
-  "calendar", "work-schedules", "timesheet", "salary", "payroll"
+  "calendar", "work-schedules", "timesheet", "salary", "payroll",
+  "warehouse", "product", "promotion", "transfer", "write-off",
+  "purchase-return", "sale-return", "profile", "auth"
 ] as const;
 
 export default getRequestConfig(async () => {

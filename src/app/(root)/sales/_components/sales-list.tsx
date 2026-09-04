@@ -229,7 +229,7 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
 }
 
 export function SaleList({ sales }: Props) {
-  const t = useTranslations("sales.sales-list");
+  const t = useTranslations("sales.list");
 
   if (sales.length === 0) {
     return (

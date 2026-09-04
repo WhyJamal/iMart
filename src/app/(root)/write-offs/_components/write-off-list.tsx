@@ -1,9 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ChevronDown, ChevronRight, FileMinus, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  FileMinus,
+  Trash2,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,23 +38,33 @@ interface Props {
   writeOffs: TSerializedWriteOff[];
 }
 
-const fmt = (n: number) => Number(n).toFixed(2) + " сум";
-const fmtDate = (d: Date) =>
-  new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(d));
+function WriteOffRow({
+  writeOff,
+}: {
+  writeOff: TSerializedWriteOff;
+}) {
+  const t = useTranslations("write-off.list");
 
-function WriteOffRow({ writeOff }: { writeOff: TSerializedWriteOff }) {
   const router = useRouter();
+
   const [expanded, setExpanded] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  const fmt = (n: number) =>
+    Number(n).toFixed(2) + ` ${t("currency")}`;
+
+  const fmtDate = (d: Date) =>
+    new Intl.DateTimeFormat("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(new Date(d));
 
   const handleDelete = () => {
     startTransition(async () => {
       const result = await deleteWriteOff(writeOff.id);
+
       if (result.success) {
-        toast.success("Списание удалено, остатки восстановлены");
+        toast.success(t("deleted"));
         router.refresh();
       } else {
         toast.error(result.error);
@@ -63,19 +79,41 @@ function WriteOffRow({ writeOff }: { writeOff: TSerializedWriteOff }) {
         onClick={() => setExpanded((v) => !v)}
       >
         <TableCell className="w-6 text-muted-foreground">
-          {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          {expanded ? (
+            <ChevronDown className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
         </TableCell>
-        <TableCell className="font-mono text-sm">{writeOff.writeOffNumber}</TableCell>
+
+        <TableCell className="font-mono text-sm">
+          {writeOff.writeOffNumber}
+        </TableCell>
+
         <TableCell>{writeOff.point?.name || "—"}</TableCell>
+
         <TableCell>
-          <Badge variant="secondary">{writeOff.items.length} поз.</Badge>
+          <Badge variant="secondary">
+            {writeOff.items.length} {t("itemsShort")}
+          </Badge>
         </TableCell>
-        <TableCell className="font-semibold">{fmt(writeOff.totalAmount)}</TableCell>
+
+        <TableCell className="font-semibold">
+          {fmt(writeOff.totalAmount)}
+        </TableCell>
+
         <TableCell className="text-muted-foreground text-sm max-w-60 truncate">
           {writeOff.reason || "—"}
         </TableCell>
-        <TableCell className="text-muted-foreground text-sm">{fmtDate(writeOff.createdAt)}</TableCell>
-        <TableCell onClick={(e) => e.stopPropagation()} className="text-right">
+
+        <TableCell className="text-muted-foreground text-sm">
+          {fmtDate(writeOff.createdAt)}
+        </TableCell>
+
+        <TableCell
+          onClick={(e) => e.stopPropagation()}
+          className="text-right"
+        >
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
@@ -87,20 +125,30 @@ function WriteOffRow({ writeOff }: { writeOff: TSerializedWriteOff }) {
                 <Trash2 className="w-4 h-4" />
               </Button>
             </AlertDialogTrigger>
+
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Удалить списание?</AlertDialogTitle>
+                <AlertDialogTitle>
+                  {t("deleteTitle")}
+                </AlertDialogTitle>
+
                 <AlertDialogDescription>
-                  Остатки по документу <strong>{writeOff.writeOffNumber}</strong> будут восстановлены. Это действие нельзя отменить.
+                  {t("deleteDescriptionBefore")}{" "}
+                  <strong>{writeOff.writeOffNumber}</strong>{" "}
+                  {t("deleteDescriptionAfter")}
                 </AlertDialogDescription>
               </AlertDialogHeader>
+
               <AlertDialogFooter>
-                <AlertDialogCancel>Отмена</AlertDialogCancel>
+                <AlertDialogCancel>
+                  {t("cancel")}
+                </AlertDialogCancel>
+
                 <AlertDialogAction
                   onClick={handleDelete}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Удалить
+                  {t("delete")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -115,24 +163,60 @@ function WriteOffRow({ writeOff }: { writeOff: TSerializedWriteOff }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-xs text-muted-foreground border-b">
-                    <th className="text-left pb-1 font-medium">Товар</th>
-                    <th className="text-left pb-1 font-medium">Ячейка</th>
-                    <th className="text-right pb-1 font-medium">Количество</th>
-                    <th className="text-right pb-1 font-medium">Цена</th>
-                    <th className="text-right pb-1 font-medium">Сумма</th>
+                    <th className="text-left pb-1 font-medium">
+                      {t("product")}
+                    </th>
+
+                    <th className="text-left pb-1 font-medium">
+                      {t("cell")}
+                    </th>
+
+                    <th className="text-right pb-1 font-medium">
+                      {t("quantity")}
+                    </th>
+
+                    <th className="text-right pb-1 font-medium">
+                      {t("price")}
+                    </th>
+
+                    <th className="text-right pb-1 font-medium">
+                      {t("amount")}
+                    </th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {writeOff.items.map((item) => (
-                    <tr key={item.id} className="border-b last:border-0">
+                    <tr
+                      key={item.id}
+                      className="border-b last:border-0"
+                    >
                       <td className="py-1.5">
                         <div>{item.product.name}</div>
-                        <div className="text-xs text-muted-foreground font-mono">{item.product.code}</div>
+
+                        <div className="text-xs text-muted-foreground font-mono">
+                          {item.product.code}
+                        </div>
                       </td>
-                      <td className="py-1.5 text-muted-foreground">{item.warehouseCell.name}</td>
-                      <td className="py-1.5 text-right">{Number(item.qty)}</td>
-                      <td className="py-1.5 text-right">{fmt(Number(item.unitCost))}</td>
-                      <td className="py-1.5 text-right font-medium">{fmt(Number(item.qty) * Number(item.unitCost))}</td>
+
+                      <td className="py-1.5 text-muted-foreground">
+                        {item.warehouseCell.name}
+                      </td>
+
+                      <td className="py-1.5 text-right">
+                        {Number(item.qty)}
+                      </td>
+
+                      <td className="py-1.5 text-right">
+                        {fmt(Number(item.unitCost))}
+                      </td>
+
+                      <td className="py-1.5 text-right font-medium">
+                        {fmt(
+                          Number(item.qty) *
+                            Number(item.unitCost)
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -146,11 +230,14 @@ function WriteOffRow({ writeOff }: { writeOff: TSerializedWriteOff }) {
 }
 
 export function WriteOffList({ writeOffs }: Props) {
+  const t = useTranslations("write-off.list");
+
   if (writeOffs.length === 0) {
     return (
       <div className="text-center py-24 text-muted-foreground">
         <FileMinus className="w-10 h-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">Списаний пока нет</p>
+
+        <p className="text-sm">{t("empty")}</p>
       </div>
     );
   }
@@ -160,18 +247,24 @@ export function WriteOffList({ writeOffs }: Props) {
       <TableHeader>
         <TableRow>
           <TableHead className="w-6" />
-          <TableHead>Списание №</TableHead>
-          <TableHead>Точка</TableHead>
-          <TableHead>Товары</TableHead>
-          <TableHead>Сумма</TableHead>
-          <TableHead>Причина</TableHead>
-          <TableHead>Дата</TableHead>
-          <TableHead className="text-right">Действия</TableHead>
+          <TableHead>{t("writeOffNumber")}</TableHead>
+          <TableHead>{t("point")}</TableHead>
+          <TableHead>{t("products")}</TableHead>
+          <TableHead>{t("amount")}</TableHead>
+          <TableHead>{t("reason")}</TableHead>
+          <TableHead>{t("date")}</TableHead>
+          <TableHead className="text-right">
+            {t("actions")}
+          </TableHead>
         </TableRow>
       </TableHeader>
+
       <TableBody>
         {writeOffs.map((writeOff) => (
-          <WriteOffRow key={writeOff.id} writeOff={writeOff} />
+          <WriteOffRow
+            key={writeOff.id}
+            writeOff={writeOff}
+          />
         ))}
       </TableBody>
     </Table>

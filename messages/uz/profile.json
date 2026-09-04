@@ -1,0 +1,41 @@
+{
+    "tabs": {
+        "account": "Hisob ma'lumotlari",
+        "security": "Xavfsizlik"
+    },
+    "fields": {
+        "firstName": "Ism",
+        "lastName": "Familiya",
+        "email": "Email",
+        "language": "Til",
+        "organization": "Tashkilot"
+    },
+    "organization": {
+        "unassigned": "Biriktirilmagan",
+        "adminHint": "Tashkilotni o'zgartirish uchun administratorga murojaat qiling."
+    },
+    "security": {
+        "currentPassword": "Joriy parol",
+        "newPassword": "Yangi parol",
+        "confirmPassword": "Tasdiqlash"
+    },
+    "buttons": {
+        "update": "Yangilash",
+        "updating": "Yangilanmoqda…",
+        "logout": "Chiqish"
+    },
+    "status": {
+        "active": "Faol"
+    },
+    "avatar": {
+        "comingSoon": "Tez orada qo'shiladi"
+    },
+    "messages": {
+        "languageUpdated": "Til yangilandi",
+        "nameRequired": "Ismni kiriting",
+        "profileUpdated": "Ma'lumotlar yangilandi",
+        "allFieldsRequired": "Barcha maydonlarni to'ldiring",
+        "passwordMismatch": "Yangi parollar mos kelmadi",
+        "passwordUpdated": "Parol yangilandi"
+    }
+}
