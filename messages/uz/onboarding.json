@@ -1,0 +1,13 @@
+{
+  "title": "Tashkilotingizni sozlang",
+  "description": "Bu amalga oshirilgach, jamoa a'zolarini taklif qilishingiz va mahsulotlarni boshqarishingiz mumkin.",
+  "organizationName": "Tashkilot nomi",
+  "namePlaceholder": "Acme Inc.",
+  "creating": "Yaratilmoqda…",
+  "continue": "Davom etish →",
+  "success": "Tashkilot yaratildi!",
+  "step": "2 dan {step}-qadam",
+  "validation": {
+    "name": "Kamida 2 ta belgi kiriting"
+  }
+}

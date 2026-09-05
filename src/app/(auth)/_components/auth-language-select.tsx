@@ -31,7 +31,7 @@ export function AuthLanguageSelect({ locale }: Props) {
 
   return (
     <Select value={locale} onValueChange={handleChange}>
-      <SelectTrigger className="h-9 w-30 rounded-lg border-gray-200 bg-white text-sm">
+      <SelectTrigger className="h-9 w-30 rounded-lg border-0 bg-transparent text-sm text-white shadow-none [&>svg]:text-white">
         <SelectValue />
       </SelectTrigger>
 

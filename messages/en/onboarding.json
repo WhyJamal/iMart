@@ -1,0 +1,13 @@
+{
+  "title": "Set up your organization",
+  "description": "You'll be able to invite teammates and manage products once this is done.",
+  "organizationName": "Organization name",
+  "namePlaceholder": "Acme Inc.",
+  "creating": "Creating…",
+  "continue": "Continue →",
+  "success": "Organization created!",
+  "step": "Step {step} of 2",
+  "validation": {
+    "name": "At least 2 characters"
+  }
+}
