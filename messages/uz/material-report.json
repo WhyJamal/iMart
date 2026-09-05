@@ -1,0 +1,28 @@
+{
+  "warehouse": {
+    "title": "Material otchyot",
+    "description": "Ombordagi tovar qoldiqlari — sklad va nuqta bo'yicha, yacheykalarigacha",
+    "empty": "Tanlangan filtr bo'yicha qoldiq topilmadi",
+    "filters": {
+      "all": "Barchasi",
+      "point": "Nuqta",
+      "warehouse": "Sklad",
+      "category": "Kategoriya",
+      "product": "Nomenklatura",
+      "reset": "Tozalash"
+    },
+    "table": {
+      "product": "Nomenklatura",
+      "code": "Kod",
+      "category": "Kategoriya",
+      "point": "Nuqta",
+      "warehouse": "Sklad",
+      "cell": "Yacheyka",
+      "qty": "Miqdor",
+      "unit": "Birlik",
+      "price": "Narx",
+      "amount": "Summa",
+      "total": "Jami"
+    }
+  }
+}

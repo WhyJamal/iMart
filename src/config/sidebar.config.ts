@@ -151,6 +151,18 @@ export const SIDEBARITEMS: ISidebar[] = [
         icon: "undo",
         href: PAGES.RETURNS,
         permission: "returns:create",
+      }
+    ],
+  },
+  {
+    groupKey: "reports",
+    items: [
+      {
+        id: "material-report",
+        labelKey: "materialReport",
+        icon: "file-bar-chart",
+        href: PAGES.MATERIAL_REPORT,
+        permission: "reports:read",
       },
     ],
   },

@@ -26,6 +26,7 @@ import {
     FileMinus,
     Percent,
     ArrowLeftRight,
+    FileBarChart,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -51,6 +52,7 @@ const icons = {
     clock: Clock,
     timesheet: ClipboardClock, 
     "arrow-left-right": ArrowLeftRight,
+    "file-bar-chart": FileBarChart,
 };
 
 export function SidebarNavItem({

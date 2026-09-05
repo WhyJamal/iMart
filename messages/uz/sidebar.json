@@ -13,11 +13,13 @@
   "timesheets": "Tabel",
   "salary": "Xodim maoshi",
   "payroll": "Ish haqini hisoblash",
-  "warehouses": "Omborlar",
+  "warehouses": "Ombor",
   "items": "Mahsulotlar",
   "promotions": "Aksiyalar",
   "transfers": "Mahsulotlarni ko‘chirish",
   "writeOffs": "Mahsulotlarni hisobdan chiqarish",
   "purchaseReturns": "Yetkazib beruvchilarga qaytarish",
-  "returns": "Sotuvlarni qaytarish"
+  "returns": "Sotuvlarni qaytarish",
+  "reports": "Hisobotlar",
+  "materialReport": "Material otchyot"
 }

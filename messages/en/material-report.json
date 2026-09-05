@@ -1,0 +1,28 @@
+{
+  "warehouse": {
+    "title": "Material Report",
+    "description": "Stock balances — by warehouse and location, down to cell level",
+    "empty": "No stock found for the selected filter",
+    "filters": {
+      "all": "All",
+      "point": "Location",
+      "warehouse": "Warehouse",
+      "category": "Category",
+      "product": "Item",
+      "reset": "Reset"
+    },
+    "table": {
+      "product": "Item",
+      "code": "Code",
+      "category": "Category",
+      "point": "Location",
+      "warehouse": "Warehouse",
+      "cell": "Cell",
+      "qty": "Qty",
+      "unit": "Unit",
+      "price": "Price",
+      "amount": "Amount",
+      "total": "Total"
+    }
+  }
+}

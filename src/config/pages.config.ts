@@ -1,9 +1,9 @@
 export const PAGES = {
     HOME: "/",
-    
+
+    // Documents
     CASH: "/cash",
     POS: "/pos",
-    ONBOARDING: "/onboarding",
     PRODUCTS: "/products",
     PURCHASES: "/purchases",
     SALES: "/sales",
@@ -21,10 +21,17 @@ export const PAGES = {
     WAREHOUSES: "/warehouses",
     CONTRAGENTS: "/contragents",
     PROMOTIONS: "/promotions",
-    
+
+    // Reports
+    MATERIAL_REPORT: "/reports/material-report",
+
+    // User profile pages
     PROFILE: "/u/profile",
     USER_PROFILE: (userId: string) => `/u/profile/${userId}`,
 
+    ONBOARDING: "/onboarding",
+
+    // Auth pages
     LOGIN: "/login",
     REGISTER: "/register",
 }

@@ -13,11 +13,13 @@
   "timesheets": "Timesheet",
   "salary": "Employee Salary",
   "payroll": "Payroll",
-  "warehouses": "Warehouses",
+  "warehouses": "Warehouse",
   "items": "Products",
   "promotions": "Promotions",
   "transfers": "Product Transfers",
   "writeOffs": "Product Write-offs",
   "purchaseReturns": "Supplier Returns",
-  "returns": "Sales Returns"
+  "returns": "Sales Returns",
+  "reports": "Reports",
+  "materialReport": "Material Report"
 }

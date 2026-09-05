@@ -7,7 +7,8 @@ const NAMESPACES = [
   "purchase", "sales", "cash", "point", "contragent", "users",
   "calendar", "work-schedules", "timesheet", "salary", "payroll",
   "warehouse", "product", "promotion", "transfer", "write-off",
-  "purchase-return", "sale-return", "profile", "auth", "onboarding"
+  "purchase-return", "sale-return", "profile", "auth", "onboarding",
+  "material-report"
 ] as const;
 
 export default getRequestConfig(async () => {

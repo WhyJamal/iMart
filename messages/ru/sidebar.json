@@ -13,11 +13,13 @@
   "timesheets": "Табель",
   "salary": "Оклад сотрудника",
   "payroll": "Начисление зарплаты",
-  "warehouses": "Склады",
+  "warehouses": "Склад",
   "items": "Товары",
   "promotions": "Акции",
   "transfers": "Перемещения товаров",
   "writeOffs": "Списание товаров",
   "purchaseReturns": "Возвраты поставщикам",
-  "returns": "Возвраты продаж"
+  "returns": "Возвраты продаж",
+  "reports": "Отчёты",
+  "materialReport": "Материальный отчёт"
 }
