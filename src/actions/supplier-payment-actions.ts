@@ -9,6 +9,7 @@ import type { ActionResult } from "@/types/action-result.types";
 import type { TxClient } from "@/types/prisma.types";
 import type { CashMethod } from "@/types/cash.types";
 import type { ISupplierPayment } from "@/types/debtor.types";
+import type { IDebtLedgerEntry } from "@/types/debtor.types";
 
 /**
  * Bir kontragentga (SUPPLIER) bo'lgan joriy qarzimiz:
@@ -71,6 +72,74 @@ export async function getSupplierPayments(
     note: r.note,
     createdAt: r.createdAt,
   }));
+}
+
+/**
+ * Kontragent "Tarix" oynasi uchun — xaridlardan tug'ilgan qarz (+) va
+ * to'lovlardan kamaygan qarz (−) yozuvlari xronologik tartibda, har
+ * birida shundan keyingi qoldiq (running balance) bilan.
+ */
+export async function getContragentLedger(
+  contragentId: string
+): Promise<IDebtLedgerEntry[]> {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const [purchases, payments] = await Promise.all([
+    prisma.purchase.findMany({
+      where: { contragentId, organizationId: session.organizationId },
+      select: {
+        id: true,
+        receiptNumber: true,
+        paidAmount: true,
+        createdAt: true,
+        items: { select: { qty: true, unitCost: true } },
+      },
+    }),
+    prisma.supplierPayment.findMany({
+      where: { contragentId, organizationId: session.organizationId },
+    }),
+  ]);
+
+  type Raw = { date: Date; type: "debt" | "payment"; label: string; amount: number };
+
+  const debtEvents: Raw[] = purchases
+    .map((p: (typeof purchases)[number]) => {
+      const total = p.items.reduce(
+        (sum: number, i: { qty: unknown; unitCost: unknown }) =>
+          sum + Number(i.qty) * Number(i.unitCost),
+        0
+      );
+      const unpaid = total - Number(p.paidAmount);
+      return unpaid > 0
+        ? {
+            date: p.createdAt,
+            type: "debt" as const,
+            label: `Xarid #${p.receiptNumber}`,
+            amount: unpaid,
+          }
+        : null;
+    })
+    .filter((e: Raw | null): e is Raw => e !== null);
+
+  const paymentEvents: Raw[] = payments.map(
+    (pay: (typeof payments)[number]) => ({
+      date: pay.createdAt,
+      type: "payment" as const,
+      label: pay.note ? `To'lov (${pay.method}) — ${pay.note}` : `To'lov (${pay.method})`,
+      amount: Number(pay.amount),
+    })
+  );
+
+  const merged = [...debtEvents, ...paymentEvents].sort(
+    (a, b) => a.date.getTime() - b.date.getTime()
+  );
+
+  let balance = 0;
+  return merged.map((e, idx) => {
+    balance += e.type === "debt" ? e.amount : -e.amount;
+    return { id: `${e.type}-${idx}-${e.date.getTime()}`, ...e, balance };
+  });
 }
 
 /**

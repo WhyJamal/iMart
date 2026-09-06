@@ -31,7 +31,11 @@ import type { IContragent } from "@/types/contragent.types";
 import { PAGES } from "@/config/pages.config";
 import { useDeleteContragent } from "../_hooks/use-contragent-mutations";
 import { DebtPaymentDialog } from "@/components/debt-payment-dialog";
-import { createSupplierPayment } from "@/actions/supplier-payment-actions";
+import { DebtHistoryDialog } from "@/components/debt-history-dialog";
+import {
+  createSupplierPayment,
+  getContragentLedger,
+} from "@/actions/supplier-payment-actions";
 
 interface Props {
   contragents: IContragent[];
@@ -103,12 +107,17 @@ export function ContragentList({ contragents, canManage }: Props) {
             </TableCell>
 
             <TableCell>
-              {c.type === "SUPPLIER" && c.debt > 0 ? (
+              {c.type === "SUPPLIER" ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-amber-600">
-                    {c.debt.toLocaleString("uz-UZ")} so'm
-                  </span>
-                  {canManage && (
+                  {c.debt > 0 ? (
+                    <span className="text-sm font-medium text-amber-600">
+                      {c.debt.toLocaleString("uz-UZ")} so'm
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">—</span>
+                  )}
+
+                  {canManage && c.debt > 0 && (
                     <DebtPaymentDialog
                       name={c.name}
                       debt={c.debt}
@@ -134,6 +143,19 @@ export function ContragentList({ contragents, canManage }: Props) {
                       }}
                     />
                   )}
+
+                  <DebtHistoryDialog
+                    name={c.name}
+                    fetchLedger={() => getContragentLedger(c.id)}
+                    labels={{
+                      trigger: t("history"),
+                      title: t("historyTitle"),
+                      empty: t("historyEmpty"),
+                      debt: t("historyDebt"),
+                      payment: t("historyPayment"),
+                      balance: t("historyBalance"),
+                    }}
+                  />
                 </div>
               ) : (
                 <span className="text-sm text-muted-foreground">—</span>

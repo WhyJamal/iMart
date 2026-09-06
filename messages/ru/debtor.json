@@ -18,6 +18,12 @@
     "payCash": "Наличные",
     "payCard": "Карта",
     "payQr": "QR",
-    "paymentSaved": "Оплата сохранена"
+    "paymentSaved": "Оплата сохранена",
+    "history": "История",
+    "historyTitle": "История долга",
+    "historyEmpty": "Пока нет операций",
+    "historyDebt": "Долг",
+    "historyPayment": "Оплата",
+    "historyBalance": "Остаток"
   }
 }

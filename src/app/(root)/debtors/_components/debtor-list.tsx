@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/table";
 
 import { DebtPaymentDialog } from "@/components/debt-payment-dialog";
-import { createDebtorPayment } from "@/actions/debtor-actions";
+import { DebtHistoryDialog } from "@/components/debt-history-dialog";
+import { createDebtorPayment, getDebtorLedger } from "@/actions/debtor-actions";
 import type { IDebtor } from "@/types/debtor.types";
 
 interface Props {
@@ -59,7 +60,7 @@ export function DebtorList({ debtors }: Props) {
                 <span className="text-sm text-muted-foreground">—</span>
               )}
             </TableCell>
-            <TableCell className="text-right">
+            <TableCell className="text-right space-x-1">
               {d.debt > 0 && (
                 <DebtPaymentDialog
                   name={d.name}
@@ -83,6 +84,19 @@ export function DebtorList({ debtors }: Props) {
                   }}
                 />
               )}
+
+              <DebtHistoryDialog
+                name={d.name}
+                fetchLedger={() => getDebtorLedger(d.id)}
+                labels={{
+                  trigger: t("history"),
+                  title: t("historyTitle"),
+                  empty: t("historyEmpty"),
+                  debt: t("historyDebt"),
+                  payment: t("historyPayment"),
+                  balance: t("historyBalance"),
+                }}
+              />
             </TableCell>
           </TableRow>
         ))}

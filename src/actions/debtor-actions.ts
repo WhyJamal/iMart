@@ -12,6 +12,7 @@ import type {
   IDebtor,
   IDebtorOption,
   IDebtorPayment,
+  IDebtLedgerEntry,
 } from "@/types/debtor.types";
 
 /**
@@ -118,6 +119,60 @@ export async function getDebtorPayments(
     note: r.note,
     createdAt: r.createdAt,
   }));
+}
+
+/**
+ * Mijoz "Tarix" oynasi uchun — qarzga sotuvlardan tug'ilgan qarz (+) va
+ * to'lovlardan kamaygan qarz (−) yozuvlari xronologik tartibda, har
+ * birida shundan keyingi qoldiq (running balance) bilan.
+ */
+export async function getDebtorLedger(
+  debtorId: string
+): Promise<IDebtLedgerEntry[]> {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const [sales, payments] = await Promise.all([
+    prisma.sale.findMany({
+      where: {
+        debtorId,
+        organizationId: session.organizationId,
+        paymentMethod: "debt",
+      },
+      select: { id: true, saleNumber: true, totalAmount: true, createdAt: true },
+    }),
+    prisma.debtorPayment.findMany({
+      where: { debtorId, organizationId: session.organizationId },
+    }),
+  ]);
+
+  type Raw = { date: Date; type: "debt" | "payment"; label: string; amount: number };
+
+  const debtEvents: Raw[] = sales.map((s: (typeof sales)[number]) => ({
+    date: s.createdAt,
+    type: "debt" as const,
+    label: `Sotuv #${s.saleNumber}`,
+    amount: Number(s.totalAmount),
+  }));
+
+  const paymentEvents: Raw[] = payments.map(
+    (pay: (typeof payments)[number]) => ({
+      date: pay.createdAt,
+      type: "payment" as const,
+      label: pay.note ? `To'lov (${pay.method}) — ${pay.note}` : `To'lov (${pay.method})`,
+      amount: Number(pay.amount),
+    })
+  );
+
+  const merged = [...debtEvents, ...paymentEvents].sort(
+    (a, b) => a.date.getTime() - b.date.getTime()
+  );
+
+  let balance = 0;
+  return merged.map((e, idx) => {
+    balance += e.type === "debt" ? e.amount : -e.amount;
+    return { id: `${e.type}-${idx}-${e.date.getTime()}`, ...e, balance };
+  });
 }
 
 // ─── Mutations ────────────────────────────────────────────────────────────────

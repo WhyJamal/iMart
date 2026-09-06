@@ -18,6 +18,12 @@
     "payCash": "Naqd",
     "payCard": "Karta",
     "payQr": "QR",
-    "paymentSaved": "To‘lov saqlandi"
+    "paymentSaved": "To‘lov saqlandi",
+    "history": "Tarix",
+    "historyTitle": "Qarz tarixi",
+    "historyEmpty": "Hozircha harakatlar yo‘q",
+    "historyDebt": "Qarz",
+    "historyPayment": "To‘lov",
+    "historyBalance": "Qoldiq"
   }
 }

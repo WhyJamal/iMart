@@ -32,3 +32,15 @@ export interface ISupplierPayment {
   note: string | null;
   createdAt: Date;
 }
+
+// Kontragent/mijoz "Tarix" oynasida ko'rsatiladigan bitta harakat —
+// qarz qo'shilgan (xarid/sotuv) yoki qarz kamaygan (to'lov) yozuv,
+// xronologik tartibda, shu yozuvdan keyingi qoldiq (balance) bilan.
+export interface IDebtLedgerEntry {
+  id: string;
+  date: Date;
+  type: "debt" | "payment";
+  label: string;
+  amount: number; // har doim musbat; ishorasi `type`dan bilinadi
+  balance: number;
+}

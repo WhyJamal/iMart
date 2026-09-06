@@ -18,6 +18,12 @@
     "payCash": "Cash",
     "payCard": "Card",
     "payQr": "QR",
-    "paymentSaved": "Payment saved"
+    "paymentSaved": "Payment saved",
+    "history": "History",
+    "historyTitle": "Debt history",
+    "historyEmpty": "No transactions yet",
+    "historyDebt": "Debt",
+    "historyPayment": "Payment",
+    "historyBalance": "Balance"
   }
 }
