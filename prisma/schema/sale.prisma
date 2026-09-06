@@ -5,14 +5,16 @@ model Sale {
   organizationId String
   cashierId      String?
   pointId        String?  // qaysi nuqtadan sotilgani
+  debtorId       String?  // paymentMethod === "debt" bo'lganda to'ldiriladi
 
   totalAmount    Decimal  // for PostgreSQL @db.Decimal(10, 2)
-  paymentMethod  String   @default("cash") // cash | card | qr
+  paymentMethod  String   @default("cash") // cash | card | qr | debt
 
   createdAt      DateTime @default(now())
 
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   point          Point?       @relation(fields: [pointId], references: [id])
+  debtor         Debtor?      @relation(fields: [debtorId], references: [id])
   items          SaleItem[]
   returns        SaleReturn[]
 }

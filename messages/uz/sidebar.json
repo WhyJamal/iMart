@@ -6,6 +6,7 @@
   "cash": "Kassa",
   "points": "Nuqtalar",
   "contragents": "Kontragentlar",
+  "debtors": "Mijozlar (qarzdorlar)",
   "staffAndPayroll": "Xodimlar va ish haqi",
   "users": "Foydalanuvchilar",
   "calendar": "Ishlab chiqarish kalendari",
@@ -21,5 +22,6 @@
   "purchaseReturns": "Yetkazib beruvchilarga qaytarish",
   "returns": "Sotuvlarni qaytarish",
   "reports": "Hisobotlar",
-  "materialReport": "Material otchyot"
+  "materialReport": "Material otchyot",
+  "debtReport": "Qarzdorlik otchyoti"
 }

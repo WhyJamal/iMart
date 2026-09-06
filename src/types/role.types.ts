@@ -30,4 +30,5 @@ export type Permission =
   | "promotions:manage"
   | "transfers:create"
   | "transfers:delete"
+  | "debts:manage"
   ;

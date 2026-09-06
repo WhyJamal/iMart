@@ -1,0 +1,12 @@
+{
+  "title": "Qarzdorlik otchyoti",
+  "description": "Mijozlar sizga qancha qarz, siz yetkazib beruvchilarga qancha qarzsiz",
+  "owedToUs": {
+    "title": "Mijozlar bizga qarz",
+    "empty": "Hozircha hech kim qarz emas"
+  },
+  "weOwe": {
+    "title": "Biz yetkazib beruvchilarga qarzmiz",
+    "empty": "Hech qanday qarzingiz yo‘q"
+  }
+}

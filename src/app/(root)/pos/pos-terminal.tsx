@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { createSale } from "@/actions/sale-actions";
+import { getDebtorOptions } from "@/actions/debtor-actions";
 import {
   getPointCellStock,
   getPointStockRecord,
@@ -16,12 +17,13 @@ import { getActivePromotionDiscounts } from "@/actions/promotion-actions";
 import type { IPointOption } from "@/types/point.types";
 import type { ICellStockOption } from "@/types/warehouse.types";
 import type { IPromotionDiscount } from "@/types/promotion.types";
+import type { IDebtorOption } from "@/types/debtor.types";
 
 import { isFractionalUnit } from "@/config/units";
 import { useTranslations } from "next-intl";
 
 type Stage = "idle" | "processing" | "success";
-type PayMethod = "card" | "cash" | "qr";
+type PayMethod = "card" | "cash" | "qr" | "debt";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -120,6 +122,24 @@ const QRIcon = () => (
   </svg>
 );
 
+const DebtIcon = () => (
+  <svg
+    className="w-5 h-5"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+    <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z" />
+    <path d="M9 15h1.5a1.5 1.5 0 0 0 0-3H9v-1.5" />
+    <path d="M9 15v1" />
+    <path d="M9 9.5V9" />
+  </svg>
+);
+
 const CheckIcon = () => (
   <svg
     className="w-7 h-7"
@@ -148,6 +168,7 @@ interface Props {
   defaultPointId: string;
   initialCellStock: Record<string, ICellStockOption[]>;
   initialPromotions: IPromotionDiscount[];
+  initialDebtors: IDebtorOption[];
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -158,6 +179,7 @@ export default function POSTerminal({
   defaultPointId,
   initialCellStock,
   initialPromotions,
+  initialDebtors,
 }: Props) {
   const t = useTranslations("pos-terminal");
 
@@ -186,6 +208,12 @@ export default function POSTerminal({
   const [tip, setTip] = useState(0);
   const [method, setMethod] = useState<PayMethod>("card");
 
+  // ─── Qarz (debt) — mijoz tanlash/kiritish ───────────────────────────────────
+  const [debtors, setDebtors] = useState<IDebtorOption[]>(initialDebtors);
+  const [debtorQuery, setDebtorQuery] = useState("");
+  const [selectedDebtorId, setSelectedDebtorId] = useState<string | null>(null);
+  const [debtorPickerOpen, setDebtorPickerOpen] = useState(false);
+
   const [stage, setStage] = useState<Stage>("idle");
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -202,9 +230,13 @@ export default function POSTerminal({
       id: "cash",
       label: t("paymentMethods.cash"),
     },
+    // {
+    //   id: "qr",
+    //   label: t("paymentMethods.qr"),
+    // },
     {
-      id: "qr",
-      label: t("paymentMethods.qr"),
+      id: "debt",
+      label: t("paymentMethods.debt"),
     },
   ];
 
@@ -235,6 +267,40 @@ export default function POSTerminal({
     card: <CardIcon />,
     cash: <CashIcon />,
     qr: <QRIcon />,
+    debt: <DebtIcon />,
+  };
+
+  // ─── Debtor combobox helpers ─────────────────────────────────────────────────
+
+  const filteredDebtors = useMemo(() => {
+    const q = debtorQuery.trim().toLowerCase();
+    if (!q) return debtors;
+    return debtors.filter((d) => d.name.toLowerCase().includes(q));
+  }, [debtors, debtorQuery]);
+
+  const selectedDebtor = useMemo(
+    () => debtors.find((d) => d.id === selectedDebtorId) ?? null,
+    [debtors, selectedDebtorId]
+  );
+
+  const exactNameMatch = useMemo(
+    () =>
+      debtors.some(
+        (d) => d.name.toLowerCase() === debtorQuery.trim().toLowerCase()
+      ),
+    [debtors, debtorQuery]
+  );
+
+  const handlePickDebtor = (debtor: IDebtorOption) => {
+    setSelectedDebtorId(debtor.id);
+    setDebtorQuery(debtor.name);
+    setDebtorPickerOpen(false);
+  };
+
+  const handleDebtorInputChange = (value: string) => {
+    setDebtorQuery(value);
+    setSelectedDebtorId(null);
+    setDebtorPickerOpen(true);
   };
 
   // ─── Promotion helpers ──────────────────────────────────────────────────────
@@ -667,6 +733,11 @@ export default function POSTerminal({
       return;
     }
 
+    if (method === "debt" && !selectedDebtorId && !debtorQuery.trim()) {
+      toast.error(t("messages.selectDebtor"));
+      return;
+    }
+
     setStage("processing");
 
     startTransition(async () => {
@@ -676,6 +747,11 @@ export default function POSTerminal({
         totalAmount: total,
         subtotal,
         tipPercent: tip * 100,
+        debtorId: method === "debt" ? selectedDebtorId ?? undefined : undefined,
+        debtorName:
+          method === "debt" && !selectedDebtorId
+            ? debtorQuery.trim()
+            : undefined,
         items: cart.map((item) => ({
           productId: item.id,
           qty: item.qty,
@@ -699,12 +775,14 @@ export default function POSTerminal({
           freshStock,
           freshCells,
           freshPromotions,
+          freshDebtors,
         ] = await Promise.all([
           getPointStockRecord(pointId),
           getPointCellStock(pointId),
           getActivePromotionDiscounts(
             pointId
           ),
+          getDebtorOptions(),
         ]);
 
         setStockOverride(freshStock);
@@ -712,6 +790,7 @@ export default function POSTerminal({
         setPromotionDiscounts(
           freshPromotions
         );
+        setDebtors(freshDebtors);
 
         setStage("success");
 
@@ -733,6 +812,9 @@ export default function POSTerminal({
     setQrInput("");
     setCart([]);
     setLastSaleNumber("");
+    setSelectedDebtorId(null);
+    setDebtorQuery("");
+    setDebtorPickerOpen(false);
   };
 
   // ─── Render ─────────────────────────────────────────────────────────────────
@@ -1271,10 +1353,70 @@ export default function POSTerminal({
                 </button>
               ))}
             </div>
+
+            {method === "debt" && (
+              <div className="mt-3 relative">
+                <input
+                  type="text"
+                  value={debtorQuery}
+                  onChange={(e) =>
+                    handleDebtorInputChange(e.target.value)
+                  }
+                  onFocus={() => setDebtorPickerOpen(true)}
+                  onBlur={() =>
+                    setTimeout(() => setDebtorPickerOpen(false), 150)
+                  }
+                  placeholder={t("payment.debtorPlaceholder")}
+                  className="w-full text-sm px-3 py-2.5 rounded-[10px] border-[1.5px] border-gray-200 focus:border-red-400 outline-none"
+                />
+
+                {selectedDebtor && (
+                  <p className="text-[11px] text-gray-400 mt-1.5">
+                    {t("payment.currentDebt")}: {fmt(selectedDebtor.debt)}
+                  </p>
+                )}
+
+                {debtorPickerOpen && (
+                  <div className="absolute z-20 mt-1 w-full bg-white rounded-[10px] shadow-lg border border-gray-100 max-h-48 overflow-y-auto">
+                    {filteredDebtors.map((d) => (
+                      <button
+                        key={d.id}
+                        type="button"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => handlePickDebtor(d)}
+                        className="w-full flex items-center justify-between px-3 py-2 text-left text-sm hover:bg-gray-50"
+                      >
+                        <span className="text-gray-700">{d.name}</span>
+                        <span className="text-[11px] text-gray-400">
+                          {fmt(d.debt)}
+                        </span>
+                      </button>
+                    ))}
+
+                    {debtorQuery.trim() && !exactNameMatch && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => setDebtorPickerOpen(false)}
+                        className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 border-t border-gray-100"
+                      >
+                        {t("payment.newDebtor")}: “{debtorQuery.trim()}”
+                      </button>
+                    )}
+
+                    {filteredDebtors.length === 0 && !debtorQuery.trim() && (
+                      <p className="px-3 py-2 text-[11px] text-gray-400">
+                        {t("payment.noDebtors")}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Tip */}
-          <div className="bg-white rounded-2xl shadow-sm p-4">
+          {/* <div className="bg-white rounded-2xl shadow-sm p-4">
             <SectionLabel>
               {t("tip.title")}
             </SectionLabel>
@@ -1298,7 +1440,7 @@ export default function POSTerminal({
                 </button>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Summary */}
           <div className="bg-white rounded-2xl shadow-sm p-4 sticky bottom-0">

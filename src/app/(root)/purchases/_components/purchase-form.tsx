@@ -93,6 +93,24 @@ export function PurchaseForm({
       initialData?.paymentMethod ?? "CASH"
     );
 
+  // To'liq to'landimi, yoki qisman (qolgani kontragentga qarz)?
+  const [isFullyPaid, setIsFullyPaid] = useState(
+    initialData?.paidAmount === undefined ||
+      initialData?.paidAmount === null
+      ? true
+      : Number(initialData.paidAmount) >= 0 &&
+        initialData.items?.reduce(
+          (sum: number, i: { qty: number; unitCost: number }) =>
+            sum + i.qty * i.unitCost,
+          0
+        ) <= Number(initialData.paidAmount)
+  );
+  const [paidAmountInput, setPaidAmountInput] = useState<string>(
+    initialData?.paidAmount !== undefined && initialData?.paidAmount !== null
+      ? String(initialData.paidAmount)
+      : ""
+  );
+
   const [lines, setLines] = useState<LineItem[]>(
     initialData?.items?.map(
       (item: {
@@ -193,6 +211,11 @@ export function PurchaseForm({
     0
   );
 
+  const paidAmount = isFullyPaid
+    ? totalCost
+    : Math.min(Math.max(Number(paidAmountInput) || 0, 0), totalCost);
+  const debtAmount = totalCost - paidAmount;
+
   const handleSubmit = () => {
     const validLines = lines.filter(
       (l) => l.productId
@@ -237,6 +260,7 @@ export function PurchaseForm({
         contragentId,
         note,
         paymentMethod,
+        paidAmount,
         items: validLines.map(
           ({
             productId,
@@ -385,6 +409,40 @@ export function PurchaseForm({
               {/* <SelectItem value="QR">QR</SelectItem> */}
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={isFullyPaid}
+              onChange={(e) => {
+                setIsFullyPaid(e.target.checked);
+                if (e.target.checked) setPaidAmountInput("");
+              }}
+              className="h-4 w-4 rounded border-gray-300"
+            />
+            {t("fullyPaid")}
+          </label>
+
+          {!isFullyPaid && (
+            <div className="pt-1 space-y-1">
+              <Label>{t("paidAmount")}</Label>
+              <Input
+                type="number"
+                min={0}
+                max={totalCost}
+                value={paidAmountInput}
+                onChange={(e) => setPaidAmountInput(e.target.value)}
+                placeholder="0"
+              />
+              {debtAmount > 0 && (
+                <p className="text-xs text-amber-600">
+                  {t("debtWillBe")}: {debtAmount.toFixed(2)} {t("currency")}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <Separator />
@@ -562,6 +620,15 @@ export function PurchaseForm({
                 {t("currency")}
               </dd>
             </div>
+
+            {debtAmount > 0 && (
+              <div className="flex gap-16 justify-between text-sm text-amber-600">
+                <dt>{t("debtWillBe")}</dt>
+                <dd>
+                  {debtAmount.toFixed(2)} {t("currency")}
+                </dd>
+              </div>
+            )}
           </dl>
         </div>
       </div>

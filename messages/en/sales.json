@@ -9,6 +9,7 @@
         "date": "Date",
         "actions": "Actions",
         "itemCount": "{count} items",
+        "debt": "Debt",
         "noSales": "No sales yet — charge a customer from the POS",
         "deleteSale": "Delete sale?",
         "deleteDescription": "This will reverse inventory movements for {saleNumber} — stock will be restored. This action cannot be undone.",

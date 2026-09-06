@@ -1,0 +1,62 @@
+// Debtor (Дебитор/Клиент в долг) — POS'da "Qarz" tugmasi orqali
+// yaratiladigan yengil mijoz yozuvi. Contragent'dan farqli — rasmiy
+// emas, faqat ism (va ixtiyoriy telefon) bilan saqlanadi, do'kon
+// har bir xaridorni rasmiy ro'yxatga olmaydi.
+model Debtor {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  phone          String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sales          Sale[]
+  payments       DebtorPayment[]
+
+  @@index([organizationId, name])
+}
+
+// DebtorPayment (Погашение долга клиентом) — mijoz oldingi nasiya
+// sotuv(lar)i uchun keyin kelib to'lagan summasi. Yozuvlar o'chirilmaydi
+// — joriy qarz shu yozuvlar yig'indisidan hisoblanadi (ledger printsipi).
+model DebtorPayment {
+  id             String   @id @default(cuid())
+  organizationId String
+  debtorId       String
+
+  amount         Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  method         String   // CASH | CARD | QR
+  note           String?
+
+  createdBy      String?
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  debtor         Debtor       @relation(fields: [debtorId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, debtorId])
+}
+
+// SupplierPayment (Оплата поставщику) — Purchase yaratilgandan keyin
+// yetkazib beruvchiga qo'shimcha qilingan to'lov (qarzni qisman/to'liq
+// yopish). Purchase.paidAmount — xarid vaqtidagi boshlang'ich to'lov;
+// bu yerdagi yozuvlar — keyingi to'lovlar.
+model SupplierPayment {
+  id             String   @id @default(cuid())
+  organizationId String
+  contragentId   String
+
+  amount         Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  method         String   // CASH | CARD | QR
+  note           String?
+
+  createdBy      String?
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contragent     Contragent   @relation(fields: [contragentId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, contragentId])
+}

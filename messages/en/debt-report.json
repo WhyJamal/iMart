@@ -1,0 +1,12 @@
+{
+  "title": "Debt Report",
+  "description": "How much clients owe you, and how much you owe suppliers",
+  "owedToUs": {
+    "title": "Clients owe us",
+    "empty": "No one owes anything yet"
+  },
+  "weOwe": {
+    "title": "We owe suppliers",
+    "empty": "You have no debts"
+  }
+}

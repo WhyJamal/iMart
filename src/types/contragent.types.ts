@@ -7,6 +7,7 @@ export interface IContragent {
   inn: string | null;
   type: ContragentType;
   purchaseCount: number;
+  debt: number; // faqat SUPPLIER uchun mazmunli — biz unga qancha qarzmiz
   createdAt: Date;
 }
 

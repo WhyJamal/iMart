@@ -119,6 +119,14 @@ function PurchaseRow({ purchase }: { purchase: Purchase }) {
 
         <TableCell className="font-semibold">
           {fmt(total)}
+          {Number(purchase.paidAmount ?? total) < total && (
+            <Badge
+              variant="outline"
+              className="ml-2 border-amber-400 text-amber-600 font-normal"
+            >
+              {t("debt")}
+            </Badge>
+          )}
         </TableCell>
 
         <TableCell className="text-muted-foreground text-sm">

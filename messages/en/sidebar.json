@@ -6,6 +6,7 @@
   "cash": "Cash",
   "points": "Locations",
   "contragents": "Counterparties",
+  "debtors": "Clients (debtors)",
   "staffAndPayroll": "Staff & Payroll",
   "users": "Users",
   "calendar": "Production Calendar",
@@ -13,7 +14,7 @@
   "timesheets": "Timesheet",
   "salary": "Employee Salary",
   "payroll": "Payroll",
-  "warehouses": "Warehouse",
+  "warehouse": "Warehouse",
   "items": "Products",
   "promotions": "Promotions",
   "transfers": "Product Transfers",
@@ -21,5 +22,6 @@
   "purchaseReturns": "Supplier Returns",
   "returns": "Sales Returns",
   "reports": "Reports",
-  "materialReport": "Material Report"
+  "materialReport": "Material Report",
+  "debtReport": "Debt Report"
 }

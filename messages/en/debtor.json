@@ -1,0 +1,23 @@
+{
+  "title": "Clients (debtors)",
+  "description": "Clients sold to \"on credit\" via POS, and their current debt",
+  "list": {
+    "name": "Name",
+    "phone": "Phone",
+    "debt": "Debt",
+    "actions": "Actions",
+    "empty": "No clients with debt yet",
+    "payDebt": "Pay",
+    "payDebtTitle": "Pay debt",
+    "currentDebt": "Current debt",
+    "amount": "Amount",
+    "method": "Payment method",
+    "note": "Note (optional)",
+    "submit": "Save",
+    "cancel": "Cancel",
+    "payCash": "Cash",
+    "payCard": "Card",
+    "payQr": "QR",
+    "paymentSaved": "Payment saved"
+  }
+}

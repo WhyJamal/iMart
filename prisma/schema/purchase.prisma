@@ -7,6 +7,8 @@ model Purchase {
   contragentId   String?  // sotuvchi (Contragent, type=SUPPLIER)
   note           String?
   paymentMethod  String   @default("cash") // cash | card | qr
+  paidAmount     Decimal  @default(0) // xarid vaqtida haqiqatda to'langan summa; for PostgreSQL @db.Decimal(14, 2)
+  // umumiy summa = items yig'indisi (unitCost*qty); qarz = umumiy - paidAmount
 
   postedAt       DateTime?
 

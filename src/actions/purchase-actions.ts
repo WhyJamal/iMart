@@ -43,6 +43,7 @@ export async function getPurchases() {
   return purchases.map((purchase: TPurchaseWithItems) => ({
     ...purchase,
     contragentName: purchase.contragent?.name ?? null,
+    paidAmount: Number(purchase.paidAmount),
     items: purchase.items.map((item: TPurchaseItemWithProduct) => ({
       ...item,
       qty: Number(item.qty),
@@ -137,8 +138,6 @@ export async function createPurchase(
     }
 
     const { pointId, contragentId, note, paymentMethod, items } = parsed.data;
-
-    // Verify all products belong to this org
     const productIds = items.map((i) => i.productId);
     const found = await prisma.product.findMany({
       where: { id: { in: productIds }, organizationId: session.organizationId },
@@ -186,6 +185,14 @@ export async function createPurchase(
       0
     );
 
+    // Bo'sh qoldirilsa — to'liq to'langan deb olinadi; umumiy summadan
+    // oshib ketmasligi/manfiy bo'lmasligi uchun [0, totalCost] oralig'ida
+    // ushlab turamiz.
+    const paidAmount = Math.min(
+      Math.max(parsed.data.paidAmount ?? totalCost, 0),
+      totalCost
+    );
+
     const purchase = await prisma.$transaction(async (tx: TxClient) => {
       const doc = await tx.purchase.create({
         data: {
@@ -195,6 +202,7 @@ export async function createPurchase(
           contragentId,
           note: note?.trim() || null,
           paymentMethod,
+          paidAmount,
           postedAt: new Date(),
           items: {
             create: items.map((item) => ({
@@ -232,16 +240,20 @@ export async function createPurchase(
         });
       }
 
-      // Write OUT movement to the cash register (taminotchiga tolov)
-      await recordCashFlow(tx, {
-        organizationId: session.organizationId,
-        docType: "PURCHASE",
-        docId: doc.id,
-        direction: "OUT",
-        method: paymentMethod.toUpperCase() as CashMethod,
-        amount: totalCost,
-        createdBy: session.userId,
-      });
+      // Write OUT movement to the cash register — faqat haqiqatda
+      // to'langan summa (paidAmount) uchun; qolgani kontragentga qarz
+      // bo'lib qoladi va Purchase.paidAmount orqali kuzatiladi.
+      if (paidAmount > 0) {
+        await recordCashFlow(tx, {
+          organizationId: session.organizationId,
+          docType: "PURCHASE",
+          docId: doc.id,
+          direction: "OUT",
+          method: paymentMethod.toUpperCase() as CashMethod,
+          amount: paidAmount,
+          createdBy: session.userId,
+        });
+      }
 
       return doc;
     });
@@ -379,6 +391,14 @@ export async function updatePurchase(
           contragentId,
           note: note?.trim() || null,
           paymentMethod,
+          paidAmount: Math.min(
+            Math.max(
+              parsed.data.paidAmount ??
+                items.reduce((sum, item) => sum + item.qty * item.unitCost, 0),
+              0
+            ),
+            items.reduce((sum, item) => sum + item.qty * item.unitCost, 0)
+          ),
           items: {
             create: items.map((item) => ({
               productId: item.productId,

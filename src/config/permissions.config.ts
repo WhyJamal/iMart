@@ -24,6 +24,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "timesheets:read",
     "promotions:manage",
     "transfers:create", "transfers:delete",
+    "debts:manage",
   ],
   ADMIN: [
     "products:read", "products:write",
@@ -41,6 +42,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "timesheets:read",
     "promotions:manage",
     "transfers:create", "transfers:delete",
+    "debts:manage",
   ],
   MANAGER: [
     "products:read", "products:write",
@@ -52,6 +54,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "reports:read",
     "promotions:manage",
     "transfers:create",
+    "debts:manage",
   ],
   CASHIER: [
     "products:read",

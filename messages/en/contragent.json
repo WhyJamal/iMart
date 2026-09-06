@@ -23,6 +23,7 @@
     "type": "Type",
     "phone": "Phone",
     "purchases": "Purchases",
+    "debt": "Debt",
     "actions": "Actions",
     "empty": "No contragents yet",
     "supplier": "Supplier",
@@ -30,6 +31,17 @@
     "deleteTitle": "Delete contragent?",
     "deleteDescription": "{name} will be deleted. If there are related purchases, it cannot be deleted.",
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "payDebt": "Pay",
+    "payDebtTitle": "Pay debt",
+    "currentDebt": "Current debt",
+    "amount": "Amount",
+    "method": "Payment method",
+    "note": "Note (optional)",
+    "submit": "Save",
+    "payCash": "Cash",
+    "payCard": "Card",
+    "payQr": "QR",
+    "paymentSaved": "Payment saved"
   }
 }

@@ -1,0 +1,23 @@
+{
+  "title": "Mijozlar (qarzdorlar)",
+  "description": "POS'da \"Qarz\" orqali sotilgan mijozlar va ularning joriy qarzi",
+  "list": {
+    "name": "Ismi",
+    "phone": "Telefon",
+    "debt": "Qarz",
+    "actions": "Amallar",
+    "empty": "Hozircha qarzdor mijozlar yo‘q",
+    "payDebt": "To‘lov",
+    "payDebtTitle": "Qarzni to‘lash",
+    "currentDebt": "Joriy qarz",
+    "amount": "Summa",
+    "method": "To‘lov usuli",
+    "note": "Izoh (ixtiyoriy)",
+    "submit": "Saqlash",
+    "cancel": "Bekor qilish",
+    "payCash": "Naqd",
+    "payCard": "Karta",
+    "payQr": "QR",
+    "paymentSaved": "To‘lov saqlandi"
+  }
+}

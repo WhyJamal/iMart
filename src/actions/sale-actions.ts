@@ -103,6 +103,7 @@ export async function createSale(
     }
 
     const { pointId, items } = parsed.data;
+    const isDebt = parsed.data.paymentMethod === "debt";
 
     // ── 1. Fetch products ──────────────────────────────────────────────────
     const productIds = items.map((i) => i.productId);
@@ -192,12 +193,34 @@ export async function createSale(
 
     // ── 4. Persist ────────────────────────────────────────────────────────
     const sale = await prisma.$transaction(async (tx: TxClient) => {
+      // Qarzga sotilayotgan bo'lsa — mijozni topamiz yoki yangi yaratamiz.
+      let debtorId: string | null = null;
+      if (isDebt) {
+        if (parsed.data.debtorId) {
+          const debtor = await tx.debtor.findFirst({
+            where: {
+              id: parsed.data.debtorId,
+              organizationId: session.organizationId,
+            },
+          });
+          if (!debtor) throw new Error("DEBTOR_NOT_FOUND");
+          debtorId = debtor.id;
+        } else {
+          const name = parsed.data.debtorName!.trim();
+          const created = await tx.debtor.create({
+            data: { organizationId: session.organizationId, name },
+          });
+          debtorId = created.id;
+        }
+      }
+
       const doc = await tx.sale.create({
         data: {
           saleNumber,
           organizationId: session.organizationId,
           cashierId: session.userId ?? null,
           pointId,
+          debtorId,
           totalAmount: effectiveTotal,
           paymentMethod: parsed.data.paymentMethod,
           items: {
@@ -244,16 +267,20 @@ export async function createSale(
         });
       }
 
-      // Write IN movement to the cash register (kassa)
-      await recordCashFlow(tx, {
-        organizationId: session.organizationId,
-        docType: "SALE",
-        docId: doc.id,
-        direction: "IN",
-        method: parsed.data.paymentMethod.toUpperCase() as CashMethod,
-        amount: effectiveTotal,
-        createdBy: session.userId,
-      });
+      // Write IN movement to the cash register (kassa) — qarzga
+      // sotilganda naqd/karta pul kirmaydi, shuning uchun bu yozuv
+      // o'tkazilmaydi; summa Debtor balansida qarz sifatida qoladi.
+      if (!isDebt) {
+        await recordCashFlow(tx, {
+          organizationId: session.organizationId,
+          docType: "SALE",
+          docId: doc.id,
+          direction: "IN",
+          method: parsed.data.paymentMethod.toUpperCase() as CashMethod,
+          amount: effectiveTotal,
+          createdBy: session.userId,
+        });
+      }
 
       return doc;
     });
@@ -267,6 +294,9 @@ export async function createSale(
       data: { id: sale.id, saleNumber: sale.saleNumber },
     };
   } catch (err) {
+    if (err instanceof Error && err.message === "DEBTOR_NOT_FOUND") {
+      return { success: false, error: "Mijoz topilmadi" };
+    }
     console.error("[createSale]", err);
     return { success: false, error: "Failed to create sale" };
   }

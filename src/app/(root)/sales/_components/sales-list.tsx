@@ -107,6 +107,14 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
 
         <TableCell className="font-semibold">
           {fmt(sale.totalAmount)}
+          {sale.paymentMethod === "debt" && (
+            <Badge
+              variant="outline"
+              className="ml-2 border-amber-400 text-amber-600 font-normal"
+            >
+              {t("debt")}
+            </Badge>
+          )}
         </TableCell>
 
         <TableCell className="text-muted-foreground text-sm">

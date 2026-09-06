@@ -23,6 +23,7 @@
     "type": "Turi",
     "phone": "Telefon",
     "purchases": "Kirimlar",
+    "debt": "Qarz",
     "actions": "Amallar",
     "empty": "Hali kontragentlar mavjud emas",
     "supplier": "Sotuvchi",
@@ -30,6 +31,17 @@
     "deleteTitle": "Kontragentni o‘chirish?",
     "deleteDescription": "{name} o‘chiriladi. Agar unga bog‘liq kirimlar bo‘lsa, o‘chirib bo‘lmaydi.",
     "cancel": "Bekor qilish",
-    "delete": "O‘chirish"
+    "delete": "O‘chirish",
+    "payDebt": "To‘lov",
+    "payDebtTitle": "Qarzni to‘lash",
+    "currentDebt": "Joriy qarz",
+    "amount": "Summa",
+    "method": "To‘lov usuli",
+    "note": "Izoh (ixtiyoriy)",
+    "submit": "Saqlash",
+    "payCash": "Naqd",
+    "payCard": "Karta",
+    "payQr": "QR",
+    "paymentSaved": "To‘lov saqlandi"
   }
 }

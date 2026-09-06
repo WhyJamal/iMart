@@ -13,6 +13,7 @@ model Contragent {
 
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   purchases      Purchase[]
+  payments       SupplierPayment[]
 
   @@index([organizationId, type])
 }

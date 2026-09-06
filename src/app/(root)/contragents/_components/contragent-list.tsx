@@ -30,6 +30,8 @@ import {
 import type { IContragent } from "@/types/contragent.types";
 import { PAGES } from "@/config/pages.config";
 import { useDeleteContragent } from "../_hooks/use-contragent-mutations";
+import { DebtPaymentDialog } from "@/components/debt-payment-dialog";
+import { createSupplierPayment } from "@/actions/supplier-payment-actions";
 
 interface Props {
   contragents: IContragent[];
@@ -62,6 +64,7 @@ export function ContragentList({ contragents, canManage }: Props) {
           <TableHead>{t("type")}</TableHead>
           <TableHead>{t("phone")}</TableHead>
           <TableHead>{t("purchases")}</TableHead>
+          <TableHead>{t("debt")}</TableHead>
           {canManage && (
             <TableHead className="text-right">
               {t("actions")}
@@ -97,6 +100,44 @@ export function ContragentList({ contragents, canManage }: Props) {
 
             <TableCell>
               <Badge variant="secondary">{c.purchaseCount}</Badge>
+            </TableCell>
+
+            <TableCell>
+              {c.type === "SUPPLIER" && c.debt > 0 ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-amber-600">
+                    {c.debt.toLocaleString("uz-UZ")} so'm
+                  </span>
+                  {canManage && (
+                    <DebtPaymentDialog
+                      name={c.name}
+                      debt={c.debt}
+                      onSubmit={(input) =>
+                        createSupplierPayment({
+                          contragentId: c.id,
+                          ...input,
+                        })
+                      }
+                      labels={{
+                        trigger: t("payDebt"),
+                        title: t("payDebtTitle"),
+                        currentDebt: t("currentDebt"),
+                        amount: t("amount"),
+                        method: t("method"),
+                        note: t("note"),
+                        submit: t("submit"),
+                        cancel: t("cancel"),
+                        cash: t("payCash"),
+                        card: t("payCard"),
+                        qr: t("payQr"),
+                        success: t("paymentSaved"),
+                      }}
+                    />
+                  )}
+                </div>
+              ) : (
+                <span className="text-sm text-muted-foreground">—</span>
+              )}
             </TableCell>
 
             {canManage && (

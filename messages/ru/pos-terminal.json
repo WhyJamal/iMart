@@ -20,12 +20,17 @@
         "loading": "Загрузка остатков..."
     },
     "payment": {
-        "title": "Способ оплаты"
+        "title": "Способ оплаты",
+        "debtorPlaceholder": "Имя клиента (поиск или новый)",
+        "currentDebt": "Текущий долг",
+        "newDebtor": "Новый клиент",
+        "noDebtors": "Клиентов пока нет"
     },
     "paymentMethods": {
         "card": "Карта",
         "cash": "Наличные",
-        "qr": "QR-оплата"
+        "qr": "QR-оплата",
+        "debt": "В долг"
     },
     "tips": {
         "none": "Без чаевых"
@@ -57,6 +62,7 @@
         "emptyCell": "В выбранной ячейке нет остатков",
         "quantityReduced": "Количество уменьшено до {quantity}",
         "selectPoint": "Сначала выберите точку",
+        "selectDebtor": "Выберите клиента или введите имя",
         "productNotFound": "Товар не найден"
     }
 }

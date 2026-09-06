@@ -155,7 +155,7 @@ function PromotionCard({ promotion: p }: { promotion: IPromotion }) {
           className={
             expired
               ? "text-muted-foreground"
-              : "font-semibold text-white bg-red-500 p-0.5 px-2 rounded-lg"
+              : "font-semibold text-black p-0.5 px-2 "
           }
         >
           {countdown(remaining, t)}

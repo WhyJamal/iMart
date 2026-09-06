@@ -50,6 +50,13 @@ export const SIDEBARITEMS: ISidebar[] = [
         href: PAGES.CONTRAGENTS,
         permission: "contragents:manage",
       },
+      {
+        id: "debtors",
+        labelKey: "debtors",
+        icon: "users",
+        href: PAGES.DEBTORS,
+        permission: "debts:manage",
+      },
     ],
   },
 
@@ -151,9 +158,10 @@ export const SIDEBARITEMS: ISidebar[] = [
         icon: "undo",
         href: PAGES.RETURNS,
         permission: "returns:create",
-      }
+      },
     ],
   },
+
   {
     groupKey: "reports",
     items: [
@@ -162,6 +170,13 @@ export const SIDEBARITEMS: ISidebar[] = [
         labelKey: "materialReport",
         icon: "file-bar-chart",
         href: PAGES.MATERIAL_REPORT,
+        permission: "reports:read",
+      },
+      {
+        id: "debt-report",
+        labelKey: "debtReport",
+        icon: "badge-dollar",
+        href: PAGES.DEBT_REPORT,
         permission: "reports:read",
       },
     ],

@@ -1,6 +1,6 @@
 export const PAGES = {
     HOME: "/",
-
+    
     // Documents
     CASH: "/cash",
     POS: "/pos",
@@ -20,18 +20,20 @@ export const PAGES = {
     POINTS: "/points",
     WAREHOUSES: "/warehouses",
     CONTRAGENTS: "/contragents",
+    DEBTORS: "/debtors",
     PROMOTIONS: "/promotions",
-
+    
     // Reports
     MATERIAL_REPORT: "/reports/material-report",
+    DEBT_REPORT: "/reports/debt-report",
 
-    // User profile pages
+    // Profile
     PROFILE: "/u/profile",
     USER_PROFILE: (userId: string) => `/u/profile/${userId}`,
 
     ONBOARDING: "/onboarding",
 
-    // Auth pages
+    // Auth
     LOGIN: "/login",
     REGISTER: "/register",
 }

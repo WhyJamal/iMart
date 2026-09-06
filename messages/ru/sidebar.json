@@ -6,6 +6,7 @@
   "cash": "Касса",
   "points": "Точки",
   "contragents": "Контрагенты",
+  "debtors": "Клиенты (должники)",
   "staffAndPayroll": "Персонал и зарплата",
   "users": "Пользователи",
   "calendar": "Производственный календарь",
@@ -21,5 +22,6 @@
   "purchaseReturns": "Возвраты поставщикам",
   "returns": "Возвраты продаж",
   "reports": "Отчёты",
-  "materialReport": "Материальный отчёт"
+  "materialReport": "Материальный отчёт",
+  "debtReport": "Отчёт по долгам"
 }

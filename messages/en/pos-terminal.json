@@ -20,12 +20,17 @@
         "loading": "Loading stock..."
     },
     "payment": {
-        "title": "Payment method"
+        "title": "Payment method",
+        "debtorPlaceholder": "Client name (search or new)",
+        "currentDebt": "Current debt",
+        "newDebtor": "New client",
+        "noDebtors": "No clients yet"
     },
     "paymentMethods": {
         "card": "Card",
         "cash": "Cash",
-        "qr": "QR Pay"
+        "qr": "QR Pay",
+        "debt": "Credit"
     },
     "tips": {
         "none": "No tip"
@@ -57,6 +62,7 @@
         "emptyCell": "The selected cell has no stock",
         "quantityReduced": "Quantity reduced to {quantity}",
         "selectPoint": "Please select a point first",
+        "selectDebtor": "Select a client or enter a name",
         "productNotFound": "Product not found"
     }
 }

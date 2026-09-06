@@ -12,6 +12,13 @@ export const CreatePurchaseSchema = z.object({
   contragentId: z.string().min(1, "Sotuvchi (kontragent) tanlanishi shart"),
   note: z.string().optional(),
   paymentMethod: z.enum(["CASH", "CARD", "QR"]).default("CASH"),
+  // Xarid vaqtida haqiqatda to'langan summa. Bo'sh qoldirilsa — umumiy
+  // summaga teng deb olinadi (ya'ni "to'liq to'landi"). Umumiy summadan
+  // kam bo'lsa, qolgani kontragentga bo'lgan qarz sifatida saqlanadi.
+  paidAmount: z
+    .number({ error: "Paid amount must be a number" })
+    .nonnegative("Paid amount cannot be negative")
+    .optional(),
   items: z
     .array(PurchaseItemSchema)
     .min(1, "At least one item is required"),

@@ -9,6 +9,7 @@
         "date": "Sana",
         "actions": "Amallar",
         "itemCount": "{count} ta",
+        "debt": "Qarz",
         "noSales": "Hali sotuvlar mavjud emas — POS orqali mijozga sotuv amalga oshiring",
         "deleteSale": "Sotuvni o‘chirish?",
         "deleteDescription": "{saleNumber} raqamli sotuv bo‘yicha mahsulot harakatlari bekor qilinadi va qoldiq tiklanadi. Bu amalni ortga qaytarib bo‘lmaydi.",

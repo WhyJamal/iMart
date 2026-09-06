@@ -16,16 +16,20 @@ import type {
   IContragentOption,
   ContragentType,
 } from "@/types/contragent.types";
+import { getSupplierDebts } from "@/actions/supplier-payment-actions";
 
 export async function getContragents(): Promise<IContragent[]> {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
-  const rows = await prisma.contragent.findMany({
-    where: { organizationId: session.organizationId },
-    include: { _count: { select: { purchases: true } } },
-    orderBy: { createdAt: "asc" },
-  });
+  const [rows, debts] = await Promise.all([
+    prisma.contragent.findMany({
+      where: { organizationId: session.organizationId },
+      include: { _count: { select: { purchases: true } } },
+      orderBy: { createdAt: "asc" },
+    }),
+    getSupplierDebts(session.organizationId),
+  ]);
 
   return rows.map((c: (typeof rows)[number]) => ({
     id: c.id,
@@ -34,6 +38,7 @@ export async function getContragents(): Promise<IContragent[]> {
     inn: c.inn,
     type: c.type as ContragentType,
     purchaseCount: c._count.purchases,
+    debt: c.type === "SUPPLIER" ? debts.get(c.id) ?? 0 : 0,
     createdAt: c.createdAt,
   }));
 }

@@ -20,12 +20,17 @@
         "loading": "Qoldiq yuklanmoqda..."
     },
     "payment": {
-        "title": "To‘lov usuli"
+        "title": "To‘lov usuli",
+        "debtorPlaceholder": "Mijoz ismi (qidirish yoki yangi kiritish)",
+        "currentDebt": "Joriy qarzi",
+        "newDebtor": "Yangi mijoz",
+        "noDebtors": "Hozircha mijozlar yo‘q"
     },
     "paymentMethods": {
         "card": "Karta",
         "cash": "Naqd",
-        "qr": "QR to‘lov"
+        "qr": "QR to‘lov",
+        "debt": "Qarz"
     },
     "tips": {
         "none": "Choychaqa yo‘q"
@@ -57,6 +62,7 @@
         "emptyCell": "Tanlangan yacheykada qoldiq yo‘q",
         "quantityReduced": "Miqdor {quantity} tagacha kamaytirildi",
         "selectPoint": "Avval Point tanlang",
+        "selectDebtor": "Mijozni tanlang yoki ismini kiriting",
         "productNotFound": "Mahsulot topilmadi"
     }
 }
