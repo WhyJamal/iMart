@@ -9,7 +9,7 @@ model SalaryRegister {
   userId         String
 
   salaryType     String   // FIXED | DAILY | HOURLY
-  rate           Decimal  // shu turdagi 1 birlik narxi, for PostgreSQL @db.Decimal(14, 2)
+  rate           Decimal @db.Decimal(14, 2) // shu turdagi 1 birlik narxi, for PostgreSQL @db.Decimal(14, 2)
 
   effectiveFrom  DateTime // qaysi sanadan boshlab amal qiladi
   reason         String?  // masalan "Yillik oshirish", "Lavozim o'zgardi"
@@ -36,12 +36,12 @@ model PayrollPayment {
   periodEnd      DateTime
 
   salaryType     String   // shu to'lov paytidagi tur (snapshot)
-  rate           Decimal  // shu to'lov paytidagi stavka (snapshot), for PostgreSQL @db.Decimal(14, 2)
-  workedUnits    Decimal? // FIXED uchun null; DAILY uchun kun soni; HOURLY uchun soat soni, for PostgreSQL @db.Decimal(10, 2)
+  rate           Decimal @db.Decimal(14, 2) // shu to'lov paytidagi stavka (snapshot), for PostgreSQL @db.Decimal(14, 2)
+  workedUnits    Decimal? @db.Decimal(10, 2) // FIXED uchun null; DAILY uchun kun soni; HOURLY uchun soat soni, for PostgreSQL @db.Decimal(10, 2)
 
-  bonus          Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
-  deduction      Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
-  totalAmount    Decimal  // yakuniy to'langan summa, for PostgreSQL @db.Decimal(14, 2)
+  bonus          Decimal @db.Decimal(14, 2) @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  deduction      Decimal @db.Decimal(14, 2) @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  totalAmount    Decimal @db.Decimal(14, 2) // yakuniy to'langan summa, for PostgreSQL @db.Decimal(14, 2)
 
   paymentMethod  String   @default("cash") // cash | card
   note           String?

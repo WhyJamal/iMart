@@ -7,7 +7,7 @@ model Purchase {
   contragentId   String?  // sotuvchi (Contragent, type=SUPPLIER)
   note           String?
   paymentMethod  String   @default("cash") // cash | card | qr
-  paidAmount     Decimal  @default(0) // xarid vaqtida haqiqatda to'langan summa; for PostgreSQL @db.Decimal(14, 2)
+  paidAmount     Decimal @db.Decimal(14, 2) @default(0) // xarid vaqtida haqiqatda to'langan summa; for PostgreSQL @db.Decimal(14, 2)
   // umumiy summa = items yig'indisi (unitCost*qty); qarz = umumiy - paidAmount
 
   postedAt       DateTime?
@@ -28,8 +28,8 @@ model PurchaseItem {
   productId       String
   warehouseCellId String?  // tovar qaysi sklad yacheykasiga kirim qilingani
 
-  qty        Decimal  // for PostgreSQL @db.Decimal(14, 3)
-  unitCost   Decimal  // for PostgreSQL @db.Decimal(14, 2)
+  qty        Decimal @db.Decimal(14, 3) // for PostgreSQL @db.Decimal(14, 3)
+  unitCost   Decimal @db.Decimal(14, 2) // for PostgreSQL @db.Decimal(14, 2)
 
   receipt    Purchase @relation(fields: [receiptId], references: [id], onDelete: Cascade)
   product    Product @relation(fields: [productId], references: [id])

@@ -28,14 +28,14 @@ model PayrollAccrualLine {
   userId    String
 
   salaryType  String // FIXED | DAILY | HOURLY (snapshot)
-  rate        Decimal // snapshot, for PostgreSQL @db.Decimal(14, 2)
-  workedUnits Decimal? // Tabeldan (kun/soat), FIXED uchun null, for PostgreSQL @db.Decimal(10, 2)
+  rate        Decimal @db.Decimal(14, 2) // snapshot, for PostgreSQL @db.Decimal(14, 2)
+  workedUnits Decimal? @db.Decimal(10, 2) // Tabeldan (kun/soat), FIXED uchun null, for PostgreSQL @db.Decimal(10, 2)
 
-  grossAmount Decimal @default(0) // workedUnits*rate yoki rate (FIXED), for PostgreSQL @db.Decimal(14, 2)
-  alreadyPaid Decimal @default(0) // shu oy uchun oldingi CONFIRMED hujjatlardan to'langan, for PostgreSQL @db.Decimal(14, 2)
-  bonus       Decimal @default(0) // for PostgreSQL @db.Decimal(14, 2)
-  deduction   Decimal @default(0) // for PostgreSQL @db.Decimal(14, 2)
-  payAmount   Decimal @default(0) // haqiqiy to'lanadigan summa — tahrirlanadi, for PostgreSQL @db.Decimal(14, 2)
+  grossAmount Decimal @db.Decimal(14, 2) @default(0) // workedUnits*rate yoki rate (FIXED), for PostgreSQL @db.Decimal(14, 2)
+  alreadyPaid Decimal @db.Decimal(14, 2) @default(0) // shu oy uchun oldingi CONFIRMED hujjatlardan to'langan, for PostgreSQL @db.Decimal(14, 2)
+  bonus       Decimal @db.Decimal(14, 2) @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  deduction   Decimal @db.Decimal(14, 2) @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  payAmount   Decimal @db.Decimal(14, 2) @default(0) // haqiqiy to'lanadigan summa — tahrirlanadi, for PostgreSQL @db.Decimal(14, 2)
 
   paymentMethod String @default("cash") // cash | card
 

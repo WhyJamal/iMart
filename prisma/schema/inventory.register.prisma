@@ -14,8 +14,8 @@ model InventoryRegister {
 
   direction      String   // IN | OUT
 
-  qty            Decimal  // for PostgreSQL @db.Decimal(14, 3)
-  unitCost       Decimal? // for PostgreSQL @db.Decimal(14, 2)
+  qty            Decimal @db.Decimal(14, 3) // for PostgreSQL @db.Decimal(14, 3)
+  unitCost       Decimal? @db.Decimal(14, 2) // for PostgreSQL @db.Decimal(14, 2)
 
   createdAt      DateTime @default(now())
 

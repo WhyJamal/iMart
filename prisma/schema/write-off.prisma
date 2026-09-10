@@ -3,7 +3,7 @@ model WriteOff {
   writeOffNumber String         @unique
   organizationId String
   reason         String?
-  totalAmount    Decimal
+  totalAmount    Decimal @db.Decimal(14, 2)
   createdBy      String?
   pointId        String?
   createdAt      DateTime       @default(now())
@@ -21,8 +21,8 @@ model WriteOffItem {
   writeOffId      String
   warehouseCellId String
   productId       String
-  qty             Decimal
-  unitCost        Decimal
+  qty             Decimal @db.Decimal(14, 3)
+  unitCost        Decimal @db.Decimal(14, 2)
 
   writeOff        WriteOff     @relation(fields: [writeOffId], references: [id], onDelete: Cascade)
   warehouseCell   WarehouseCell @relation(fields: [warehouseCellId], references: [id], onDelete: Restrict)

@@ -8,7 +8,7 @@ model SaleReturn {
   reason         String?
   paymentMethod  String   @default("cash") // cash | card | qr — pul qaysi usulda qaytariladi
 
-  totalAmount    Decimal  // for PostgreSQL @db.Decimal(10, 2)
+  totalAmount    Decimal @db.Decimal(10, 2) // for PostgreSQL @db.Decimal(10, 2)
 
   createdBy      String?  // qaytarishni amalga oshirgan foydalanuvchi id
 
@@ -28,8 +28,8 @@ model SaleReturnItem {
   saleItemId String
   productId  String
 
-  qty        Decimal  // qaytarilayotgan miqdor, for PostgreSQL @db.Decimal(14, 3)
-  unitPrice  Decimal  // qaytarish vaqtidagi narx (asl SaleItem'dan olinadi), for PostgreSQL @db.Decimal(10, 2)
+  qty        Decimal @db.Decimal(14, 3) // qaytarilayotgan miqdor, for PostgreSQL @db.Decimal(14, 3)
+  unitPrice  Decimal @db.Decimal(10, 2) // qaytarish vaqtidagi narx (asl SaleItem'dan olinadi), for PostgreSQL @db.Decimal(10, 2)
 
   return     SaleReturn @relation(fields: [returnId], references: [id], onDelete: Cascade)
   saleItem   SaleItem   @relation(fields: [saleItemId], references: [id])

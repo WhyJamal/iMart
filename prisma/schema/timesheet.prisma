@@ -27,7 +27,7 @@ model TimesheetEntry {
   userId      String
   date        DateTime
 
-  hours    Decimal @default(0) // for PostgreSQL @db.Decimal(4, 2)
+  hours    Decimal @db.Decimal(4, 2) @default(0) // for PostgreSQL @db.Decimal(4, 2)
   dayKind  String // workday | weekend | holiday | short | moved-workday | absent
   isManual Boolean @default(false)
 

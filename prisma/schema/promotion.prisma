@@ -5,7 +5,7 @@ model Promotion {
   warehouseId    String
   warehouseCellId String
   name           String
-  discountPercent Decimal
+  discountPercent Decimal @db.Decimal(5, 2)
   endsAt         DateTime
   comment        String?
   createdAt      DateTime @default(now())

@@ -48,7 +48,7 @@ model WorkCalendarDay {
   date        DateTime
   dayType     String   // HOLIDAY | SHORT | WORKDAY
   title       String?  // masalan "Navro'z bayrami"
-  shortenedBy Decimal? // SHORT uchun necha soatga qisqaradi, for PostgreSQL @db.Decimal(4, 2)
+  shortenedBy Decimal? @db.Decimal(4, 2) // SHORT uchun necha soatga qisqaradi, for PostgreSQL @db.Decimal(4, 2)
 
   calendar    WorkCalendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
 

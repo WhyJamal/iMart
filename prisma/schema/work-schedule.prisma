@@ -25,8 +25,8 @@ model WorkScheduleTemplateDay {
 
   startTime  String? // "08:00" — faqat ma'lumot uchun, hisoblashda ishlatilmaydi
   endTime    String? // "16:00"
-  workHours  Decimal @default(0) // for PostgreSQL @db.Decimal(4, 2)
-  breakHours Decimal @default(0) // for PostgreSQL @db.Decimal(4, 2)
+  workHours  Decimal @db.Decimal(4, 2) @default(0) // for PostgreSQL @db.Decimal(4, 2)
+  breakHours Decimal @db.Decimal(4, 2) @default(0) // for PostgreSQL @db.Decimal(4, 2)
 
   template WorkScheduleTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
 
@@ -65,7 +65,7 @@ model WorkScheduleDay {
   scheduleId String
   date       DateTime
 
-  hours      Decimal  @default(0) // for PostgreSQL @db.Decimal(4, 2)
+  hours      Decimal @db.Decimal(4, 2) @default(0) // for PostgreSQL @db.Decimal(4, 2)
   dayKind    String   // workday | weekend | holiday | short | moved-workday (WorkCalendar'dan)
   isManual   Boolean  @default(false)
 

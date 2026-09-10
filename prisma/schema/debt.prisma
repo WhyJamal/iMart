@@ -26,7 +26,7 @@ model DebtorPayment {
   organizationId String
   debtorId       String
 
-  amount         Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  amount         Decimal @db.Decimal(14, 2) @default(0) // for PostgreSQL @db.Decimal(14, 2)
   method         String   // CASH | CARD | QR
   note           String?
 
@@ -48,7 +48,7 @@ model SupplierPayment {
   organizationId String
   contragentId   String
 
-  amount         Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  amount         Decimal @db.Decimal(14, 2) @default(0) // for PostgreSQL @db.Decimal(14, 2)
   method         String   // CASH | CARD | QR
   note           String?
 

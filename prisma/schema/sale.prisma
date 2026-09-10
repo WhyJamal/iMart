@@ -7,7 +7,7 @@ model Sale {
   pointId        String?  // qaysi nuqtadan sotilgani
   debtorId       String?  // paymentMethod === "debt" bo'lganda to'ldiriladi
 
-  totalAmount    Decimal  // for PostgreSQL @db.Decimal(10, 2)
+  totalAmount    Decimal @db.Decimal(10, 2) // for PostgreSQL @db.Decimal(10, 2)
   paymentMethod  String   @default("cash") // cash | card | qr | debt
 
   createdAt      DateTime @default(now())
@@ -25,8 +25,8 @@ model SaleItem {
   productId  String
   warehouseCellId String? // sotuvda qaysi yacheykadan yechilgani
 
-  qty        Decimal  // for PostgreSQL @db.Decimal(14, 3)
-  unitPrice  Decimal  // for PostgreSQL @db.Decimal(10, 2)
+  qty        Decimal @db.Decimal(14, 3) // for PostgreSQL @db.Decimal(14, 3)
+  unitPrice  Decimal @db.Decimal(10, 2) // for PostgreSQL @db.Decimal(10, 2)
 
   sale       Sale @relation(fields: [saleId], references: [id], onDelete: Cascade)
   product    Product @relation(fields: [productId], references: [id])

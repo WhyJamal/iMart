@@ -6,7 +6,7 @@ model ItemPrice {
   id              String   @id @default(cuid())
   warehouseCellId String
   productId       String
-  price           Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  price           Decimal @db.Decimal(14, 2) @default(0) // for PostgreSQL @db.Decimal(14, 2)
   updatedAt       DateTime @updatedAt
 
   warehouseCell WarehouseCell @relation(fields: [warehouseCellId], references: [id], onDelete: Cascade)
@@ -22,8 +22,8 @@ model StockBalance {
   id              String   @id @default(cuid())
   warehouseCellId String
   productId       String
-  qty             Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 3)
-  amount          Decimal  @default(0) // for PostgreSQL @db.Decimal(14, 2)
+  qty             Decimal @db.Decimal(14, 3) @default(0) // for PostgreSQL @db.Decimal(14, 3)
+  amount          Decimal @db.Decimal(14, 2) @default(0) // for PostgreSQL @db.Decimal(14, 2)
   updatedAt       DateTime @updatedAt
 
   warehouseCell WarehouseCell @relation(fields: [warehouseCellId], references: [id], onDelete: Cascade)

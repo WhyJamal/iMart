@@ -5,7 +5,7 @@ model Transfer {
   fromPointId    String
   toPointId      String
   note           String?
-  totalAmount    Decimal
+  totalAmount    Decimal @db.Decimal(14, 2)
   createdBy      String?
   createdAt      DateTime @default(now())
 
@@ -25,8 +25,8 @@ model TransferItem {
   productId      String
   fromCellId     String
   toCellId       String
-  qty            Decimal
-  unitCost       Decimal
+  qty            Decimal @db.Decimal(14, 3)
+  unitCost       Decimal @db.Decimal(14, 2)
 
   transfer       Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
   product        Product @relation(fields: [productId], references: [id], onDelete: Restrict)
