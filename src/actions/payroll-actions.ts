@@ -4,6 +4,7 @@
   import { prisma } from "@/lib/prisma";
   import { getServerSession } from "@/lib/auth";
   import { checkPermission } from "@/lib/permissions";
+  import { findOrgUser } from "@/lib/membership";
   import {
     SetSalaryRateSchema,
     CreatePayrollPaymentSchema,
@@ -87,9 +88,7 @@ export async function createPayrollPayment(
       note,
     } = parsed.data;
 
-    const user = await prisma.user.findFirst({
-      where: { id: userId, organizationId: session.organizationId },
-    });
+    const user = await findOrgUser(userId, session.organizationId);
     if (!user) return { success: false, error: "Foydalanuvchi topilmadi" };
 
     const currentSalary = await prisma.salaryRegister.findFirst({

@@ -20,7 +20,7 @@ export async function getPoints(): Promise<IPoint[]> {
   const points = await prisma.point.findMany({
     where: { organizationId: session.organizationId },
     include: {
-      _count: { select: { warehouses: true, users: true } },
+      _count: { select: { warehouses: true, members: true } },
     },
     orderBy: { createdAt: "asc" },
   });
@@ -29,7 +29,7 @@ export async function getPoints(): Promise<IPoint[]> {
     id: p.id,
     name: p.name,
     warehouseCount: p._count.warehouses,
-    userCount: p._count.users,
+    userCount: p._count.members,
     createdAt: p.createdAt,
   }));
 }
@@ -51,15 +51,9 @@ export async function getCurrentUserPointId(): Promise<string | null> {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
-  const user = await prisma.user.findFirst({
-    where: {
-      id: session.userId,
-      organizationId: session.organizationId,
-    },
-    select: { pointId: true },
-  });
-
-  return user?.pointId ?? null;
+  // session.pointId — joriy tashkilotdagi OrganizationMember'dan
+  // getServerSession() tomonidan allaqachon o'qib qo'yilgan.
+  return session.pointId;
 }
 
 export async function createPoint(

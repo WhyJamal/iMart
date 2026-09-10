@@ -194,7 +194,7 @@ export async function getWorkSchedules(): Promise<IWorkScheduleSummary[]> {
     where: { organizationId: session.organizationId },
     include: {
       template: { select: { name: true } },
-      _count: { select: { users: true, days: true } },
+      _count: { select: { members: true, days: true } },
     },
     orderBy: [{ year: "desc" }, { name: "asc" }],
   });
@@ -205,7 +205,7 @@ export async function getWorkSchedules(): Promise<IWorkScheduleSummary[]> {
     year: s.year,
     templateId: s.templateId,
     templateName: s.template.name,
-    userCount: s._count.users,
+    userCount: s._count.members,
     filledDaysCount: s._count.days,
     createdAt: s.createdAt,
   }));

@@ -1,0 +1,28 @@
+// OrganizationMember — bitta User bir nechta Organization'ga a'zo
+// bo'lishini ta'minlaydi (masalan narsil'dan bir xil product bir necha
+// marta sotib olinsa — bitta odam bir nechta do'konda ishlashi mumkin).
+//
+// role/pointId/workScheduleId ATAYLAB shu yerda, User'da emas — chunki
+// bitta odam bir do'konda OWNER, boshqasida oddiy CASHIER bo'lishi,
+// yoki har bir do'konda boshqa Point/WorkSchedule'ga biriktirilgan
+// bo'lishi mumkin.
+model OrganizationMember {
+  id       String   @id @default(cuid())
+  role     String   @default("CASHIER") // Role type: OWNER | ADMIN | MANAGER | CASHIER
+  joinedAt DateTime @default(now())
+
+  userId         String
+  organizationId String
+  pointId        String?
+  workScheduleId String?
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  point        Point?        @relation(fields: [pointId], references: [id])
+  workSchedule WorkSchedule? @relation(fields: [workScheduleId], references: [id])
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@index([pointId])
+  @@index([workScheduleId])
+}

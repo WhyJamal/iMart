@@ -190,10 +190,11 @@ export async function fillPayrollAccrual(
       return { success: false, error: "Tasdiqlangan hujjatni to'ldirib bo'lmaydi" };
     }
 
-    const users = await prisma.user.findMany({
+    const memberships = await prisma.organizationMember.findMany({
       where: { organizationId: session.organizationId, pointId: accrual.pointId },
-      select: { id: true },
+      select: { userId: true },
     });
+    const users = memberships.map((m: { userId: string }) => ({ id: m.userId }));
 
     const timesheet = await prisma.timesheet.findFirst({
       where: { pointId: accrual.pointId, year: accrual.year, month: accrual.month },

@@ -32,6 +32,7 @@ export const PAGES = {
     USER_PROFILE: (userId: string) => `/u/profile/${userId}`,
 
     ONBOARDING: "/onboarding",
+    SELECT_ORGANIZATION: "/select-organization",
     // Auth
     LOGIN: "/login",
     REGISTER: "/register",

@@ -11,7 +11,7 @@ model Organization {
   saasProjectId          String?   @unique
   subscriptionExpiresAt  DateTime?
 
-  users     User[]
+  members   OrganizationMember[]
   products  Product[]
   productCategories ProductCategory[]
 

@@ -31,9 +31,8 @@ export async function createOrganization(input: {
         data: { name: parsed.data.name },
       });
 
-      await tx.user.update({
-        where: { id: session.userId },
-        data: { organizationId: org.id, role: "OWNER" },
+      await tx.organizationMember.create({
+        data: { userId: session.userId, organizationId: org.id, role: "OWNER" },
       });
     });
 

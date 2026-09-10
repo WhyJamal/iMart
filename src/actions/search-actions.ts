@@ -141,14 +141,19 @@ function searchContragents(q: string, organizationId: string) {
 }
 
 function searchUsers(q: string, organizationId: string) {
-  return prisma.user.findMany({
-    where: {
-      organizationId,
-      OR: [{ name: { contains: q } }, { email: { contains: q } }],
-    },
-    take: RESULTS_PER_GROUP,
-    orderBy: { name: "asc" },
-  });
+  return prisma.organizationMember
+    .findMany({
+      where: {
+        organizationId,
+        user: {
+          OR: [{ name: { contains: q } }, { email: { contains: q } }],
+        },
+      },
+      take: RESULTS_PER_GROUP,
+      orderBy: { user: { name: "asc" } },
+      select: { user: { select: { id: true, name: true, email: true } } },
+    })
+    .then((rows) => rows.map((r) => r.user));
 }
 
 /** Purchase receipts tied to a Contragent that already matched the query. */

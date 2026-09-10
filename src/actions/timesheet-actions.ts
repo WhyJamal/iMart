@@ -225,10 +225,11 @@ export async function fillTimesheetUsers(
     });
     if (!timesheet) return { success: false, error: "Tabel topilmadi" };
 
-    const users = await prisma.user.findMany({
+    const memberships = await prisma.organizationMember.findMany({
       where: { organizationId: session.organizationId, pointId: timesheet.pointId },
-      select: { id: true },
+      select: { userId: true },
     });
+    const users = memberships.map((m: { userId: string }) => ({ id: m.userId }));
 
     const existingUserIds = new Set(
       (
@@ -315,10 +316,17 @@ export async function fillTimesheetDays(
       };
     }
 
-    const users = await prisma.user.findMany({
-      where: { id: { in: entryUserIds } },
-      select: { id: true, workScheduleId: true },
+    const memberships = await prisma.organizationMember.findMany({
+      where: {
+        organizationId: session.organizationId,
+        userId: { in: entryUserIds },
+      },
+      select: { userId: true, workScheduleId: true },
     });
+    const users = memberships.map((m: { userId: string; workScheduleId: string | null }) => ({
+      id: m.userId,
+      workScheduleId: m.workScheduleId,
+    }));
 
     const dim = daysInMonth(timesheet.year, timesheet.month);
     const rangeStart = new Date(

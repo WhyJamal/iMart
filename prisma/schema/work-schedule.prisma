@@ -52,7 +52,7 @@ model WorkSchedule {
   template     WorkScheduleTemplate @relation(fields: [templateId], references: [id])
   workCalendar WorkCalendar?        @relation(fields: [workCalendarId], references: [id])
   days         WorkScheduleDay[]
-  users        User[]
+  members      OrganizationMember[]
 
   @@unique([organizationId, name, year])
   @@index([organizationId, year])

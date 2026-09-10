@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { checkPermission } from "@/lib/permissions";
+import { findOrgUser } from "@/lib/membership";
 import {
   SetSalaryRateSchema,
   type SetSalaryRateInput,
@@ -73,16 +74,19 @@ export async function getEmployeeSalaries(): Promise<IOrgUser[]> {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
-  const users = await prisma.user.findMany({
+  const memberships = await prisma.organizationMember.findMany({
     where: { organizationId: session.organizationId },
-    include: { point: { select: { id: true, name: true } } },
-    orderBy: { name: "asc" },
+    include: {
+      point: { select: { id: true, name: true } },
+      user: { select: { id: true, name: true, email: true, createdAt: true } },
+    },
+    orderBy: { user: { name: "asc" } },
   });
 
   const latestEntries = await prisma.salaryRegister.findMany({
     where: {
       organizationId: session.organizationId,
-      userId: { in: users.map((u: (typeof users)[number]) => u.id) },
+      userId: { in: memberships.map((m: { user: { id: string } }) => m.user.id) },
     },
     orderBy: { effectiveFrom: "desc" },
   });
@@ -97,16 +101,16 @@ export async function getEmployeeSalaries(): Promise<IOrgUser[]> {
     }
   }
 
-  return users.map((u: (typeof users)[number]) => {
-    const latest = latestByUser.get(u.id);
+  return memberships.map((m: { user: { id: string; name: string; email: string; createdAt: Date }; role: string; point: { id: string; name: string } | null }) => {
+    const latest = latestByUser.get(m.user.id);
     return {
-      id: u.id,
-      name: u.name,
-      email: u.email,
-      role: u.role as Role,
-      createdAt: u.createdAt,
-      pointId: u.point?.id ?? null,
-      pointName: u.point?.name ?? null,
+      id: m.user.id,
+      name: m.user.name,
+      email: m.user.email,
+      role: m.role as Role,
+      createdAt: m.user.createdAt,
+      pointId: m.point?.id ?? null,
+      pointName: m.point?.name ?? null,
       salaryType: latest ? (latest.salaryType as SalaryType) : null,
       rate: latest ? Number(latest.rate) : null,
       effectiveFrom: latest ? latest.effectiveFrom : null,
@@ -136,9 +140,7 @@ export async function setSalaryRate(
     }
     const { userId, salaryType, rate, effectiveFrom, reason } = parsed.data;
 
-    const user = await prisma.user.findFirst({
-      where: { id: userId, organizationId: session.organizationId },
-    });
+    const user = await findOrgUser(userId, session.organizationId);
     if (!user) return { success: false, error: "Foydalanuvchi topilmadi" };
 
     const entry = await prisma.salaryRegister.create({

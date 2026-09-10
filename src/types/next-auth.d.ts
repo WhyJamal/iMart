@@ -5,10 +5,16 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
+      // Faol tashkilot tanlanmagan bo'lsa (0 yoki 1+ dan ko'p a'zolik
+      // holatida tanlov qilinmaguncha) — null.
       organizationId: string | null;
-      role: Role;
+      role: Role | null;
       locale: string;
       pointId: string | null;
+      workScheduleId: string | null;
+      // Foydalanuvchi nechta tashkilotga a'zoligini bildiradi —
+      // routing (onboarding vs select-organization) shu asosda hal qilinadi.
+      membershipCount: number;
     } & DefaultSession["user"];
   }
 }

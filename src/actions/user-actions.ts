@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { checkPermission, hasPermission } from "@/lib/permissions";
+import { findOrgUser } from "@/lib/membership";
 import {
   CreateUserSchema,
   UpdateUserRoleSchema,
@@ -16,6 +17,7 @@ import {
 import type { ActionResult } from "@/types/action-result.types";
 import type { IOrgUser } from "@/types/user.types";
 import type { Role } from "@/types/role.types";
+import type { TxClient } from "@/types/prisma.types";
 import { PAGES } from "@/config/pages.config";
 import { isLocale, type TLocale } from "@/config/locales.config";
 
@@ -23,17 +25,20 @@ export async function getProfile() {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
-  return prisma.user.findUniqueOrThrow({
-    where: { id: session.userId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      locale: true,
-      organization: { select: { id: true, name: true, logo: true } },
-    },
-  });
+  const [user, organization] = await Promise.all([
+    prisma.user.findUniqueOrThrow({
+      where: { id: session.userId },
+      select: { id: true, name: true, email: true, locale: true },
+    }),
+    prisma.organization.findUnique({
+      where: { id: session.organizationId },
+      select: { id: true, name: true, logo: true },
+    }),
+  ]);
+
+  // role — User'da emas, joriy tashkilot bo'yicha OrganizationMember'da;
+  // getServerSession() buni allaqachon faol a'zolikdan o'qib bergan.
+  return { ...user, role: session.role, organization };
 }
 
 export async function updateProfile(input: {
@@ -115,30 +120,27 @@ export async function getOrgUsers(): Promise<IOrgUser[]> {
   if (!session) throw new Error("Unauthorized");
   if (!hasPermission(session.role, "users:manage")) return [];
 
-  const users = await prisma.user.findMany({
+  const memberships = await prisma.organizationMember.findMany({
     where: { organizationId: session.organizationId },
     select: {
-      id: true,
-      name: true,
-      email: true,
       role: true,
-      createdAt: true,
       pointId: true,
       workScheduleId: true,
       point: { select: { name: true } },
+      user: { select: { id: true, name: true, email: true, createdAt: true } },
     },
-    orderBy: { createdAt: "asc" },
+    orderBy: { joinedAt: "asc" },
   });
 
-  return users.map((u: (typeof users)[number]) => ({
-    id: u.id,
-    name: u.name,
-    email: u.email,
-    role: u.role as Role,
-    createdAt: u.createdAt,
-    pointId: u.pointId,
-    pointName: u.point?.name ?? null,
-    workScheduleId: u.workScheduleId,
+  return memberships.map((m: { role: string; pointId: string | null; workScheduleId: string | null; point: { name: string } | null; user: { id: string; name: string; email: string; createdAt: Date } }) => ({
+    id: m.user.id,
+    name: m.user.name,
+    email: m.user.email,
+    role: m.role as Role,
+    createdAt: m.user.createdAt,
+    pointId: m.pointId,
+    pointName: m.point?.name ?? null,
+    workScheduleId: m.workScheduleId,
     salaryType: null,
     rate: null,
     effectiveFrom: null,
@@ -179,15 +181,27 @@ export async function createUser(
 
     const hashed = await bcrypt.hash(password, 12);
 
-    const user = await prisma.user.create({
-      data: {
-        name: name.trim(),
-        email: email.toLowerCase(),
-        password: hashed,
-        role,
-        pointId: pointId ?? null,
-        organizationId: session.organizationId,
-      },
+    // User (identity) va OrganizationMember (shu tashkilotdagi rol/nuqta)
+    // birga, bitta tranzaksiyada yaratiladi.
+    const user = await prisma.$transaction(async (tx: TxClient) => {
+      const created = await tx.user.create({
+        data: {
+          name: name.trim(),
+          email: email.toLowerCase(),
+          password: hashed,
+        },
+      });
+
+      await tx.organizationMember.create({
+        data: {
+          userId: created.id,
+          organizationId: session.organizationId,
+          role,
+          pointId: pointId ?? null,
+        },
+      });
+
+      return created;
     });
 
     revalidatePath(PAGES.USERS);
@@ -222,12 +236,15 @@ export async function updateUserRole(
       return { success: false, error: "Вы не можете изменить свою роль." };
     }
 
-    const target = await prisma.user.findFirst({
-      where: { id: userId, organizationId: session.organizationId },
-    });
+    const target = await findOrgUser(userId, session.organizationId);
     if (!target) return { success: false, error: "Пользователь не найден." };
 
-    await prisma.user.update({ where: { id: userId }, data: { role } });
+    await prisma.organizationMember.update({
+      where: {
+        userId_organizationId: { userId, organizationId: session.organizationId },
+      },
+      data: { role },
+    });
 
     revalidatePath("/users");
     return { success: true, data: undefined };
@@ -253,9 +270,7 @@ export async function updateUserPoint(
     }
     const { userId, pointId } = parsed.data;
 
-    const target = await prisma.user.findFirst({
-      where: { id: userId, organizationId: session.organizationId },
-    });
+    const target = await findOrgUser(userId, session.organizationId);
     if (!target) return { success: false, error: "Пользователь не найден." };
 
     if (pointId) {
@@ -265,7 +280,12 @@ export async function updateUserPoint(
       if (!point) return { success: false, error: "Nuqta topilmadi" };
     }
 
-    await prisma.user.update({ where: { id: userId }, data: { pointId } });
+    await prisma.organizationMember.update({
+      where: {
+        userId_organizationId: { userId, organizationId: session.organizationId },
+      },
+      data: { pointId },
+    });
 
     revalidatePath("/users");
     return { success: true, data: undefined };
@@ -289,12 +309,18 @@ export async function deleteOrgUser(
       return { success: false, error: "Вы не можете удалить себя." };
     }
 
-    const target = await prisma.user.findFirst({
-      where: { id: userId, organizationId: session.organizationId },
-    });
+    const target = await findOrgUser(userId, session.organizationId);
     if (!target) return { success: false, error: "Пользователь не найден." };
 
-    await prisma.user.delete({ where: { id: userId } });
+    // MUHIM: endi bu userni global o'chirmaydi — faqat shu tashkilotdan
+    // chiqaradi (OrganizationMember o'chiriladi). Chunki bitta User
+    // bir nechta tashkilotga a'zo bo'lishi mumkin, va tarixiy yozuvlar
+    // (Sale, Timesheet va h.k.) userId'ga bog'liq — ular saqlanib qoladi.
+    await prisma.organizationMember.delete({
+      where: {
+        userId_organizationId: { userId, organizationId: session.organizationId },
+      },
+    });
 
     revalidatePath(PAGES.USERS);
     return { success: true, data: undefined };
@@ -321,12 +347,7 @@ export async function updateUserSchedule({
     const denied = checkPermission(session.role, "users:manage");
     if (denied) return denied;
 
-    const target = await prisma.user.findFirst({
-      where: {
-        id: userId,
-        organizationId: session.organizationId,
-      },
-    });
+    const target = await findOrgUser(userId, session.organizationId);
 
     if (!target) {
       return {
@@ -335,15 +356,15 @@ export async function updateUserSchedule({
       };
     }
 
+    const membershipWhere = {
+      userId_organizationId: { userId, organizationId: session.organizationId },
+    } as const;
+
     // Grafikni olib tashlash
     if (workScheduleId === null) {
-      await prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          workScheduleId: null,
-        },
+      await prisma.organizationMember.update({
+        where: membershipWhere,
+        data: { workScheduleId: null },
       });
 
       revalidatePath(PAGES.USERS);
@@ -368,13 +389,9 @@ export async function updateUserSchedule({
       };
     }
 
-    await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        workScheduleId,
-      },
+    await prisma.organizationMember.update({
+      where: membershipWhere,
+      data: { workScheduleId },
     });
 
     revalidatePath(PAGES.USERS);
