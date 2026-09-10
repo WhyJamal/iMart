@@ -32,8 +32,8 @@ export const PAGES = {
     USER_PROFILE: (userId: string) => `/u/profile/${userId}`,
 
     ONBOARDING: "/onboarding",
-
     // Auth
     LOGIN: "/login",
     REGISTER: "/register",
+    SUBSCRIPTION_EXPIRED: "/subscription-expired",
 }

@@ -7,6 +7,12 @@ model User {
   locale         String        @default("ru") // Locale type: ru | en | uz
   isActive       Boolean       @default(true)
 
+  // Bu login narsil (SaaS) orqali avtomatik yaratilgan bo'lsa — o'sha
+  // tomondagi haqiqiy foydalanuvchi ID'si shu yerda saqlanadi. Hozircha
+  // faqat kuzatuv/kelajakdagi birlashtirish uchun, login jarayoniga
+  // ta'sir qilmaydi.
+  saasUserId     String?
+
   organization   Organization? @relation(fields: [organizationId], references: [id])
   organizationId String?
 

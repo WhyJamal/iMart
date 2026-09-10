@@ -17,7 +17,9 @@ export const authConfig: NextAuthConfig = {
       const path = nextUrl.pathname;
 
       const isPublic =
-        path.startsWith(PAGES.LOGIN) || path.startsWith(PAGES.REGISTER);
+        path.startsWith(PAGES.LOGIN) ||
+        path.startsWith(PAGES.REGISTER) ||
+        path.startsWith(PAGES.SUBSCRIPTION_EXPIRED);
       const isOnboarding = path.startsWith(PAGES.ONBOARDING);
 
       if (!isLoggedIn && !isPublic) return false; // → redirects to signIn page

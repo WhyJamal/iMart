@@ -5,6 +5,12 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Bu tashkilot narsil (SaaS) orqali sotib olingan bo'lsa — o'sha
+  // xariddagi Project.id shu yerda saqlanadi (qayta provisioning
+  // qilib yubormaslik uchun tekshiriladi).
+  saasProjectId          String?   @unique
+  subscriptionExpiresAt  DateTime?
+
   users     User[]
   products  Product[]
   productCategories ProductCategory[]
