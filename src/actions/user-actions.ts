@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth";
+import { getServerSession, getAuthUser } from "@/lib/auth";
 import { checkPermission, hasPermission } from "@/lib/permissions";
 import { findOrgUser } from "@/lib/membership";
 import {
@@ -23,7 +24,11 @@ import { isLocale, type TLocale } from "@/config/locales.config";
 
 export async function getProfile() {
   const session = await getServerSession();
-  if (!session) throw new Error("Unauthorized");
+
+  if (!session) {
+    const authUser = await getAuthUser();
+    redirect(authUser ? PAGES.ONBOARDING : PAGES.LOGIN);
+  }
 
   const [user, organization] = await Promise.all([
     prisma.user.findUniqueOrThrow({
