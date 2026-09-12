@@ -197,7 +197,12 @@ export async function fillPayrollAccrual(
     const users = memberships.map((m: { userId: string }) => ({ id: m.userId }));
 
     const timesheet = await prisma.timesheet.findFirst({
-      where: { pointId: accrual.pointId, year: accrual.year, month: accrual.month },
+      where: {
+        pointId: accrual.pointId,
+        year: accrual.year,
+        month: accrual.month,
+        organizationId: session.organizationId,
+      },
     });
 
     const existingLineUserIds = new Set(

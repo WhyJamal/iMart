@@ -27,9 +27,18 @@ export async function POST(req: Request) {
     }
 
     if (oldPath) {
-      const fullOldPath = path.join(process.cwd(), "public", oldPath);
-      if (fs.existsSync(fullOldPath)) {
-        fs.unlinkSync(fullOldPath);
+      // MUHIM: oldPath mijozdan (formData) keladi — tekshirilmasa,
+      // boshqa tashkilotning (yoki server diskidagi istalgan) faylini
+      // o'chirish uchun ishlatilishi mumkin edi (path traversal /
+      // cross-tenant fayl o'chirish). Endi faqat JORIY tashkilotning
+      // o'z papkasi ichidagi faylni o'chirishga ruxsat beriladi.
+      const uploadsRoot = path.join(process.cwd(), "public", "uploads", orgId);
+      const resolvedOldPath = path.resolve(
+        path.join(process.cwd(), "public", oldPath)
+      );
+
+      if (resolvedOldPath.startsWith(uploadsRoot + path.sep) && fs.existsSync(resolvedOldPath)) {
+        fs.unlinkSync(resolvedOldPath);
       }
     }
 

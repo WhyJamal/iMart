@@ -156,7 +156,7 @@ export async function createTimesheet(
     if (!point) return { success: false, error: "Nuqta topilmadi" };
 
     const existing = await prisma.timesheet.findFirst({
-      where: { pointId, year, month },
+      where: { pointId, year, month, organizationId: session.organizationId },
     });
     if (existing) {
       return { success: false, error: "Shu davr uchun tabel allaqachon mavjud" };

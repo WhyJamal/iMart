@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import type { Role } from "@/types/role.types";
+import { scopedPrisma, type ScopedPrismaClient } from "@/lib/tenant-prisma";
 
 export type ServerSession = {
   userId: string;
@@ -7,6 +8,14 @@ export type ServerSession = {
   role: Role;
   pointId: string | null;
   workScheduleId: string | null;
+  /**
+   * organizationId bilan avtomatik "qulflangan" Prisma client —
+   * yangi kod yozganda `prisma` o'rniga shuni ishlatish tavsiya
+   * etiladi: har bir so'rovga organizationId majburiy qo'shiladi,
+   * hatto yozishni unutib qo'ysangiz ham. Batafsil:
+   * src/lib/tenant-prisma.ts
+   */
+  db: ScopedPrismaClient;
 };
 
 /**
@@ -26,6 +35,7 @@ export async function getServerSession(): Promise<ServerSession | null> {
     role: session.user.role,
     pointId: session.user.pointId ?? null,
     workScheduleId: session.user.workScheduleId ?? null,
+    db: scopedPrisma(session.user.organizationId),
   };
 }
 

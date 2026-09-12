@@ -243,10 +243,18 @@ export async function deleteWarehouse(
 
 /**
  * Point'ga tegishli barcha sklad yacheykalarining id'lari.
+ * MUHIM: organizationId shart — aks holda boshqa tashkilotning pointId'i
+ * yuborilsa, uning sklad qoldiqlari(!) chiqib qolar edi. Bu funksiya
+ * to'g'ridan-to'g'ri Server Action sifatida ishlatilmaydi (private),
+ * lekin uni chaqiruvchi barcha eksport funksiyalar organizationId'ni
+ * shu yerga uzatishi SHART.
  */
-async function getCellIdsForPoint(pointId: string): Promise<string[]> {
+async function getCellIdsForPoint(
+  pointId: string,
+  organizationId: string
+): Promise<string[]> {
   const cells = await prisma.warehouseCell.findMany({
-    where: { warehouse: { pointId } },
+    where: { warehouse: { pointId, organizationId } },
     select: { id: true },
   });
   return cells.map((c: (typeof cells)[number]) => c.id);
@@ -255,12 +263,22 @@ async function getCellIdsForPoint(pointId: string): Promise<string[]> {
 /**
  * Berilgan Point'dagi (uning skladlari/yacheykalari bo'yicha jamlangan)
  * har bir mahsulot uchun joriy qoldiq. POS'da sotish uchun ishlatiladi.
+ *
+ * MUHIM: bu Server Action — client'dan to'g'ridan-to'g'ri chaqiriladi
+ * (POS, promotion-form), shuning uchun pointId klient tomonidan
+ * o'zgartirilishi mumkin. Shu sabab pointId'ning HAQIQATAN HAM joriy
+ * tashkilotga tegishli ekanligi shu yerda tekshiriladi — aks holda
+ * boshqa tashkilotning pointId'ini yuborib, uning qoldiqlarini
+ * ko'rish mumkin bo'lardi.
  */
 // for PostGRESQL
 export async function getPointStockMap(
   pointId: string
 ): Promise<Map<string, number>> {
-  const cellIds = await getCellIdsForPoint(pointId);
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const cellIds = await getCellIdsForPoint(pointId, session.organizationId);
   const map = new Map<string, number>();
 
   if (cellIds.length === 0) return map;
@@ -333,14 +351,21 @@ export async function getPointStockMap(
  * eng ko'pidan kamiga qarab qaytaradi. sale-actions.ts shu ro'yxatdan
  * kerakli miqdorni yig'ib, har biriga alohida InventoryRegister OUT
  * yozuvi yozadi.
+ *
+ * MUHIM: bu funksiya odatda boshqa Server Action ichidan (session
+ * allaqachon tekshirilgan joydan, ko'pincha tranzaksiya ichida)
+ * chaqiriladi, shuning uchun o'zi getServerSession() chaqirmaydi —
+ * organizationId'ni CHAQIRUVCHI aniq uzatishi SHART, aks holda
+ * pointId boshqa tashkilotnikiga tegishli bo'lib qolishi mumkin.
  */
 export async function getSellableCellsForProduct(
   pointId: string,
   productId: string,
+  organizationId: string,
   tx?: TxClient
 ): Promise<{ warehouseCellId: string; available: number }[]> {
   const client = tx ?? prisma;
-  const cellIds = await getCellIdsForPoint(pointId);
+  const cellIds = await getCellIdsForPoint(pointId, organizationId);
   if (cellIds.length === 0) return [];
 
   const rows = await client.inventoryRegister.groupBy({
@@ -388,8 +413,14 @@ export async function getPointStockRecord(
 export async function getPointCellStock(
   pointId: string
 ): Promise<Record<string, ICellStockOption[]>> {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  // MUHIM: bu ham Server Action, client tomondan pointId beriladi —
+  // organizationId bilan tekshirmasak, boshqa tashkilotning
+  // yacheyka/qoldiq ma'lumotlari chiqib qolardi.
   const cells = await prisma.warehouseCell.findMany({
-    where: { warehouse: { pointId } },
+    where: { warehouse: { pointId, organizationId: session.organizationId } },
     include: { warehouse: { select: { name: true } } },
   });
   if (cells.length === 0) return {};
