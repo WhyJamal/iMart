@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Building2, ArrowRight } from "lucide-react";
@@ -14,7 +13,6 @@ export function OrganizationPicker({
   organizations: SelectableOrganization[];
 }) {
   const t = useTranslations("select-organization");
-  const router = useRouter();
   const { update } = useSession();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -22,12 +20,9 @@ export function OrganizationPicker({
   const handleSelect = (organizationId: string) => {
     setPendingId(organizationId);
     startTransition(async () => {
-      // jwt callback'dagi `trigger === "update" && session?.organizationId`
-      // shoxobchasini ishga tushiradi — o'sha OrganizationMember'dan
-      // role/pointId/workScheduleId'ni sessiyaga yozadi.
       await update({ organizationId });
-      router.push(PAGES.HOME);
-      router.refresh();
+
+      window.location.href = PAGES.HOME;
     });
   };
 

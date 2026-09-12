@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
@@ -23,7 +22,6 @@ export default function OnboardingPage() {
 
   type FormValues = z.infer<typeof Schema>;
 
-  const router = useRouter();
   const { update } = useSession();
   const [isPending, startTransition] = useTransition();
 
@@ -44,12 +42,11 @@ export default function OnboardingPage() {
         return;
       }
 
-      await update();
+      await update({ organizationId: result.organizationId });
 
       toast.success(t("success"));
 
-      router.push("/");
-      router.refresh();
+      window.location.href = "/";
     });
   };
 

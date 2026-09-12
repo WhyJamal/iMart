@@ -10,6 +10,7 @@ declare module "next-auth" {
       organizationId: string | null;
       role: Role | null;
       locale: string;
+      isEmailVerified: boolean;
       pointId: string | null;
       workScheduleId: string | null;
       // Foydalanuvchi nechta tashkilotga a'zoligini bildiradi —

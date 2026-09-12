@@ -16,6 +16,17 @@ model User {
   // ta'sir qilmaydi.
   saasUserId     String?
 
+  // Email tasdiqlash (ro'yxatdan o'tishda). Mavjud userlar migratsiyada
+  // true bo'lib qoladi — faqat yangi ro'yxatdan o'tganlar false bilan
+  // boshlaydi va /verify-email orqali kod kiritib tasdiqlaydi.
+  emailVerified           Boolean   @default(true)
+  verificationCode        String?
+  verificationCodeExpiry  DateTime?
+
+  // Parolni tiklash ("parolni unutdingizmi?" oqimi).
+  resetCode        String?
+  resetCodeExpiry  DateTime?
+
   memberships    OrganizationMember[]
 
   timesheetEntries    TimesheetEntry[]

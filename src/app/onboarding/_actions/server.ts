@@ -10,7 +10,7 @@ const OrgSchema = z.object({
 });
 
 type ActionResult =
-  | { success: true }
+  | { success: true; organizationId: string }
   | { success: false; error: string };
 
 export async function createOrganization(input: {
@@ -26,7 +26,7 @@ export async function createOrganization(input: {
       return { success: false, error: parsed.error.issues[0].message };
     }
 
-    await prisma.$transaction(async (tx: any) => {
+    const organizationId = await prisma.$transaction(async (tx: any) => {
       const org = await tx.organization.create({
         data: { name: parsed.data.name },
       });
@@ -34,10 +34,12 @@ export async function createOrganization(input: {
       await tx.organizationMember.create({
         data: { userId: session.userId, organizationId: org.id, role: "OWNER" },
       });
+
+      return org.id as string;
     });
 
     revalidatePath("/");
-    return { success: true };
+    return { success: true, organizationId };
   } catch (err) {
     console.error("[createOrganization]", err);
     return { success: false, error: "Failed to create organization" };

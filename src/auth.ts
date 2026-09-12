@@ -58,6 +58,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           email: user.email,
           locale: user.locale,
+          isEmailVerified: user.emailVerified,
           memberships: user.memberships as MembershipSnapshot[],
         };
       },
@@ -69,6 +70,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
         token.locale = (user as { locale?: string }).locale ?? "ru";
+        token.isEmailVerified =
+          (user as { isEmailVerified?: boolean }).isEmailVerified ?? true;
 
         const initialMemberships =
           (user as { memberships?: MembershipSnapshot[] }).memberships ?? [];
@@ -85,6 +88,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           clearMembership(token);
         }
 
+        return token;
+      }
+
+      if (
+        trigger === "update" &&
+        typeof session?.isEmailVerified === "boolean"
+      ) {
+        // /verify-email kod tasdiqlangandan keyin sessionni yangilash uchun
+        // chaqiriladi (update({ isEmailVerified: true })).
+        token.isEmailVerified = session.isEmailVerified;
         return token;
       }
 
@@ -156,6 +169,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.workScheduleId =
         (token.workScheduleId as string | null) ?? null;
       session.user.membershipCount = (token.membershipCount as number) ?? 0;
+      session.user.isEmailVerified =
+        (token.isEmailVerified as boolean) ?? true;
       return session;
     },
   },

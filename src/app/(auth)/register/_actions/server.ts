@@ -3,6 +3,8 @@
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { generateOtpCode, getOtpExpiry } from "@/lib/otp";
+import { sendVerificationEmail } from "@/lib/mailer";
 
 const RegisterSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -31,10 +33,20 @@ export async function registerUser(input: RegisterInput): Promise<ActionResult> 
     }
 
     const hashed = await bcrypt.hash(password, 12);
+    const code = generateOtpCode();
 
     await prisma.user.create({
-      data: { name, email, password: hashed },
+      data: {
+        name,
+        email,
+        password: hashed,
+        emailVerified: false,
+        verificationCode: code,
+        verificationCodeExpiry: getOtpExpiry(),
+      },
     });
+
+    await sendVerificationEmail(email, code);
 
     return { success: true };
   } catch (err) {
