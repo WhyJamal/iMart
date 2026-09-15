@@ -121,6 +121,16 @@ export async function createSale(
     });
     if (!point) return { success: false, error: "Nuqta topilmadi" };
 
+    // Tashkilotning soliq foizi — bu yerda serverda o'qiladi (mijoz
+    // tomonidan yuborilgan qiymatga ishonilmaydi), shunda savdo summasi
+    // har doim joriy tashkilot sozlamasiga mos hisoblanadi.
+    const organization = await prisma.organization.findUniqueOrThrow({
+      where: { id: session.organizationId },
+      select: { taxPercent: true },
+    });
+    const taxRate = Number(organization.taxPercent) / 100;
+
+
     // ── 2. Har bir item'ning tanlangan yacheykasi shu Point ostidagi
     // skladga tegishli ekanligini tekshiramiz ──────────────────────────────
     const cellIds = items.map((i) => i.warehouseCellId);
@@ -159,7 +169,7 @@ export async function createSale(
       return { ...item, unitPrice: item.unitPrice * (1 - discount / 100) };
     });
     const effectiveSubtotal = effectiveItems.reduce((sum, item) => sum + item.qty * item.unitPrice, 0);
-    const effectiveTotal = effectiveSubtotal * (1 + 0.08 + Number(parsed.data.tipPercent ?? 0) / 100);
+    const effectiveTotal = effectiveSubtotal * (1 + taxRate + Number(parsed.data.tipPercent ?? 0) / 100);
 
     // ── 3. Har bir tanlangan yacheykaning joriy qoldig'ini tekshiramiz ─────
     const cellStockRows = await prisma.inventoryRegister.groupBy({

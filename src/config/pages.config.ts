@@ -22,6 +22,7 @@ export const PAGES = {
     CONTRAGENTS: "/contragents",
     DEBTORS: "/debtors",
     PROMOTIONS: "/promotions",
+    SETTINGS: "/settings",
     
     // Reports
     MATERIAL_REPORT: "/reports/material-report",

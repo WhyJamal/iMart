@@ -3,6 +3,7 @@ import { getPointStockMap, getPointCellStock } from "@/actions/warehouse-actions
 import { getActivePromotionDiscounts } from "@/actions/promotion-actions";
 import { getPointOptions } from "@/actions/point-actions";
 import { getDebtorOptions } from "@/actions/debtor-actions";
+import { getOrganizationSettings } from "@/actions/organization-actions";
 import { getServerSession } from "@/lib/auth";
 import POSTerminal from "./pos-terminal";
 import { IProduct } from "@/types/product.types";
@@ -16,12 +17,13 @@ export default async function POSPage() {
   const points = await getPointOptions();
   const defaultPointId = session.pointId ?? points[0]?.id ?? "";
 
-  const [products, stockMap, cellStock, initialPromotions, debtors] = await Promise.all([
+  const [products, stockMap, cellStock, initialPromotions, debtors, settings] = await Promise.all([
     getProducts(),
     defaultPointId ? getPointStockMap(defaultPointId) : Promise.resolve(new Map<string, number>()),
     defaultPointId ? getPointCellStock(defaultPointId) : Promise.resolve({}),
     defaultPointId ? getActivePromotionDiscounts(defaultPointId) : Promise.resolve([]),
     getDebtorOptions(),
+    getOrganizationSettings(),
   ]);
  
   // Merge stock into product data
@@ -44,6 +46,8 @@ export default async function POSPage() {
       initialCellStock={cellStock}
       initialPromotions={initialPromotions}
       initialDebtors={debtors}
+      pricingMode={settings.pricingMode}
+      taxPercent={settings.taxPercent}
     />
   );
 }

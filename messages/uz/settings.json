@@ -1,0 +1,28 @@
+{
+  "title": "Tashkilot sozlamalari",
+  "description": "Savdo va narxlash bilan bog'liq umumiy sozlamalar",
+  "success": "Sozlamalar saqlandi",
+  "saving": "Saqlanmoqda...",
+  "save": "Saqlash",
+  "validation": {
+    "taxPercent": "Soliq foizi 0 dan 100 gacha bo'lishi kerak"
+  },
+  "pricingMode": {
+    "title": "Sotuvda qaysi narx taklif qilinsin?",
+    "description": "POS terminalda mahsulot savatga qo'shilganda, tizim quyidagilardan qaysi birini narx sifatida avtomatik taklif qilishini tanlang.",
+    "catalog": {
+      "title": "Nomenklaturadagi narx",
+      "description": "Mahsulot kartochkasida (nomenklaturada) belgilangan doimiy sotuv narxi taklif qilinadi. Tavsiya etiladigan, standart usul."
+    },
+    "average": {
+      "title": "O'rtacha narx bilan",
+      "description": "Sklad yacheykasidagi joriy o'rtacha tannarx (kirim/xaridlardan avtomatik hisoblanadigan narx) sotuv narxi sifatida taklif qilinadi."
+    },
+    "note": "Diqqat: bu sozlama faqat mijozga chiqadigan sotuv narxini tanlaydi. O'rtacha tannarxning o'zi bu yerdan mustaqil — u faqat kirim/xarid harakatlaridan hisoblanadi. Shuning uchun bu ikki rejim orasida istalgancha almashtirish mumkin: o'rtacha tannarx qayta hisoblanmaydi va baza buzilmaydi."
+  },
+  "taxPercent": {
+    "title": "Soliq foizi",
+    "description": "POS'da hisob-kitob qilinganda savdo summasiga qo'shiladigan soliq foizi",
+    "label": "Foiz"
+  }
+}

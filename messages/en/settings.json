@@ -1,0 +1,28 @@
+{
+  "title": "Organization Settings",
+  "description": "General settings related to sales and pricing",
+  "success": "Settings saved",
+  "saving": "Saving...",
+  "save": "Save",
+  "validation": {
+    "taxPercent": "Tax percent must be between 0 and 100"
+  },
+  "pricingMode": {
+    "title": "Which price should be suggested on sale?",
+    "description": "Choose which price the system should automatically suggest when a product is added to the cart at the POS terminal.",
+    "catalog": {
+      "title": "Catalog price",
+      "description": "The fixed sale price set on the product card is suggested. Recommended, standard option."
+    },
+    "average": {
+      "title": "Average cost",
+      "description": "The current average cost of the warehouse cell (auto-calculated from purchases/receipts) is suggested as the sale price."
+    },
+    "note": "Note: this setting only chooses the customer-facing sale price. The average cost itself is independent of this setting — it is calculated only from purchase/receipt movements. You can switch between these modes as many times as you like: the average cost is never recalculated and the database is never affected."
+  },
+  "taxPercent": {
+    "title": "Tax percent",
+    "description": "The tax percent added to the sale total at the POS",
+    "label": "Percent"
+  }
+}

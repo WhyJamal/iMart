@@ -20,6 +20,7 @@ import type { IPromotionDiscount } from "@/types/promotion.types";
 import type { IDebtorOption } from "@/types/debtor.types";
 
 import { isFractionalUnit } from "@/config/units";
+import type { PricingMode } from "@/schema/organization.schema";
 import { useTranslations } from "next-intl";
 
 type Stage = "idle" | "processing" | "success";
@@ -169,6 +170,8 @@ interface Props {
   initialCellStock: Record<string, ICellStockOption[]>;
   initialPromotions: IPromotionDiscount[];
   initialDebtors: IDebtorOption[];
+  pricingMode: PricingMode;
+  taxPercent: number;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -180,6 +183,8 @@ export default function POSTerminal({
   initialCellStock,
   initialPromotions,
   initialDebtors,
+  pricingMode,
+  taxPercent,
 }: Props) {
   const t = useTranslations("pos-terminal");
 
@@ -315,6 +320,24 @@ export default function POSTerminal({
         promotion.productId === productId
     );
 
+  // getBasePrice — tashkilot sozlamasiga (pricingMode) qarab, mijozga
+  // taklif qilinadigan BOSHLANG'ICH narxni tanlaydi (promo hisobga
+  // olinmasdan): CATALOG -> nomenklaturadagi narx (product.price),
+  // AVERAGE -> shu yacheykadagi joriy o'rtacha tannarx (cell.price).
+  // Bu FAQAT ko'rsatiladigan/sotiladigan narxni tanlaydi — o'rtacha
+  // tannarxning o'zi (ItemPrice) bu yerdan mustaqil hisoblanadi.
+  const getBasePrice = (
+    cell: ICellStockOption | undefined,
+    productId: string
+  ) => {
+    if (pricingMode === "AVERAGE" && cell) return cell.price;
+    return (
+      products.find((product) => product.id === productId)?.price ??
+      cell?.price ??
+      0
+    );
+  };
+
   const getSellPrice = (
     cell: ICellStockOption,
     productId: string
@@ -324,10 +347,12 @@ export default function POSTerminal({
       productId
     );
 
+    const base = getBasePrice(cell, productId);
+
     return promotion
-      ? cell.price *
+      ? base *
       (1 - promotion.discountPercent / 100)
-      : cell.price;
+      : base;
   };
 
   const getPreferredCell = (productId: string) => {
@@ -416,7 +441,7 @@ export default function POSTerminal({
     0
   );
 
-  const taxAmt = subtotal * 0.08;
+  const taxAmt = subtotal * (taxPercent / 100);
   const tipAmt = subtotal * tip;
   const total = subtotal + taxAmt + tipAmt;
 
@@ -755,12 +780,12 @@ export default function POSTerminal({
         items: cart.map((item) => ({
           productId: item.id,
           qty: item.qty,
-          unitPrice:
-            cellStock[item.id]?.find(
-              (cell) =>
-                cell.warehouseCellId ===
-                item.warehouseCellId
-            )?.price ?? item.price,
+          // MUHIM: item.price — savatga qo'shilganda getSellPrice orqali
+          // (pricingMode + aksiya hisobga olingan holda) aniq hisoblangan
+          // narx. Uni sklad yacheykasining xom o'rtacha narxi bilan
+          // qayta almashtirmaymiz — aks holda pricingMode/aksiya e'tiborga
+          // olinmay, har doim o'rtacha tannarxda sotilib qolardi.
+          unitPrice: item.price,
           warehouseCellId:
             item.warehouseCellId,
         })),
@@ -958,8 +983,7 @@ export default function POSTerminal({
                                 <div className="text-right shrink-0">
                                   <p className="text-[11px] text-gray-400 line-through">
                                     {fmt(
-                                      cell?.price ??
-                                      product.price
+                                      getBasePrice(cell, product.id)
                                     )}
                                   </p>
 
@@ -1233,7 +1257,7 @@ export default function POSTerminal({
                             <div className="text-[11px] text-gray-400 line-through">
                               {fmt(
                                 item.qty *
-                                currentCell.price
+                                getBasePrice(currentCell, item.id)
                               )}
                             </div>
 
@@ -1454,7 +1478,7 @@ export default function POSTerminal({
             <div className="flex justify-between items-center py-1 text-[11px] text-gray-400">
               <span>
                 {t("summary.tax", {
-                  percent: 8,
+                  percent: taxPercent,
                 })}
               </span>
               <span>{fmt(taxAmt)}</span>

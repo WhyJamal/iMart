@@ -91,6 +91,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return token;
       }
 
+      if (trigger === "update" && typeof session?.locale === "string") {
+        token.locale = session.locale;
+        return token;
+      }
+
       if (
         trigger === "update" &&
         typeof session?.isEmailVerified === "boolean"

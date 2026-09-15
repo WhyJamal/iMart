@@ -181,4 +181,17 @@ export const SIDEBARITEMS: ISidebar[] = [
       },
     ],
   },
+
+  {
+    groupKey: "system",
+    items: [
+      {
+        id: "settings",
+        labelKey: "settings",
+        icon: "wrench",
+        href: PAGES.SETTINGS,
+        permission: "organization:manage",
+      },
+    ],
+  },
 ];

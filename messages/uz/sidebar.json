@@ -23,5 +23,7 @@
   "returns": "Sotuvlarni qaytarish",
   "reports": "Hisobotlar",
   "materialReport": "Material otchyot",
-  "debtReport": "Qarzdorlik otchyoti"
+  "debtReport": "Qarzdorlik otchyoti",
+  "system": "Tizim",
+  "settings": "Sozlamalar"
 }

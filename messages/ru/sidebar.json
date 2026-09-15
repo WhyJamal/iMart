@@ -23,5 +23,7 @@
   "returns": "Возвраты продаж",
   "reports": "Отчёты",
   "materialReport": "Материальный отчёт",
-  "debtReport": "Отчёт по долгам"
+  "debtReport": "Отчёт по долгам",
+  "system": "Система",
+  "settings": "Настройки"
 }

@@ -11,6 +11,22 @@ model Organization {
   saasProjectId          String?   @unique
   subscriptionExpiresAt  DateTime?
 
+  // ── Tashkilot sozlamalari ──────────────────────────────────────────────
+  // pricingMode — POS/savdoga mahsulot qo'shilganda TAKLIF qilinadigan
+  // narx manbai: "CATALOG" -> Product.price (nomenklaturadagi narx),
+  // "AVERAGE" -> ItemPrice (sklad yacheykasidagi joriy o'rtacha tannarx).
+  // MUHIM: bu faqat SaleItem.unitPrice (mijozga sotish narxi)ga ta'sir
+  // qiladi. O'rtacha tannarxning o'zi (ItemPrice/StockBalance) faqat
+  // stock-actions.ts#applyStockMovement orqali, xarid/kirim harakatlari
+  // asosida hisoblanadi va bu sozlamadan mutlaqo mustaqil — shuning
+  // uchun rejimni oldinga-orqaga almashtiraverish bazani buzmaydi va
+  // o'rtacha narxni qayta hisoblab yubormaydi.
+  pricingMode            String    @default("CATALOG")
+
+  // taxPercent — POS savdosiga qo'shiladigan soliq foizi (ilgari kodda
+  // qattiq yozilgan 0.08 / 8% o'rniga endi tashkilot o'zi sozlaydi).
+  taxPercent             Float     @default(8)
+
   members   OrganizationMember[]
   products  Product[]
   productCategories ProductCategory[]

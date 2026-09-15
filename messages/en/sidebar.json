@@ -23,5 +23,7 @@
   "returns": "Sales Returns",
   "reports": "Reports",
   "materialReport": "Material Report",
-  "debtReport": "Debt Report"
+  "debtReport": "Debt Report",
+  "system": "System",
+  "settings": "Settings"
 }

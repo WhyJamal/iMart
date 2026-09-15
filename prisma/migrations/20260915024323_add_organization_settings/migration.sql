@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Organization" ADD COLUMN     "pricingMode" TEXT NOT NULL DEFAULT 'CATALOG',
+ADD COLUMN     "taxPercent" DOUBLE PRECISION NOT NULL DEFAULT 8;
