@@ -8,5 +8,6 @@ export interface IProduct {
   categoryName: string;
   unit: string;
   image: string | null;
+  minStock: number;
   createdAt: Date;
 }

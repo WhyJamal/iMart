@@ -6,6 +6,14 @@ model Product {
   unit      String   @default("dona") // birlik: dona | kg | litr | metr | quti — src/config/units.ts
   image     String?
 
+  // minStock — shu mahsulotning TASHKILOT bo'yicha (barcha skladlar
+  // yig'indisi) minimal qoldig'i. 0 = o'chirilgan (hech qachon
+  // ogohlantirilmaydi). Qoldiq shu chegaradan PASTGA o'tganda (OUT
+  // harakatidan keyin) stock-actions.ts#applyStockMovement OWNER/ADMIN
+  // rollariga LOW_STOCK bildirishnomasi yuboradi — bir marta, faqat
+  // chegaradan "kesib o'tgan" paytda (spam bo'lmasligi uchun).
+  minStock  Float    @default(0)
+
   category   ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   categoryId String?
 

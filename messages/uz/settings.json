@@ -24,5 +24,17 @@
     "title": "Soliq foizi",
     "description": "POS'da hisob-kitob qilinganda savdo summasiga qo'shiladigan soliq foizi",
     "label": "Foiz"
+  },
+  "announcement": {
+    "title": "E'lon yuborish",
+    "description": "Dasturga o'zgartirish kiritganingizda, barcha xodimlarga rasm va havola bilan xabar yuboring — ular header'dagi qo'ng'iroqcha orqali ko'radi va bosganda ko'rsatilgan sahifaga o'tadi.",
+    "titleLabel": "Sarlavha",
+    "messageLabel": "Matn",
+    "imageLabel": "Rasm havolasi (ixtiyoriy)",
+    "linkLabel": "Bosganda o'tiladigan sahifa (ixtiyoriy)",
+    "send": "Yuborish",
+    "sending": "Yuborilmoqda...",
+    "success": "E'lon barcha xodimlarga yuborildi",
+    "validation": "Sarlavha va matn kiritilishi shart"
   }
 }

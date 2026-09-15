@@ -7,6 +7,7 @@ import { hasPermission } from "@/lib/permissions";
 import { PAGES } from "@/config/pages.config";
 import { getOrganizationSettings } from "@/actions/organization-actions";
 import { SettingsForm } from "./_components/settings-form";
+import { AnnouncementForm } from "./_components/announcement-form";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,10 @@ export default async function SettingsPage() {
       </div>
 
       <SettingsForm initialSettings={settings} />
+
+      {hasPermission(session.role, "notifications:broadcast") && (
+        <AnnouncementForm />
+      )}
     </div>
   );
 }

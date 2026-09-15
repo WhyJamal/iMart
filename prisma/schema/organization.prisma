@@ -60,4 +60,6 @@ model Organization {
   debtorPayments     DebtorPayment[]
   supplierPayments   SupplierPayment[]
 
+  notifications      Notification[]
+
 }

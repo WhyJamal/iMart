@@ -35,6 +35,8 @@ model User {
   salaryRegisters SalaryRegister[]
   payrollPayments PayrollPayment[]
 
+  notifications   Notification[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

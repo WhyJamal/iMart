@@ -37,6 +37,7 @@ type FormValues = {
   name: string;
   price: string;
   code?: string;
+  minStock?: string;
 };
 
 interface ICategoryOption {
@@ -91,6 +92,7 @@ export function ProductFormContent({
         name: editTarget.name,
         price: String(editTarget.price),
         code: editTarget.code ?? "",
+        minStock: String(editTarget.minStock ?? 0),
       });
 
       setPreviewUrl(editTarget.image ?? "");
@@ -102,6 +104,7 @@ export function ProductFormContent({
         name: "",
         price: "",
         code: "",
+        minStock: "0",
       });
 
       setPreviewUrl("");
@@ -191,6 +194,7 @@ export function ProductFormContent({
       categoryId,
       unit,
       image: imageUrl,
+      minStock: data.minStock ? parseFloat(data.minStock) : 0,
     };
 
     if (isEdit && editTarget) {
@@ -344,6 +348,20 @@ export function ProductFormContent({
                 placeholder="0.00"
                 {...register("price")}
               />
+            </div>
+
+            <div>
+              <Label>{t("minStock")}</Label>
+
+              <Input
+                type="number"
+                placeholder="0"
+                {...register("minStock")}
+              />
+
+              <p className="text-[11px] text-muted-foreground mt-1">
+                {t("minStockDescription")}
+              </p>
             </div>
 
             <div>

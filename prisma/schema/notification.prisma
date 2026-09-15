@@ -1,0 +1,36 @@
+// Notification — har bir yozuv BITTA foydalanuvchiga tegishli (userId
+// majburiy). Butun tashkilotga/bir nechta xodimga xabar yuborish kerak
+// bo'lsa — action tomonida har bir qabul qiluvchi uchun alohida qator
+// yaratiladi (fan-out). Shu tufayli o'qilgan/o'qilmagan holati har bir
+// xodim uchun mustaqil bo'ladi va bell UI'ni oddiy queryda chiqarish
+// mumkin.
+//
+// type — String + TS union pattern (loyihadagi boshqa modellar kabi,
+// masalan Role). Hozircha: LOW_STOCK, DEBT_DUE, ANNOUNCEMENT. Kelajakda
+// yangi turlarni qo'shish uchun faqat src/types/notification.types.ts
+// dagi NotificationType union'iga qo'shish kifoya — bazaga migratsiya
+// kerak emas, chunki bu oddiy String ustun.
+model Notification {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+
+  type    String
+  title   String
+  message String
+
+  // ANNOUNCEMENT turidagi (masalan, "dasturga yangi funksiya qo'shildi")
+  // xabarlar uchun ixtiyoriy rasm va bosilganda o'tiladigan havola.
+  imageUrl String?
+  link     String?
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+  @@index([organizationId])
+}

@@ -46,7 +46,7 @@ export async function createProduct(
       return { success: false, error: parsed.error.issues[0].message };
     }
 
-    const { name, price, code, categoryId, unit, image } = parsed.data;
+    const { name, price, code, categoryId, unit, image, minStock } = parsed.data;
 
     const category = await prisma.productCategory.findFirst({
       where: { id: categoryId, organizationId: session.organizationId },
@@ -73,6 +73,7 @@ export async function createProduct(
         categoryId,
         unit,
         image: image?.trim() ? image.trim() : null,
+        minStock: minStock ?? 0,
         organizationId: session.organizationId,
       },
     });
@@ -106,7 +107,7 @@ export async function updateProduct(
       return { success: false, error: parsed.error.issues[0].message };
     }
 
-    const { name, price, code, categoryId, unit, image } = parsed.data;
+    const { name, price, code, categoryId, unit, image, minStock } = parsed.data;
 
     const category = await prisma.productCategory.findFirst({
       where: { id: categoryId, organizationId: session.organizationId },
@@ -138,6 +139,7 @@ export async function updateProduct(
         categoryId,
         unit,
         image: image?.trim() ? image.trim() : null,
+        minStock: minStock ?? 0,
       },
     });
 

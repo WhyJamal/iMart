@@ -23,7 +23,9 @@
     "productImage": "Mahsulot rasmi",
     "clickToUpload": "Yuklash uchun bosing",
     "imageDescription": "PNG, JPG, 5MB gacha",
-    "save": "Mahsulotni saqlash"
+    "save": "Mahsulotni saqlash",
+    "minStock": "Minimal qoldiq",
+    "minStockDescription": "Tashkilot bo'yicha umumiy qoldiq shu sondan pastga tushsa, OWNER/ADMIN'larga bildirishnoma yuboriladi. 0 = ogohlantirish o'chirilgan."
   },
   "list": {
     "product": "Mahsulot",

@@ -1,4 +1,50 @@
 import type { TxClient } from "@/types/prisma.types";
+import { notifyUsers } from "@/actions/notification-actions";
+
+/**
+ * checkLowStockAndNotify — OUT harakatidan keyin shu mahsulotning
+ * TASHKILOT bo'yicha (barcha skladlar yig'indisi) umumiy qoldig'ini
+ * Product.minStock bilan solishtiradi. Faqat chegaradan "kesib
+ * o'tgan" paytda (avval yuqori edi, endi past/teng bo'ldi) bitta marta
+ * ogohlantiradi — har safar sotuvda qayta-qayta yubormaslik uchun.
+ * minStock = 0 bo'lsa — bu mahsulot uchun ogohlantirish o'chirilgan.
+ */
+async function checkLowStockAndNotify(
+  tx: TxClient,
+  productId: string,
+  qtyJustRemoved: number
+): Promise<void> {
+  const product = await tx.product.findUnique({
+    where: { id: productId },
+    select: { id: true, name: true, organizationId: true, minStock: true },
+  });
+  if (!product || Number(product.minStock) <= 0) return;
+
+  const totals = await tx.stockBalance.aggregate({
+    where: { productId },
+    _sum: { qty: true },
+  });
+  const nextTotal = Number(totals._sum.qty ?? 0);
+  const prevTotal = nextTotal + qtyJustRemoved;
+  const minStock = Number(product.minStock);
+
+  // Faqat chegaradan endi o'tgan bo'lsa (avval yuqori, endi past/teng)
+  if (!(prevTotal > minStock && nextTotal <= minStock)) return;
+
+  const managers = await tx.organizationMember.findMany({
+    where: { organizationId: product.organizationId, role: { in: ["OWNER", "ADMIN"] } },
+    select: { userId: true },
+  });
+
+  await notifyUsers({
+    organizationId: product.organizationId,
+    userIds: managers.map((m: { userId: string }) => m.userId),
+    type: "LOW_STOCK",
+    title: "Qoldiq kam qoldi",
+    message: `"${product.name}" mahsulotining umumiy qoldig'i ${nextTotal} ga tushdi (minimal: ${minStock}).`,
+    link: "/products",
+  });
+}
 
 /**
  * applyStockMovement — StockBalance (ТоварыНаСкладах) va ItemPrice
@@ -73,6 +119,10 @@ export async function applyStockMovement(
       price: nextPrice,
     },
   });
+
+  if (direction === "OUT") {
+    await checkLowStockAndNotify(tx, productId, qty);
+  }
 }
 
 /**

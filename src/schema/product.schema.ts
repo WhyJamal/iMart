@@ -7,6 +7,7 @@ export const ProductSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   unit: z.string().min(1, "Unit is required").max(20),
   image: z.string().optional().or(z.literal("")),
+  minStock: z.coerce.number().min(0, "Minimal qoldiq 0 dan kichik bo'lishi mumkin emas").optional(),
 });
 
 export type ProductInput = z.infer<typeof ProductSchema>;

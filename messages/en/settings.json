@@ -24,5 +24,17 @@
     "title": "Tax percent",
     "description": "The tax percent added to the sale total at the POS",
     "label": "Percent"
+  },
+  "announcement": {
+    "title": "Send announcement",
+    "description": "When you update the program, send all staff a message with an image and a link — they'll see it under the bell icon in the header, and tapping it opens the given page.",
+    "titleLabel": "Title",
+    "messageLabel": "Message",
+    "imageLabel": "Image URL (optional)",
+    "linkLabel": "Page to open on click (optional)",
+    "send": "Send",
+    "sending": "Sending...",
+    "success": "Announcement sent to all staff",
+    "validation": "Title and message are required"
   }
 }

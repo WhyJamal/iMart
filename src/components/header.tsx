@@ -1,6 +1,6 @@
-import { Bell } from "lucide-react";
 import { DateTimeNow } from "./date-time-now";
 import { HeaderSearch } from "./header-search";
+import { NotificationBell } from "./notification-bell";
 import Image from "next/image";
 import Link from "next/link";
 import { PAGES } from "@/config/pages.config";
@@ -33,10 +33,7 @@ export default async function Header() {
             <div className="flex items-center gap-2">
                 <DateTimeNow color="white" />
 
-                <button className="relative p-2 rounded-xl hover:bg-white/5 transition">
-                    <Bell className="w-4.5 h-4.5 text-white/70" />
-                    <span className="absolute top-1.5 right-1.5 w-1.75 h-1.75 bg-indigo-500 rounded-full border-2 border-[#111827]" />
-                </button>
+                <NotificationBell />
 
                 <div className="w-8 h-8 rounded-full bg-linear-to-b from-[#ff8a7a] to-[#b91c1c] ring-1 ring-white flex items-center justify-center text-white text-xs font-semibold cursor-pointer">
                     {initials(user.name) || "?"}

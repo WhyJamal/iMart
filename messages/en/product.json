@@ -23,7 +23,9 @@
     "productImage": "Product Image",
     "clickToUpload": "Click to upload",
     "imageDescription": "PNG, JPG up to 5MB",
-    "save": "Save product"
+    "save": "Save product",
+    "minStock": "Minimum stock",
+    "minStockDescription": "When the total stock across the organization drops below this number, OWNER/ADMIN get notified. 0 = alert disabled."
   },
   "list": {
     "product": "Product",

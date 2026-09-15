@@ -32,4 +32,5 @@ export type Permission =
   | "transfers:delete"
   | "debts:manage"
   | "organization:manage"
+  | "notifications:broadcast"
   ;
