@@ -36,9 +36,9 @@ export default async function SettingsPage() {
 
       <SettingsForm initialSettings={settings} />
 
-      {hasPermission(session.role, "notifications:broadcast") && (
+      {/* {hasPermission(session.role, "notifications:broadcast") && (
         <AnnouncementForm />
-      )}
+      )} */}
     </div>
   );
 }

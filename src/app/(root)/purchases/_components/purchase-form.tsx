@@ -26,6 +26,9 @@ import type { CashMethod } from "@/types/cash.types";
 import type { IPointOption } from "@/types/point.types";
 import type { IWarehouse } from "@/types/warehouse.types";
 import type { IContragentOption } from "@/types/contragent.types";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Kbd } from "@/components/ui/kbd"
+import { useHotkey } from "@/hooks/use-hotkey";
 
 interface ProductOption {
   id: string;
@@ -99,11 +102,11 @@ export function PurchaseForm({
       initialData?.paidAmount === null
       ? true
       : Number(initialData.paidAmount) >= 0 &&
-        initialData.items?.reduce(
-          (sum: number, i: { qty: number; unitCost: number }) =>
-            sum + i.qty * i.unitCost,
-          0
-        ) <= Number(initialData.paidAmount)
+      initialData.items?.reduce(
+        (sum: number, i: { qty: number; unitCost: number }) =>
+          sum + i.qty * i.unitCost,
+        0
+      ) <= Number(initialData.paidAmount)
   );
   const [paidAmountInput, setPaidAmountInput] = useState<string>(
     initialData?.paidAmount !== undefined && initialData?.paidAmount !== null
@@ -192,12 +195,12 @@ export function PurchaseForm({
       prev.map((l) =>
         l._key === key
           ? {
-              ...l,
-              productId,
-              unitCost: String(
-                product?.price ?? 0
-              ),
-            }
+            ...l,
+            productId,
+            unitCost: String(
+              product?.price ?? 0
+            ),
+          }
           : l
       )
     );
@@ -207,7 +210,7 @@ export function PurchaseForm({
     (sum, l) =>
       sum +
       (Number(l.qty) || 0) *
-        (Number(l.unitCost) || 0),
+      (Number(l.unitCost) || 0),
     0
   );
 
@@ -278,9 +281,9 @@ export function PurchaseForm({
 
       const result = initialData
         ? await updatePurchase(
-            initialData.id,
-            payload
-          )
+          initialData.id,
+          payload
+        )
         : await createPurchase(payload);
 
       if (result.success) {
@@ -296,6 +299,8 @@ export function PurchaseForm({
       }
     });
   };
+
+  useHotkey("s", handleSubmit, { ctrl: true });
 
   return (
     <div className="h-full flex flex-col">
@@ -634,25 +639,41 @@ export function PurchaseForm({
       </div>
 
       {/* Footer */}
-
       <div className="p-4 border-t flex justify-end gap-2">
-        <Button
-          variant="ghost"
-          onClick={handleClose}
-        >
-          {t("cancel")}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              onClick={handleClose}
+            >
+              {t("cancel")}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {t("cancel")}{" "}
+            <Kbd>Esc</Kbd>
+          </TooltipContent>
+        </Tooltip>
 
-        <Button
-          onClick={handleSubmit}
-          disabled={isPending}
-        >
-          {isPending
-            ? t("saving")
-            : initialData
-              ? t("updatePurchase")
-              : t("createPurchase")}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleSubmit}
+              disabled={isPending}
+            >
+              {isPending
+                ? t("saving")
+                : initialData
+                  ? t("updatePurchase")
+                  : t("createPurchase")}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {t("updatePurchase")}{" "}
+            <Kbd>Ctrl</Kbd> + <Kbd>S</Kbd>
+          </TooltipContent>
+        </Tooltip>
+
       </div>
     </div>
   );
