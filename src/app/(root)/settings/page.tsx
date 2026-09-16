@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Settings2 } from "lucide-react";
+import { Settings2, Receipt as ReceiptIcon } from "lucide-react";
+import Link from "next/link";
 
 import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
@@ -35,6 +36,21 @@ export default async function SettingsPage() {
       </div>
 
       <SettingsForm initialSettings={settings} />
+
+      <Link
+        href="/settings/receipt"
+        className="flex items-center gap-3 rounded-xl border p-4 hover:bg-muted/50 transition-colors"
+      >
+        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+          <ReceiptIcon className="w-5 h-5 text-primary" />
+        </div>
+        <div>
+          <p className="font-medium text-sm">{t("receiptTemplates.linkTitle")}</p>
+          <p className="text-xs text-muted-foreground">
+            {t("receiptTemplates.linkDescription")}
+          </p>
+        </div>
+      </Link>
 
       {/* {hasPermission(session.role, "notifications:broadcast") && (
         <AnnouncementForm />

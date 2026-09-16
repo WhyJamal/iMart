@@ -1,0 +1,13 @@
+{
+  "title": "Receipt",
+  "print": "Print",
+  "cashier": "Cashier",
+  "subtotal": "Subtotal",
+  "total": "TOTAL",
+  "payment": {
+    "cash": "Cash",
+    "card": "Card",
+    "qr": "QR",
+    "debt": "Debt"
+  }
+}

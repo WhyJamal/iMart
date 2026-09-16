@@ -36,5 +36,47 @@
     "sending": "Sending...",
     "success": "Announcement sent to all staff",
     "validation": "Title and message are required"
+  },
+  "receiptTemplates": {
+    "linkTitle": "Receipt template",
+    "linkDescription": "Customize how the receipt looks — which columns show, where the total aligns",
+    "title": "Receipt templates",
+    "description": "Create multiple templates and mark one as default — POS and sales will print using that template.",
+    "newTemplate": "New template",
+    "nameLabel": "Template name",
+    "columnsLabel": "Which columns to show",
+    "columns": {
+      "name": "Name",
+      "qty": "Qty",
+      "unit": "Unit",
+      "unitPrice": "Price",
+      "lineTotal": "Total"
+    },
+    "totalAlignLabel": "Total alignment",
+    "align": {
+      "left": "Left",
+      "center": "Center",
+      "right": "Right"
+    },
+    "headerLabel": "Header text (optional)",
+    "headerPlaceholder": "Address, phone...",
+    "footerLabel": "Footer text (optional)",
+    "footerPlaceholder": "Thank you for your purchase!",
+    "preview": "Preview",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Template saved",
+    "setDefault": "Set as default",
+    "defaultSet": "Default template set",
+    "delete": "Delete",
+    "deleted": "Template deleted",
+    "validation": {
+      "name": "Enter a template name"
+    },
+    "newTemplateName": "Template",
+    "sampleOrgName": "YOUR STORE",
+    "samplePoint": "Main branch",
+    "sampleCashier": "Aziz",
+    "sampleFooter": "Thank you for your purchase!"
   }
 }

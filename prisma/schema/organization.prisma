@@ -61,5 +61,6 @@ model Organization {
   supplierPayments   SupplierPayment[]
 
   notifications      Notification[]
+  receiptTemplates   ReceiptTemplate[]
 
 }

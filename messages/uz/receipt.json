@@ -1,0 +1,13 @@
+{
+  "title": "Chek",
+  "print": "Pechat qilish",
+  "cashier": "Kassir",
+  "subtotal": "Summa",
+  "total": "ITOGO",
+  "payment": {
+    "cash": "Naqd",
+    "card": "Karta",
+    "qr": "QR",
+    "debt": "Qarz"
+  }
+}

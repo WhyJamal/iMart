@@ -36,5 +36,47 @@
     "sending": "Yuborilmoqda...",
     "success": "E'lon barcha xodimlarga yuborildi",
     "validation": "Sarlavha va matn kiritilishi shart"
+  },
+  "receiptTemplates": {
+    "linkTitle": "Chek shabloni",
+    "linkDescription": "Chekning ko'rinishini o'zingiz sozlang — qaysi ustunlar chiqsin, itogo qayerda tursin",
+    "title": "Chek shablonlari",
+    "description": "Bir nechta shablon yarating, birini asosiy qilib belgilang — POS va sotuvlar shu shablon bilan chek chiqaradi.",
+    "newTemplate": "Yangi shablon",
+    "nameLabel": "Shablon nomi",
+    "columnsLabel": "Qaysi ustunlar ko'rinsin",
+    "columns": {
+      "name": "Nomi",
+      "qty": "Soni",
+      "unit": "O'lchov birligi",
+      "unitPrice": "Narxi",
+      "lineTotal": "Summasi"
+    },
+    "totalAlignLabel": "Itogo qayerga tekislansin",
+    "align": {
+      "left": "Chapga",
+      "center": "Markazga",
+      "right": "O'ngga"
+    },
+    "headerLabel": "Tepadagi matn (ixtiyoriy)",
+    "headerPlaceholder": "Manzil, telefon...",
+    "footerLabel": "Pastdagi matn (ixtiyoriy)",
+    "footerPlaceholder": "Xaridingiz uchun rahmat!",
+    "preview": "Ko'rinishi",
+    "save": "Saqlash",
+    "saving": "Saqlanmoqda...",
+    "saved": "Shablon saqlandi",
+    "setDefault": "Asosiy qilish",
+    "defaultSet": "Asosiy shablon belgilandi",
+    "delete": "O'chirish",
+    "deleted": "Shablon o'chirildi",
+    "validation": {
+      "name": "Shablon nomini kiriting"
+    },
+    "newTemplateName": "Shablon",
+    "sampleOrgName": "SIZNING DO'KONINGIZ",
+    "samplePoint": "Bosh filial",
+    "sampleCashier": "Aziz",
+    "sampleFooter": "Xaridingiz uchun rahmat!"
   }
 }

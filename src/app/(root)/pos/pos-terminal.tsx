@@ -21,6 +21,7 @@ import type { IDebtorOption } from "@/types/debtor.types";
 
 import { isFractionalUnit } from "@/config/units";
 import type { PricingMode } from "@/schema/organization.schema";
+import { ReceiptModal } from "@/components/receipt/receipt-modal";
 import { useTranslations } from "next-intl";
 
 type Stage = "idle" | "processing" | "success";
@@ -223,6 +224,8 @@ export default function POSTerminal({
   const [searchOpen, setSearchOpen] = useState(false);
 
   const [lastSaleNumber, setLastSaleNumber] = useState("");
+  const [lastSaleId, setLastSaleId] = useState("");
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   // ─── Translated payment methods ─────────────────────────────────────────────
 
@@ -795,6 +798,7 @@ export default function POSTerminal({
         setLastSaleNumber(
           result.data.saleNumber
         );
+        setLastSaleId(result.data.id);
 
         const [
           freshStock,
@@ -837,6 +841,7 @@ export default function POSTerminal({
     setQrInput("");
     setCart([]);
     setLastSaleNumber("");
+    setLastSaleId("");
     setSelectedDebtorId(null);
     setDebtorQuery("");
     setDebtorPickerOpen(false);
@@ -1597,7 +1602,10 @@ export default function POSTerminal({
                       )}
                     </button>
 
-                    <button className="flex-1 py-2.5 bg-blue-500 rounded-xl text-xs font-semibold text-white hover:bg-blue-600 cursor-pointer transition-colors shadow-md shadow-blue-200">
+                    <button
+                      onClick={() => setReceiptOpen(true)}
+                      className="flex-1 py-2.5 bg-blue-500 rounded-xl text-xs font-semibold text-white hover:bg-blue-600 cursor-pointer transition-colors shadow-md shadow-blue-200"
+                    >
                       {t(
                         "overlay.receipt"
                       )}
@@ -1608,6 +1616,12 @@ export default function POSTerminal({
             </div>
           </div>
         )}
+
+      <ReceiptModal
+        saleId={lastSaleId || null}
+        open={receiptOpen}
+        onClose={() => setReceiptOpen(false)}
+      />
     </div>
   );
 }

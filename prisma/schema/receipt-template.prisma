@@ -1,0 +1,36 @@
+// ReceiptTemplate — tashkilot chek (POS/Sale) ko'rinishini o'zi
+// sozlaydi: qaysi ustunlar ko'rinsin, itogo qayerda tursin va
+// tepa/past matnlar (do'kon nomi, manzil, "rahmat" kabi). Bir
+// tashkilotda bir nechta shablon bo'lishi mumkin, lekin FAQAT bittasi
+// isDefault=true bo'ladi — baza doim o'sha shablon bilan ishlaydi
+// (boshqasini "asosiy" qilib belgilash — eskisidan isDefault'ni olib,
+// yangisiga qo'yish, receipt-template-actions.ts#setDefaultReceiptTemplate
+// ichida bitta tranzaksiyada bajariladi).
+model ReceiptTemplate {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  isDefault      Boolean  @default(false)
+
+  // Qaysi ustunlar chekda ko'rinsin
+  showProductName Boolean @default(true)
+  showQty         Boolean @default(true)
+  showUnit        Boolean @default(true)
+  showUnitPrice   Boolean @default(true)
+  showLineTotal   Boolean @default(true)
+
+  // Jami summa (itogo) qayerga tekislansin: left | center | right
+  totalAlign      String  @default("right")
+
+  // Chekning tepasida/pastida chiqadigan erkin matn (do'kon nomi,
+  // manzil, telefon, "Xaridingiz uchun rahmat!" va h.k.)
+  headerText      String?
+  footerText      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+}

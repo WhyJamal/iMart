@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ShoppingCart,
   Trash2,
+  Printer,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +42,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { deleteSale } from "@/actions/sale-actions";
+import { ReceiptModal } from "@/components/receipt/receipt-modal";
 
 import { TSerializedSale } from "@/types/sale.types";
 
@@ -62,6 +64,7 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
   const t = useTranslations("sales.list");
 
   const [expanded, setExpanded] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   const [isPending, startTransition] = useTransition();
 
@@ -125,6 +128,20 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
           onClick={(e) => e.stopPropagation()}
           className="text-right"
         >
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setReceiptOpen(true)}
+          >
+            <Printer className="w-4 h-4" />
+          </Button>
+
+          <ReceiptModal
+            saleId={sale.id}
+            open={receiptOpen}
+            onClose={() => setReceiptOpen(false)}
+          />
+
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
