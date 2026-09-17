@@ -179,6 +179,13 @@ export const SIDEBARITEMS: ISidebar[] = [
         href: PAGES.DEBT_REPORT,
         permission: "reports:read",
       },
+      {
+        id: "profit-loss",
+        labelKey: "profitLoss",
+        icon: "trending-up",
+        href: PAGES.PROFIT_LOSS,
+        permission: "reports:read",
+      },
     ],
   },
 

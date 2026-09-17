@@ -1,0 +1,31 @@
+{
+  "title": "Foyda va zarar hisoboti",
+  "description": "Tanlangan davr uchun tushum, tannarx va xarajatlar asosida sof foyda",
+  "dateFrom": "Dan",
+  "dateTo": "Gacha",
+  "note": "Barcha raqamlar hujjat yozilgan sanaga qarab hisoblanadi (pul kelgan/ketgan sanaga emas). Oylik (payroll) faqat tasdiqlangan (CONFIRMED) hisob-kitoblardan, tanlangan oylar bo'yicha to'liq olinadi.",
+  "rows": {
+    "indicator": "Ko‘rsatkich",
+    "amount": "Summa",
+    "revenue": "Yalpi tushum",
+    "returns": "Qaytarishlar",
+    "netRevenue": "Sof tushum",
+    "cogs": "Tannarx (COGS)",
+    "grossProfit": "Yalpi foyda",
+    "writeOff": "Yo'qotish (spisaniye)",
+    "manualExpenses": "Boshqa xarajatlar",
+    "payroll": "Oylik",
+    "netProfit": "SOF FOYDA",
+    "totalExpenses": "Jami xarajatlar"
+  },
+  "point": "Nuqta",
+  "allPoints": "Barcha nuqtalar",
+  "statementTitle": "Foyda va zarar to'g'risida hisobot",
+  "print": "Pechat",
+  "margin": "Rentabellik",
+  "sections": {
+    "revenue": "Tushum",
+    "cost": "Tannarx",
+    "expenses": "Xarajatlar"
+  }
+}

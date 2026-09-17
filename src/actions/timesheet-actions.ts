@@ -80,7 +80,24 @@ export async function getTimesheetDetail(
       point: { select: { name: true } },
       entries: {
         include: {
-          user: { select: { id: true, name: true, workSchedule: { select: { name: true } } } },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              memberships: {
+                where: {
+                  organizationId: session.organizationId,
+                },
+                select: {
+                  workSchedule: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         orderBy: { date: "asc" },
       },
@@ -105,7 +122,7 @@ export async function getTimesheetDetail(
       userMap.set(e.userId, {
         userId: e.userId,
         userName: e.user.name,
-        workScheduleName: e.user.workSchedule?.name ?? null,
+        workScheduleName: e.user.memberships[0]?.workSchedule?.name ?? null,
         totalHours: 0,
         totalDays: 0,
       });

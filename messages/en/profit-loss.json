@@ -1,0 +1,31 @@
+{
+  "title": "Profit & Loss Report",
+  "description": "Net profit for the selected period based on revenue, cost of goods, and expenses",
+  "dateFrom": "From",
+  "dateTo": "To",
+  "note": "All figures are based on the document date (not when money actually moved). Payroll only includes CONFIRMED accruals, taken in full for the selected months.",
+  "rows": {
+    "indicator": "Indicator",
+    "amount": "Amount",
+    "revenue": "Gross revenue",
+    "returns": "Returns",
+    "netRevenue": "Net revenue",
+    "cogs": "Cost of goods (COGS)",
+    "grossProfit": "Gross profit",
+    "writeOff": "Write-offs",
+    "manualExpenses": "Other expenses",
+    "payroll": "Payroll",
+    "netProfit": "NET PROFIT",
+    "totalExpenses": "Total expenses"
+  },
+  "point": "Point",
+  "allPoints": "All points",
+  "statementTitle": "Statement of Profit and Loss",
+  "print": "Print",
+  "margin": "Margin",
+  "sections": {
+    "revenue": "Revenue",
+    "cost": "Cost of goods",
+    "expenses": "Expenses"
+  }
+}

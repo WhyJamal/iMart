@@ -23,6 +23,7 @@ export type TIcon =
     | "percent"
     | "arrow-left-right"
     | "file-bar-chart"
+    | "trending-up"
     ;
 
     export type TItem = {
