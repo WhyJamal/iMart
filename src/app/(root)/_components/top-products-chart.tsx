@@ -87,7 +87,7 @@ export function TopProductsChart({
               <Tooltip
                 formatter={(value) => [
                   `${Number(value ?? 0).toLocaleString("uz-UZ")} so'm`,
-                  t("revenue"),
+                  t("topProducts.revenue"),
                 ]}
               />
 
