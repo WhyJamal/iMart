@@ -2,8 +2,8 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "@/lib/auth"
 
 const GEMINI_API_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent"
-
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent"
+    
 export async function POST(request: Request) {
   try {
     const session = await getServerSession()

@@ -10,8 +10,6 @@ const UZ_MONTHS = [
   "Iyul", "Avg", "Sen", "Okt", "Noy", "Dek",
 ];
 
-const LOW_STOCK_THRESHOLD = 5;
-
 function dateKey(d: Date) {
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 }
@@ -76,7 +74,10 @@ export async function getDashboardStats(): Promise<TDashboardStats> {
     }),
     prisma.product.findMany({
       where: { organizationId },
-      select: { id: true },
+      select: {
+        id: true,
+        minStock: true,
+      },
     }),
     getOrgStockMap(organizationId),
     getCashRegister(),
@@ -111,9 +112,12 @@ export async function getDashboardStats(): Promise<TDashboardStats> {
     if (item.receipt.createdAt >= startOfMonth) monthPurchaseCost += cost;
   }
 
-  const lowStockCount = products.filter(
-    (p: { id: string }) => (stockMap.get(p.id) ?? 0) < LOW_STOCK_THRESHOLD
-  ).length;
+  const lowStockCount = products.filter((p) => {
+    const stock = stockMap.get(p.id) ?? 0;
+    const minStock = Number(p.minStock);
+
+    return minStock > 0 && stock < minStock;
+  }).length;
 
   // ── 14-day daily trend (savdo vs xarid) ──────────────────────────
   const dailyBuckets = new Map<string, { label: string; sales: number; purchases: number }>();
