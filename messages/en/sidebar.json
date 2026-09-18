@@ -2,6 +2,7 @@
   "dashboard": "Dashboard",
   "pos": "POS Terminal",
   "purchases": "Purchases",
+  "stockIntake": "Stock Intake",
   "sales": "Sales",
   "cash": "Cash",
   "points": "Locations",

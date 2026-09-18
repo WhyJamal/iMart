@@ -33,4 +33,6 @@ export type Permission =
   | "debts:manage"
   | "organization:manage"
   | "notifications:broadcast"
+  | "stock-intake:create"
+  | "stock-intake:delete"
   ;

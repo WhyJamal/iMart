@@ -76,5 +76,14 @@
     "cellError": "Select a warehouse cell for each product",
     "warehouseLoadError": "Failed to load warehouses",
     "success": "{count} added to the database"
+  },
+  "export": {
+    "button": "Export to Excel",
+    "sheetName": "Products",
+    "code": "Code",
+    "name": "Name",
+    "unit": "Unit",
+    "qty": "Quantity",
+    "price": "Price"
   }
 }

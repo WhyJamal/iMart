@@ -24,6 +24,13 @@ export const SIDEBARITEMS: ISidebar[] = [
         href: PAGES.PURCHASES,
       },
       {
+        id: "stock-intake",
+        labelKey: "stockIntake",
+        icon: "package-plus",
+        href: PAGES.STOCK_INTAKE,
+        permission: "stock-intake:create",
+      },
+      {
         id: "sales",
         labelKey: "sales",
         icon: "receipt",

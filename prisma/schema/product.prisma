@@ -33,6 +33,7 @@ model Product {
   writeOffItems      WriteOffItem[]
   promotionItems     PromotionItem[]
   transferItems      TransferItem[]
+  stockIntakeItems   StockIntakeItem[]
 
   @@index([categoryId])
 }

@@ -39,6 +39,7 @@ import { Drawer } from "@/components/drawer";
 import { ProductFormContent } from "./product-form-content";
 import { getUnitLabel } from "@/config/units";
 import { PhotoImportButton } from "./photo-import-button";
+import { ExportProductsButton } from "./export-products-button";
 
 interface ICategoryOption {
   id: string;
@@ -138,6 +139,7 @@ export function ProductsClient({
             </div>
 
             <div className="flex gap-2">
+              <ExportProductsButton products={initialProducts} />
               <PhotoImportButton />
 
               <Button

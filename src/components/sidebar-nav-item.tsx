@@ -28,6 +28,7 @@ import {
     ArrowLeftRight,
     FileBarChart,
     TrendingUp,
+    PackagePlus,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -55,6 +56,7 @@ const icons = {
     "arrow-left-right": ArrowLeftRight,
     "file-bar-chart": FileBarChart,
     "trending-up": TrendingUp,
+    "package-plus": PackagePlus,
 };
 
 export function SidebarNavItem({

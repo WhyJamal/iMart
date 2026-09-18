@@ -23,6 +23,7 @@ export const PAGES = {
     DEBTORS: "/debtors",
     PROMOTIONS: "/promotions",
     SETTINGS: "/settings",
+    STOCK_INTAKE: "/stock-intake",
     
     // Reports
     MATERIAL_REPORT: "/reports/material-report",

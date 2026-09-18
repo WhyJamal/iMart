@@ -1,0 +1,40 @@
+// StockIntake — "Kirim" hujjati. Purchase'dan farqi: kontragent
+// (yetkazib beruvchi) yo'q, to'lov yo'q — faqat mavjud tovarni
+// (nomenklaturadan) skladga/yacheykaga kiritish uchun (masalan,
+// dastlabki qoldiqni kiritish, inventarizatsiya natijasi va h.k.).
+// Har bir qatorning narxi (unitCost) IXTIYORIY — bo'sh qoldirilsa
+// xatolik bermaydi, Product.price asosiy narx sifatida olinadi.
+model StockIntake {
+  id             String   @id @default(cuid())
+  number         String   @unique
+
+  organizationId String
+  pointId        String?
+  note           String?
+
+  createdBy      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  point          Point?       @relation(fields: [pointId], references: [id])
+  items          StockIntakeItem[]
+
+  @@index([organizationId, createdAt])
+}
+
+model StockIntakeItem {
+  id              String  @id @default(cuid())
+  intakeId        String
+  productId       String
+  warehouseCellId String
+
+  qty      Decimal @db.Decimal(14, 3)
+  // Narx IXTIYORIY — kiritilmasa (null), createStockIntake/
+  // updateStockIntake ichida Product.price bilan to'ldiriladi.
+  unitCost Decimal? @db.Decimal(14, 2)
+
+  intake        StockIntake    @relation(fields: [intakeId], references: [id], onDelete: Cascade)
+  product       Product        @relation(fields: [productId], references: [id])
+  warehouseCell WarehouseCell  @relation(fields: [warehouseCellId], references: [id])
+}

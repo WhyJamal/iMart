@@ -35,6 +35,7 @@ model WarehouseCell {
   transferFromItems TransferItem[] @relation("TransferFromCell")
   transferToItems TransferItem[] @relation("TransferToCell")
   promotions Promotion[]
+  stockIntakeItems StockIntakeItem[]
 
   @@index([warehouseId])
 }

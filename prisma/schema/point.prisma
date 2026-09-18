@@ -17,6 +17,7 @@ model Point {
   promotions     Promotion[]
   transfersFrom Transfer[] @relation("TransferFromPoint")
   transfersTo   Transfer[] @relation("TransferToPoint")
+  stockIntakes  StockIntake[]
 
   @@index([organizationId])
 }

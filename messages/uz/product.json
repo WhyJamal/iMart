@@ -76,5 +76,14 @@
     "cellError": "Har bir mahsulot uchun sklad yacheykasini tanlang",
     "warehouseLoadError": "Skladlarni yuklab bo‘lmadi",
     "success": "{count} ta mahsulot bazaga qo‘shildi"
+  },
+  "export": {
+    "button": "Excel'ga yuklab olish",
+    "sheetName": "Mahsulotlar",
+    "code": "Kod",
+    "name": "Nomi",
+    "unit": "O'lchov birligi",
+    "qty": "Miqdor",
+    "price": "Narx"
   }
 }
