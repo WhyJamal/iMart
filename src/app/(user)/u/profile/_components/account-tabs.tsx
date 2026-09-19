@@ -8,11 +8,9 @@ import { useSession } from "next-auth/react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  updateProfile,
-  changePassword,
-  updateLocale,
-} from "@/actions/user-actions";
+import { updateProfile, changePassword, updateLocale } from "@/actions/user-actions";
+import { ThemeForm } from "./theme-form";
+import type { ThemeSettings } from "@/lib/theme/types";
 import { Button } from "@/components/ui/button";
 import {
   LOCALE_KEYS,
@@ -41,9 +39,14 @@ interface Props {
   };
 }
 
+interface AccountTabsProps extends Props {
+  initialTheme: ThemeSettings;
+}
+
 const TABS = [
   { id: "account", label: "account" },
   { id: "security", label: "security" },
+  { id: "theme", label: "theme" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -309,7 +312,7 @@ function SecurityForm() {
   );
 }
 
-export default function AccountTabs({ user }: Props) {
+export default function AccountTabs({ user, initialTheme }: AccountTabsProps) {
   const t = useTranslations("profile");
   const [tab, setTab] = useState<TabId>("account");
 
@@ -334,8 +337,10 @@ export default function AccountTabs({ user }: Props) {
 
       {tab === "account" ? (
         <AccountForm user={user} />
-      ) : (
+      ) : tab === "security" ? (
         <SecurityForm />
+      ) : (
+        <ThemeForm initialTheme={initialTheme} />
       )}
     </div>
   );

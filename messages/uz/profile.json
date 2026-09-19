@@ -1,41 +1,81 @@
 {
-    "tabs": {
-        "account": "Hisob ma'lumotlari",
-        "security": "Xavfsizlik"
+  "tabs": {
+    "account": "Hisob ma'lumotlari",
+    "security": "Xavfsizlik",
+    "theme": "Tema"
+  },
+  "fields": {
+    "firstName": "Ism",
+    "lastName": "Familiya",
+    "email": "Email",
+    "language": "Til",
+    "organization": "Tashkilot"
+  },
+  "organization": {
+    "unassigned": "Biriktirilmagan",
+    "adminHint": "Tashkilotni o'zgartirish uchun administratorga murojaat qiling."
+  },
+  "security": {
+    "currentPassword": "Joriy parol",
+    "newPassword": "Yangi parol",
+    "confirmPassword": "Tasdiqlash"
+  },
+  "buttons": {
+    "update": "Yangilash",
+    "updating": "Yangilanmoqda…",
+    "logout": "Chiqish"
+  },
+  "status": {
+    "active": "Faol"
+  },
+  "avatar": {
+    "comingSoon": "Tez orada qo'shiladi"
+  },
+  "messages": {
+    "languageUpdated": "Til yangilandi",
+    "nameRequired": "Ismni kiriting",
+    "profileUpdated": "Ma'lumotlar yangilandi",
+    "allFieldsRequired": "Barcha maydonlarni to'ldiring",
+    "passwordMismatch": "Yangi parollar mos kelmadi",
+    "passwordUpdated": "Parol yangilandi"
+  },
+  "theme": {
+    "mode": "Rejim",
+    "modes": {
+      "light": "Yorug'",
+      "dark": "Qorong'i",
+      "system": "Tizim"
     },
-    "fields": {
-        "firstName": "Ism",
-        "lastName": "Familiya",
-        "email": "Email",
-        "language": "Til",
-        "organization": "Tashkilot"
+    "color": "Asosiy rang",
+    "colors": {
+      "red": "Qizil",
+      "blue": "Ko'k",
+      "green": "Yashil",
+      "violet": "Binafsha",
+      "orange": "To'q sariq"
     },
-    "organization": {
-        "unassigned": "Biriktirilmagan",
-        "adminHint": "Tashkilotni o'zgartirish uchun administratorga murojaat qiling."
+    "radius": "Burchak radiusi",
+    "radii": {
+      "none": "Yo'q",
+      "small": "Kichik",
+      "medium": "O'rta",
+      "large": "Katta"
     },
-    "security": {
-        "currentPassword": "Joriy parol",
-        "newPassword": "Yangi parol",
-        "confirmPassword": "Tasdiqlash"
-    },
-    "buttons": {
-        "update": "Yangilash",
-        "updating": "Yangilanmoqda…",
-        "logout": "Chiqish"
-    },
-    "status": {
-        "active": "Faol"
-    },
-    "avatar": {
-        "comingSoon": "Tez orada qo'shiladi"
-    },
-    "messages": {
-        "languageUpdated": "Til yangilandi",
-        "nameRequired": "Ismni kiriting",
-        "profileUpdated": "Ma'lumotlar yangilandi",
-        "allFieldsRequired": "Barcha maydonlarni to'ldiring",
-        "passwordMismatch": "Yangi parollar mos kelmadi",
-        "passwordUpdated": "Parol yangilandi"
+    "font": "Shrift",
+    "save": "Saqlash",
+    "saving": "Saqlanmoqda...",
+    "saved": "Tema saqlandi",
+    "error": "Xatolik yuz berdi",
+    "preview": "Ko'rinishi",
+    "previewTitle": "Namuna",
+    "previewSamples": {
+      "primary": "Asosiy",
+      "secondary": "Ikkinchi darajali",
+      "outline": "Konturli",
+      "destructive": "O'chirish",
+      "inputPlaceholder": "Matn kiriting...",
+      "badge": "Belgi",
+      "badgeSecondary": "Ikkinchi belgi"
     }
+  }
 }

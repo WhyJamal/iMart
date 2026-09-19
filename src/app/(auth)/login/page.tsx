@@ -54,9 +54,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 dark:bg-gray-900 dark:border-gray-700">
       <div className="mb-7">
-        <h1 className="text-xl font-semibold tracking-tight text-gray-900">
+        <h1 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
           {t("title")}
         </h1>
 

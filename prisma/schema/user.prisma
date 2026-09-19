@@ -37,7 +37,28 @@ model User {
 
   notifications   Notification[]
   cashierSales    Sale[]
+  themeSettings   UserThemeSettings?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// UserThemeSettings — har bir foydalanuvchining shaxsiy interfeys
+// sozlamasi (rang, radius, shrift, mode). RootLayout (Server
+// Component) shu jadvaldan o'qib, sahifani BIRINCHI marta chizishning
+// o'zida to'g'ri ko'rinishda beradi — shuning uchun "avval standart,
+// keyin foydalanuvchiniki" flash muammosi bo'lmaydi.
+model UserThemeSettings {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+
+  mode      String   @default("system")
+  primary   String   @default("red")
+  radius    String   @default("medium")
+  font      String   @default("geist")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

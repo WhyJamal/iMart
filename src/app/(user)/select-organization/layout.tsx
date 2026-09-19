@@ -8,7 +8,7 @@ import {
   type TLocale,
 } from "@/config/locales.config";
 
-import { AuthLanguageSelect } from "../(auth)/_components/auth-language-select";
+import { AuthLanguageSelect } from "../../(auth)/_components/auth-language-select";
 
 export const metadata: Metadata = {
   title: "iMart — Tashkilotni tanlash",

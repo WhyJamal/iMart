@@ -1,41 +1,81 @@
 {
-    "tabs": {
-        "account": "Account information",
-        "security": "Security"
+  "tabs": {
+    "account": "Account information",
+    "security": "Security",
+    "theme": "Theme"
+  },
+  "fields": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "language": "Language",
+    "organization": "Organization"
+  },
+  "organization": {
+    "unassigned": "Unassigned",
+    "adminHint": "Contact an administrator to change the organization."
+  },
+  "security": {
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password"
+  },
+  "buttons": {
+    "update": "Update",
+    "updating": "Updating…",
+    "logout": "Log out"
+  },
+  "status": {
+    "active": "Active"
+  },
+  "avatar": {
+    "comingSoon": "Coming soon"
+  },
+  "messages": {
+    "languageUpdated": "Language updated",
+    "nameRequired": "Please enter your name",
+    "profileUpdated": "Profile updated",
+    "allFieldsRequired": "Please fill in all fields",
+    "passwordMismatch": "New passwords do not match",
+    "passwordUpdated": "Password updated"
+  },
+  "theme": {
+    "mode": "Mode",
+    "modes": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
     },
-    "fields": {
-        "firstName": "First name",
-        "lastName": "Last name",
-        "email": "Email",
-        "language": "Language",
-        "organization": "Organization"
+    "color": "Primary color",
+    "colors": {
+      "red": "Red",
+      "blue": "Blue",
+      "green": "Green",
+      "violet": "Violet",
+      "orange": "Orange"
     },
-    "organization": {
-        "unassigned": "Unassigned",
-        "adminHint": "Contact an administrator to change the organization."
+    "radius": "Corner radius",
+    "radii": {
+      "none": "None",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
     },
-    "security": {
-        "currentPassword": "Current password",
-        "newPassword": "New password",
-        "confirmPassword": "Confirm password"
-    },
-    "buttons": {
-        "update": "Update",
-        "updating": "Updating…",
-        "logout": "Log out"
-    },
-    "status": {
-        "active": "Active"
-    },
-    "avatar": {
-        "comingSoon": "Coming soon"
-    },
-    "messages": {
-        "languageUpdated": "Language updated",
-        "nameRequired": "Please enter your name",
-        "profileUpdated": "Profile updated",
-        "allFieldsRequired": "Please fill in all fields",
-        "passwordMismatch": "New passwords do not match",
-        "passwordUpdated": "Password updated"
+    "font": "Font",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Theme saved",
+    "error": "Something went wrong",
+    "preview": "Preview",
+    "previewTitle": "Sample",
+    "previewSamples": {
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "outline": "Outline",
+      "destructive": "Destructive",
+      "inputPlaceholder": "Type something...",
+      "badge": "Badge",
+      "badgeSecondary": "Badge 2"
     }
+  }
 }
