@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import type { CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Sun, Moon, Monitor, Check } from "lucide-react";
@@ -43,6 +44,37 @@ const RADIUS_PREVIEW: Record<ThemeRadius, string> = {
   medium: "rounded-md",
   large: "rounded-xl",
 };
+
+// globals.css'dagi :root / .dark bloklaridan AYNAN shu qiymatlar.
+// Preview panelida MUHIM: faqat ".dark" klassini qo'shib-o'chirish
+// YETARLI EMAS — chunki --background/--foreground CSS o'zgaruvchisi
+// meros (inherit) bo'lib, agar haqiqiy sahifaning o'zi hozir dark
+// bo'lsa, preview divi klasssiz qolsa ham otasidan dark qiymatni
+// meros olib turaveradi (klass yo'qligi uni "qayta oq" qilib
+// bermaydi). Shuning uchun bu yerda ikkala palitrani ANIQ qiymat
+// bilan to'g'ridan-to'g'ri belgilaymiz.
+const PREVIEW_PALETTE = {
+  light: {
+    background: "oklch(1 0 0)",
+    foreground: "oklch(0.145 0 0)",
+    card: "oklch(1 0 0)",
+    cardForeground: "oklch(0.145 0 0)",
+    border: "oklch(0.922 0 0)",
+    secondary: "oklch(0.967 0.001 286.375)",
+    secondaryForeground: "oklch(0.21 0.006 285.885)",
+    destructive: "oklch(0.577 0.245 27.325)",
+  },
+  dark: {
+    background: "oklch(0.145 0 0)",
+    foreground: "oklch(0.985 0 0)",
+    card: "oklch(0.205 0 0)",
+    cardForeground: "oklch(0.985 0 0)",
+    border: "oklch(1 0 0 / 10%)",
+    secondary: "oklch(0.274 0.006 286.033)",
+    secondaryForeground: "oklch(0.985 0 0)",
+    destructive: "oklch(0.704 0.191 22.216)",
+  },
+} as const;
 
 interface Props {
   initialTheme: ThemeSettings;
@@ -215,11 +247,22 @@ export function ThemeForm({ initialTheme }: Props) {
             )}
             style={{
               ...previewVars,
+              // Ikkala palitradan mosini ANIQ (inherit'ga
+              // ishonmasdan) belgilaymiz — shu tufayli preview
+              // haqiqiy sahifaning joriy holatidan mustaqil ishlaydi.
+              "--background": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].background,
+              "--foreground": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].foreground,
+              "--card": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].card,
+              "--card-foreground": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].cardForeground,
+              "--border": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].border,
+              "--secondary": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].secondary,
+              "--secondary-foreground": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].secondaryForeground,
+              "--destructive": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].destructive,
               backgroundColor: "var(--background)",
               color: "var(--foreground)",
               borderColor: "var(--border)",
               fontFamily: "var(--font-sans)",
-            }}
+            } as CSSProperties}
           >
             <Card className="border-0 rounded-none shadow-none">
               <CardHeader>
