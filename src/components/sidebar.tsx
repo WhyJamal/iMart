@@ -22,7 +22,7 @@ export default async function Sidebar() {
         items.filter((item) => !item.permission || hasPermission(role, item.permission));
 
     return (
-        <aside className="w-60 bg-white border-r border-gray-100 flex flex-col h-full shadow-[1px_0_16px_rgba(0,0,0,0.04)] shrink-0">
+        <aside className="w-60 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col h-full shadow-[1px_0_16px_rgba(0,0,0,0.04)] shrink-0">
             <nav className="px-2 pt-4 space-y-0.5">
                 {visible(SIDEBARITEMS.find((g) => g.groupKey === "top")?.items ?? []).map(
                     (item) => (
@@ -47,18 +47,24 @@ export default async function Sidebar() {
                 )}
             </div>
 
-            <Link href={PAGES.PROFILE} className="p-3 border-t border-gray-100">
-                <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-100 transition-colors group">
-                    <div className="w-8 h-8 rounded-full bg-red-900 flex items-center justify-center text-white text-xs font-bold">
+            <Link href={PAGES.PROFILE} className="p-3 border-t border-sidebar-border">
+                <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-sidebar-accent transition-colors group">
+                    <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                        style={{
+                            backgroundImage:
+                                "linear-gradient(to bottom, color-mix(in oklch, var(--primary) 55%, white), var(--primary))",
+                        }}
+                    >
                         {initials(user.name) || "?"}
                     </div>
 
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-800 truncate">
+                        <p className="text-sm font-semibold text-sidebar-foreground truncate">
                             {user.name}
                         </p>
 
-                        <p className="text-[10px] text-gray-400 truncate">
+                        <p className="text-[10px] text-sidebar-foreground/50 truncate">
                             {user.email}
                         </p>
                     </div>

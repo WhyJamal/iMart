@@ -144,10 +144,10 @@ const DebtIcon = () => (
 
 const CheckIcon = () => (
   <svg
-    className="w-7 h-7"
+    className="w-7 h-7 text-green-600 dark:text-green-500"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="#16a34a"
+    stroke="currentColor"
     strokeWidth="3"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -157,7 +157,7 @@ const CheckIcon = () => (
 );
 
 const SectionLabel = ({ children }: { children: ReactNode }) => (
-  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-2.5">
+  <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-2.5">
     {children}
   </p>
 );
@@ -850,14 +850,14 @@ export default function POSTerminal({
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col h-full bg-slate-100 select-none">
+    <div className="flex flex-col h-full bg-slate-100 dark:bg-black select-none">
       <div className="flex-1 flex gap-3 p-3 overflow-hidden">
 
         {/* Left: search + cart */}
         <div className="flex-[1.35] flex flex-col gap-3 min-w-0 overflow-hidden">
 
           {/* Search */}
-          <div className="bg-white rounded-2xl shadow-sm p-4">
+          <div className="bg-card rounded-2xl shadow-sm p-4">
             <SectionLabel>
               {t("search.title")}
             </SectionLabel>
@@ -885,12 +885,12 @@ export default function POSTerminal({
                   placeholder={t(
                     "search.placeholder"
                   )}
-                  className="w-full h-11 rounded-xl border border-gray-200 px-4 text-sm outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400"
+                  className="w-full h-11 rounded-xl border border-border px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/60"
                 />
 
                 {searchOpen &&
                   suggestions.length > 0 && (
-                    <div className="absolute left-0 right-0 top-12 z-30 rounded-2xl border border-gray-200 bg-white shadow-xl overflow-hidden">
+                    <div className="absolute left-0 right-0 top-12 z-30 rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
                       {suggestions.map(
                         (product) => {
                           const cell =
@@ -928,9 +928,9 @@ export default function POSTerminal({
                                   false
                                 );
                               }}
-                              className="w-full flex items-center gap-3 px-3 py-3 hover:bg-gray-50 text-left"
+                              className="w-full flex items-center gap-3 px-3 py-3 hover:bg-muted/40 text-left"
                             >
-                              <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 shrink-0 flex items-center justify-center text-xl">
+                              <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted shrink-0 flex items-center justify-center text-xl">
                                 {product.image ? (
                                   <Image
                                     src={
@@ -957,7 +957,7 @@ export default function POSTerminal({
                                   </p>
 
                                   {promotion && (
-                                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600">
+                                    <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">
                                       −
                                       {
                                         promotion.discountPercent
@@ -967,7 +967,7 @@ export default function POSTerminal({
                                   )}
                                 </div>
 
-                                <p className="text-[11px] text-gray-400">
+                                <p className="text-[11px] text-muted-foreground">
                                   {
                                     product.category
                                   }{" "}
@@ -986,13 +986,13 @@ export default function POSTerminal({
 
                               {promotion ? (
                                 <div className="text-right shrink-0">
-                                  <p className="text-[11px] text-gray-400 line-through">
+                                  <p className="text-[11px] text-muted-foreground line-through">
                                     {fmt(
                                       getBasePrice(cell, product.id)
                                     )}
                                   </p>
 
-                                  <p className="font-bold text-red-600">
+                                  <p className="font-bold text-primary">
                                     {fmt(price)}
                                   </p>
                                 </div>
@@ -1044,18 +1044,18 @@ export default function POSTerminal({
                 placeholder={t(
                   "search.qrPlaceholder"
                 )}
-                className="h-11 rounded-xl border border-gray-200 px-4 text-sm outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400"
+                className="h-11 rounded-xl border border-border px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/60"
               />
             </div>
           </div>
 
           {/* Cart */}
-          <div className="bg-white rounded-2xl shadow-sm p-4 flex-1 min-h-0 flex flex-col">
+          <div className="bg-card rounded-2xl shadow-sm p-4 flex-1 min-h-0 flex flex-col">
             <SectionLabel>
               {t("cart.title")}
             </SectionLabel>
 
-            <p className="text-xs text-gray-400 mb-2">
+            <p className="text-xs text-muted-foreground mb-2">
               {totalItems}{" "}
               {t("cart.items")} ·{" "}
               {cart.length}{" "}
@@ -1063,7 +1063,7 @@ export default function POSTerminal({
             </p>
 
             {cart.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
+              <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
                 {t("cart.empty")}
               </div>
             ) : (
@@ -1087,9 +1087,9 @@ export default function POSTerminal({
                   return (
                     <div
                       key={`${item.id}:${item.warehouseCellId}`}
-                      className="rounded-2xl border border-gray-100 p-4 flex items-center gap-3"
+                      className="rounded-2xl border border-border p-4 flex items-center gap-3"
                     >
-                      <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center text-2xl">
+                      <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-muted flex items-center justify-center text-2xl">
                         {item.image ? (
                           <Image
                             src={item.image}
@@ -1108,7 +1108,7 @@ export default function POSTerminal({
                           {item.name}
                         </p>
 
-                        <p className="text-[11px] text-gray-400">
+                        <p className="text-[11px] text-muted-foreground">
                           {item.qty}{" "}
                           {item.unit} ×{" "}
                           {fmt(item.price)}
@@ -1145,7 +1145,7 @@ export default function POSTerminal({
                                 event.target.value
                               )
                             }
-                            className="mt-1 text-[11px] rounded-lg border border-gray-200 px-2 py-1 outline-none focus:ring-1 focus:ring-red-300 max-w-full"
+                            className="mt-1 text-[11px] rounded-lg border border-border px-2 py-1 outline-none focus:ring-1 focus:ring-primary/30 max-w-full"
                           >
                             {cells.map(
                               (cell) => (
@@ -1196,10 +1196,10 @@ export default function POSTerminal({
                                 onBlur={
                                   cleanupZeroQty
                                 }
-                                className="w-20 h-7 rounded-lg border border-gray-200 px-2 text-sm font-bold outline-none focus:ring-1 focus:ring-red-300"
+                                className="w-20 h-7 rounded-lg border border-border px-2 text-sm font-bold outline-none focus:ring-1 focus:ring-primary/30"
                               />
 
-                              <span className="text-[11px] text-gray-400">
+                              <span className="text-[11px] text-muted-foreground">
                                 {item.unit}
                               </span>
                             </>
@@ -1213,7 +1213,7 @@ export default function POSTerminal({
                                     -1
                                   )
                                 }
-                                className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 font-bold"
+                                className="w-7 h-7 rounded-full bg-muted hover:bg-accent font-bold"
                               >
                                 −
                               </button>
@@ -1230,7 +1230,7 @@ export default function POSTerminal({
                                     1
                                   )
                                 }
-                                className="w-7 h-7 rounded-full bg-blue-500 text-white hover:bg-blue-600 font-bold"
+                                className="w-7 h-7 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
                               >
                                 +
                               </button>
@@ -1244,7 +1244,7 @@ export default function POSTerminal({
                                 item.warehouseCellId
                               )
                             }
-                            className="ml-2 text-[11px] font-semibold text-red-500 hover:text-red-600"
+                            className="ml-2 text-[11px] font-semibold text-primary hover:text-primary"
                           >
                             {t(
                               "cart.remove"
@@ -1259,21 +1259,21 @@ export default function POSTerminal({
                           0 &&
                           currentCell ? (
                           <div className="leading-tight">
-                            <div className="text-[11px] text-gray-400 line-through">
+                            <div className="text-[11px] text-muted-foreground line-through">
                               {fmt(
                                 item.qty *
                                 getBasePrice(currentCell, item.id)
                               )}
                             </div>
 
-                            <div className="text-sm font-extrabold text-red-600">
+                            <div className="text-sm font-extrabold text-primary">
                               {fmt(
                                 item.qty *
                                 item.price
                               )}
                             </div>
 
-                            <div className="mt-1 inline-flex rounded-full bg-red-50 px-2 py-0.5 text-[9px] font-bold text-red-600">
+                            <div className="mt-1 inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold text-primary">
                               −
                               {
                                 item.discountPercent
@@ -1285,7 +1285,7 @@ export default function POSTerminal({
                             </div>
                           </div>
                         ) : (
-                          <p className="font-bold text-gray-900">
+                          <p className="font-bold text-foreground">
                             {fmt(
                               item.qty *
                               item.price
@@ -1305,7 +1305,7 @@ export default function POSTerminal({
         <div className="w-100 flex flex-col gap-3 shrink-0">
 
           {/* Point */}
-          <div className="bg-white rounded-2xl shadow-sm p-4">
+          <div className="bg-card rounded-2xl shadow-sm p-4">
             <SectionLabel>
               {t("point.title")}
             </SectionLabel>
@@ -1318,7 +1318,7 @@ export default function POSTerminal({
                 )
               }
               disabled={isLoadingStock}
-              className="w-full h-11 rounded-xl border border-gray-200 px-3 text-sm outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400 disabled:opacity-50"
+              className="w-full h-11 rounded-xl border border-border px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/60 disabled:opacity-50"
             >
               {points.length === 0 && (
                 <option value="">
@@ -1337,7 +1337,7 @@ export default function POSTerminal({
             </select>
 
             {isLoadingStock && (
-              <p className="text-[11px] text-gray-400 mt-1.5">
+              <p className="text-[11px] text-muted-foreground mt-1.5">
                 {t(
                   "point.loading"
                 )}
@@ -1346,7 +1346,7 @@ export default function POSTerminal({
           </div>
 
           {/* Payment method */}
-          <div className="bg-white rounded-2xl shadow-sm p-4">
+          <div className="bg-card rounded-2xl shadow-sm p-4">
             <SectionLabel>
               {t("payment.title")}
             </SectionLabel>
@@ -1362,8 +1362,8 @@ export default function POSTerminal({
                   }
                   className={`py-3 rounded-[13px] border-[1.5px] flex flex-col items-center gap-1.5 transition-all duration-150 cursor-pointer ${method ===
                       paymentMethod.id
-                      ? "border-red-500 bg-red-50 text-red-600"
-                      : "border-gray-200 text-gray-400 bg-white hover:border-gray-300"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground bg-card hover:border-input"
                     }`}
                 >
                   {methodIcons[
@@ -1373,8 +1373,8 @@ export default function POSTerminal({
                   <span
                     className={`text-[11px] font-semibold ${method ===
                         paymentMethod.id
-                        ? "text-red-600"
-                        : "text-gray-500"
+                        ? "text-primary"
+                        : "text-muted-foreground"
                       }`}
                   >
                     {paymentMethod.label}
@@ -1396,27 +1396,27 @@ export default function POSTerminal({
                     setTimeout(() => setDebtorPickerOpen(false), 150)
                   }
                   placeholder={t("payment.debtorPlaceholder")}
-                  className="w-full text-sm px-3 py-2.5 rounded-[10px] border-[1.5px] border-gray-200 focus:border-red-400 outline-none"
+                  className="w-full text-sm px-3 py-2.5 rounded-[10px] border-[1.5px] border-border focus:border-primary/60 outline-none"
                 />
 
                 {selectedDebtor && (
-                  <p className="text-[11px] text-gray-400 mt-1.5">
+                  <p className="text-[11px] text-muted-foreground mt-1.5">
                     {t("payment.currentDebt")}: {fmt(selectedDebtor.debt)}
                   </p>
                 )}
 
                 {debtorPickerOpen && (
-                  <div className="absolute z-20 mt-1 w-full bg-white rounded-[10px] shadow-lg border border-gray-100 max-h-48 overflow-y-auto">
+                  <div className="absolute z-20 mt-1 w-full bg-card rounded-[10px] shadow-lg border border-border max-h-48 overflow-y-auto">
                     {filteredDebtors.map((d) => (
                       <button
                         key={d.id}
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => handlePickDebtor(d)}
-                        className="w-full flex items-center justify-between px-3 py-2 text-left text-sm hover:bg-gray-50"
+                        className="w-full flex items-center justify-between px-3 py-2 text-left text-sm hover:bg-muted/40"
                       >
-                        <span className="text-gray-700">{d.name}</span>
-                        <span className="text-[11px] text-gray-400">
+                        <span className="text-foreground/80">{d.name}</span>
+                        <span className="text-[11px] text-muted-foreground">
                           {fmt(d.debt)}
                         </span>
                       </button>
@@ -1427,14 +1427,14 @@ export default function POSTerminal({
                         type="button"
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => setDebtorPickerOpen(false)}
-                        className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 border-t border-gray-100"
+                        className="w-full px-3 py-2 text-left text-sm text-primary hover:bg-primary/10 border-t border-border"
                       >
                         {t("payment.newDebtor")}: “{debtorQuery.trim()}”
                       </button>
                     )}
 
                     {filteredDebtors.length === 0 && !debtorQuery.trim() && (
-                      <p className="px-3 py-2 text-[11px] text-gray-400">
+                      <p className="px-3 py-2 text-[11px] text-muted-foreground">
                         {t("payment.noDebtors")}
                       </p>
                     )}
@@ -1445,7 +1445,7 @@ export default function POSTerminal({
           </div>
 
           {/* Tip */}
-          {/* <div className="bg-white rounded-2xl shadow-sm p-4">
+          {/* <div className="bg-card rounded-2xl shadow-sm p-4">
             <SectionLabel>
               {t("tip.title")}
             </SectionLabel>
@@ -1461,8 +1461,8 @@ export default function POSTerminal({
                   }
                   className={`py-2 rounded-full text-xs font-semibold border-[1.5px] transition-all duration-150 cursor-pointer ${tip ===
                       tipOption.value
-                      ? "border-red-500 bg-blue-50 text-red-600 font-bold"
-                      : "border-gray-200 text-gray-500 hover:border-gray-300 bg-transparent"
+                      ? "border-primary bg-primary/10 text-primary font-bold"
+                      : "border-border text-muted-foreground hover:border-input bg-transparent"
                     }`}
                 >
                   {tipOption.label}
@@ -1472,15 +1472,15 @@ export default function POSTerminal({
           </div> */}
 
           {/* Summary */}
-          <div className="bg-white rounded-2xl shadow-sm p-4 sticky bottom-0">
-            <div className="flex justify-between items-center py-1 text-[11px] text-gray-400">
+          <div className="bg-card rounded-2xl shadow-sm p-4 sticky bottom-0">
+            <div className="flex justify-between items-center py-1 text-[11px] text-muted-foreground">
               <span>
                 {t("summary.subtotal")}
               </span>
               <span>{fmt(subtotal)}</span>
             </div>
 
-            <div className="flex justify-between items-center py-1 text-[11px] text-gray-400">
+            <div className="flex justify-between items-center py-1 text-[11px] text-muted-foreground">
               <span>
                 {t("summary.tax", {
                   percent: taxPercent,
@@ -1490,7 +1490,7 @@ export default function POSTerminal({
             </div>
 
             {tipAmt > 0 && (
-              <div className="flex justify-between items-center py-1 text-[11px] text-gray-400">
+              <div className="flex justify-between items-center py-1 text-[11px] text-muted-foreground">
                 <span>
                   {t("summary.tip", {
                     percent: tip * 100,
@@ -1502,12 +1502,12 @@ export default function POSTerminal({
               </div>
             )}
 
-            <div className="flex justify-between items-center py-1 border-t border-gray-100 mt-2 pt-2.5">
-              <span className="text-[13px] text-gray-800 font-bold">
+            <div className="flex justify-between items-center py-1 border-t border-border mt-2 pt-2.5">
+              <span className="text-[13px] text-foreground font-bold">
                 {t("summary.total")}
               </span>
 
-              <span className="text-[13px] text-gray-800 font-bold">
+              <span className="text-[13px] text-foreground font-bold">
                 {fmt(total)}
               </span>
             </div>
@@ -1521,8 +1521,8 @@ export default function POSTerminal({
               }
               className={`w-full mt-4 py-4 rounded-2xl text-[14px] font-bold tracking-tight transition-all duration-200 cursor-pointer ${stage === "idle" &&
                   cart.length > 0
-                  ? "bg-red-500 text-white shadow-lg shadow-red-300 hover:bg-red-600 active:scale-[.98]"
-                  : "bg-gray-100 text-gray-400 cursor-default"
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90 active:scale-[.98]"
+                  : "bg-muted text-muted-foreground cursor-default"
                 }`}
             >
               {cart.length === 0
@@ -1548,19 +1548,19 @@ export default function POSTerminal({
       {(stage === "processing" ||
         stage === "success") && (
           <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-3xl px-11 py-9 text-center shadow-2xl min-w-67.5">
+            <div className="bg-card rounded-3xl px-11 py-9 text-center shadow-2xl min-w-67.5">
 
               {stage === "processing" ? (
                 <>
-                  <div className="w-12 h-12 border-[3px] border-blue-100 border-t-blue-500 rounded-full mx-auto mb-5 animate-spin" />
+                  <div className="w-12 h-12 border-[3px] border-blue-100 dark:border-blue-950 border-t-blue-500 rounded-full mx-auto mb-5 animate-spin" />
 
-                  <p className="text-[17px] font-bold text-gray-800">
+                  <p className="text-[17px] font-bold text-foreground">
                     {t(
                       "overlay.processingTitle"
                     )}
                   </p>
 
-                  <p className="text-xs text-gray-400 mt-1.5">
+                  <p className="text-xs text-muted-foreground mt-1.5">
                     {t(
                       "overlay.pleaseWait"
                     )}
@@ -1568,21 +1568,21 @@ export default function POSTerminal({
                 </>
               ) : (
                 <>
-                  <div className="w-16 h-16 rounded-full bg-green-50 border-2 border-green-200 flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 rounded-full bg-green-50 dark:bg-green-950 border-2 border-green-200 dark:border-green-900 flex items-center justify-center mx-auto mb-4">
                     <CheckIcon />
                   </div>
 
-                  <p className="text-[18px] font-bold text-gray-800">
+                  <p className="text-[18px] font-bold text-foreground">
                     {t(
                       "overlay.approved"
                     )}
                   </p>
 
-                  <p className="text-xs text-gray-500 mt-1 font-mono">
+                  <p className="text-xs text-muted-foreground mt-1 font-mono">
                     {lastSaleNumber}
                   </p>
 
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {fmt(total)}{" "}
                     {t("overlay.via")}{" "}
                     {methods.find(
@@ -1595,7 +1595,7 @@ export default function POSTerminal({
                   <div className="flex gap-2 mt-6">
                     <button
                       onClick={reset}
-                      className="flex-1 py-2.5 bg-gray-50 rounded-xl text-xs font-semibold text-gray-500 hover:bg-gray-100 cursor-pointer transition-colors"
+                      className="flex-1 py-2.5 bg-muted/40 rounded-xl text-xs font-semibold text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
                     >
                       {t(
                         "overlay.newSale"
@@ -1604,7 +1604,7 @@ export default function POSTerminal({
 
                     <button
                       onClick={() => setReceiptOpen(true)}
-                      className="flex-1 py-2.5 bg-blue-500 rounded-xl text-xs font-semibold text-white hover:bg-blue-600 cursor-pointer transition-colors shadow-md shadow-blue-200"
+                      className="flex-1 py-2.5 bg-primary rounded-xl text-xs font-semibold text-primary-foreground hover:bg-primary/90 cursor-pointer transition-colors shadow-md shadow-primary/20"
                     >
                       {t(
                         "overlay.receipt"

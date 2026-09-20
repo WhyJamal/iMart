@@ -52,7 +52,7 @@ const icons = {
     "building": Building,
     calendar: Calendar,
     clock: Clock,
-    timesheet: ClipboardClock,
+    timesheet: ClipboardClock, 
     "arrow-left-right": ArrowLeftRight,
     "file-bar-chart": FileBarChart,
     "trending-up": TrendingUp,
@@ -77,44 +77,48 @@ export function SidebarNavItem({
         <Link href={item.href}>
             <button
                 className={`
-            group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
-            text-sm font-medium transition-all duration-200 text-left cursor-pointer
-            ${active
-                        ? "bg-primary/10 text-primary"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-primary"
+                    group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
+                    text-sm font-medium transition-all duration-200 text-left cursor-pointer
+                    ${
+                        active
+                            ? "bg-primary/10 text-sidebar-foreground"
+                            : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-primary"
                     }
-        `}
+                `}
             >
                 <span
                     className={`
-                absolute left-0 top-1/2 -translate-y-1/2 w-0.75 rounded-r-full
-                transition-all duration-300
-                ${active
-                            ? "h-6 bg-primary"
-                            : "h-0 group-hover:h-4 bg-primary/60"
+                        absolute left-0 top-1/2 -translate-y-1/2 w-0.75 rounded-r-full
+                        bg-primary transition-all duration-300
+                        ${
+                            active
+                                ? "h-6 opacity-100"
+                                : "h-0 opacity-60 group-hover:h-4"
                         }
-            `}
+                    `}
                 />
 
                 <Icon
                     size={17}
-                    className={`shrink-0 transition-colors duration-200 ${active
+                    className={`shrink-0 transition-colors duration-200 ${
+                        active
                             ? "text-primary"
-                            : "text-black group-hover:text-primary"
-                        }`}
+                            : "text-sidebar-foreground/70 group-hover:text-primary"
+                    }`}
                 />
 
                 <span
-                    className={`flex-1 ${active
+                    className={`flex-1 ${
+                        active
                             ? "text-primary"
-                            : "text-black/70 group-hover:text-primary"
-                        }`}
+                            : "text-sidebar-foreground/70 group-hover:text-primary"
+                    }`}
                 >
                     {t(item.labelKey)}
                 </span>
 
                 {item.badge && (
-                    <span className="flex items-center justify-center w-5 h-5 text-[10px] font-bold bg-primary text-white rounded-full">
+                    <span className="flex items-center justify-center w-5 h-5 text-[10px] font-bold bg-primary text-primary-foreground rounded-full">
                         {item.badge}
                     </span>
                 )}

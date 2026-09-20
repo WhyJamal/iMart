@@ -22,10 +22,10 @@ export default function SidebarSection({
     const [open, setOpen] = useState(defaultOpen);
 
     return (
-        <div className="border-t border-gray-100">
+        <div className="border-t border-sidebar-border">
             <button
                 onClick={() => setOpen(!open)}
-                className="w-full flex items-center justify-between px-3 py-3.5 text-[10px] font-bold tracking-[0.14em] uppercase text-gray-400 hover:text-gray-600 transition-colors"
+                className="w-full flex items-center justify-between px-3 py-3.5 text-[10px] font-bold tracking-[0.14em] uppercase text-sidebar-foreground/40 hover:text-sidebar-foreground/70 transition-colors"
             >
                 <span>{t(title)}</span>
 

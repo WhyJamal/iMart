@@ -58,7 +58,7 @@ export function Drawer({
 
       <div
         className={cn(
-          "fixed z-50 bottom-0 right-0 h-[80vh] bg-white border-t shadow-xl rounded-tl-2xl ",
+          "fixed z-50 bottom-0 right-0 h-[80vh] bg-card border-t border-border shadow-xl rounded-tl-2xl ",
           "left-(--sidebar-width)",
           "transition-transform duration-300 ease-out",
           visible ? "translate-y-0" : "translate-y-full"
