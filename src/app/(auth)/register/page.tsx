@@ -62,13 +62,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
+    <div className="bg-card rounded-2xl border border-border shadow-sm p-8">
       <div className="mb-7">
-        <h1 className="text-xl font-semibold tracking-tight text-gray-900">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
           {t("title")}
         </h1>
 
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {t("description")}
         </p>
       </div>
@@ -144,12 +144,12 @@ export default function RegisterPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-gray-500 mt-6">
+      <p className="text-center text-sm text-muted-foreground mt-6">
         {t("hasAccount")}{" "}
 
         <Link
           href="/login"
-          className="font-medium text-gray-900 hover:underline"
+          className="font-medium text-foreground hover:underline"
         >
           {t("signIn")}
         </Link>

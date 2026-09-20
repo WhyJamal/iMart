@@ -30,7 +30,7 @@ export default async function OnboardingLayout({
       : "ru";
 
   const messages = (
-    await import(`../../../messages/${locale}/onboarding.json`)
+    await import(`../../../../messages/${locale}/onboarding.json`)
   ).default;
 
   return (

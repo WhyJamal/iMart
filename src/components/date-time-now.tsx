@@ -54,8 +54,8 @@ export function DateTimeNow({ color = "black" }: DateTimeNowProps) {
     day: "numeric",
   });
 
-  const textColor = color === "white" ? "text-white" : "text-gray-800";
-  const subColor = color === "white" ? "text-gray-200" : "text-gray-400";
+  const textColor = color === "white" ? "text-white" : "text-foreground";
+  const subColor = color === "white" ? "text-gray-200" : "text-muted-foreground";
 
   return (
     <Sheet>

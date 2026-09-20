@@ -30,7 +30,7 @@ export default async function SelectOrganizationLayout({
       : "ru";
 
   const messages = (
-    await import(`../../../messages/${locale}/select-organization.json`)
+    await import(`../../../../messages/${locale}/select-organization.json`)
   ).default;
 
   return (

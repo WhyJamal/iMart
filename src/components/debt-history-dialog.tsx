@@ -46,12 +46,12 @@ function LoadingRows() {
     <div className="space-y-3 py-1">
       {[0, 1, 2].map((i) => (
         <div key={i} className="flex items-center gap-3 animate-pulse">
-          <div className="w-8 h-8 rounded-full bg-gray-100 shrink-0" />
+          <div className="w-8 h-8 rounded-full bg-muted shrink-0" />
           <div className="flex-1 space-y-1.5">
-            <div className="h-3 w-2/5 rounded bg-gray-100" />
-            <div className="h-2.5 w-1/4 rounded bg-gray-100" />
+            <div className="h-3 w-2/5 rounded bg-muted" />
+            <div className="h-2.5 w-1/4 rounded bg-muted" />
           </div>
-          <div className="h-3 w-16 rounded bg-gray-100" />
+          <div className="h-3 w-16 rounded bg-muted" />
         </div>
       ))}
     </div>
@@ -87,14 +87,14 @@ export function DebtHistoryDialog({ name, fetchLedger, labels }: Props) {
       </DialogTrigger>
 
       <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
-        <DialogHeader className="px-5 pt-5 pb-4 space-y-3 border-b bg-linear-to-b from-gray-50/80 to-transparent">
-          <DialogTitle className="text-base font-semibold text-gray-900">
+        <DialogHeader className="px-5 pt-5 pb-4 space-y-3 border-b bg-linear-to-b from-muted/50 to-transparent">
+          <DialogTitle className="text-base font-semibold text-foreground">
             {name}
           </DialogTitle>
 
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-white border shadow-sm flex items-center justify-center shrink-0">
-              <Wallet className="w-4 h-4 text-gray-400" />
+            <div className="w-9 h-9 rounded-full bg-card border shadow-sm flex items-center justify-center shrink-0">
+              <Wallet className="w-4 h-4 text-muted-foreground" />
             </div>
             <div className="leading-tight">
               <p className="text-[11px] text-muted-foreground">
@@ -102,7 +102,7 @@ export function DebtHistoryDialog({ name, fetchLedger, labels }: Props) {
               </p>
               <p
                 className={`text-xl font-bold tabular-nums ${
-                  currentBalance > 0 ? "text-amber-600" : "text-gray-900"
+                  currentBalance > 0 ? "text-amber-600" : "text-foreground"
                 }`}
               >
                 {fmt(currentBalance)}
@@ -116,8 +116,8 @@ export function DebtHistoryDialog({ name, fetchLedger, labels }: Props) {
             <LoadingRows />
           ) : entries.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-10 text-center">
-              <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center">
-                <History className="w-4.5 h-4.5 text-gray-300" />
+              <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center">
+                <History className="w-4.5 h-4.5 text-muted-foreground" />
               </div>
               <p className="text-sm text-muted-foreground">{labels.empty}</p>
             </div>
@@ -130,7 +130,7 @@ export function DebtHistoryDialog({ name, fetchLedger, labels }: Props) {
                 return (
                   <li key={e.id} className="relative flex gap-3 pb-5 last:pb-0">
                     {!isLast && (
-                      <span className="absolute left-3.75 top-8 bottom-0 w-px bg-gray-100" />
+                      <span className="absolute left-3.75 top-8 bottom-0 w-px bg-muted" />
                     )}
 
                     <span
@@ -149,7 +149,7 @@ export function DebtHistoryDialog({ name, fetchLedger, labels }: Props) {
 
                     <div className="flex-1 flex items-start justify-between gap-3 pt-0.5">
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-foreground truncate">
                           {e.label}
                         </p>
                         <p className="text-xs text-muted-foreground mt-0.5">

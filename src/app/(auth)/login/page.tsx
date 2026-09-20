@@ -54,13 +54,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 dark:bg-gray-900 dark:border-gray-700">
+    <div className="bg-card rounded-2xl border border-border shadow-sm p-8">
       <div className="mb-7">
-        <h1 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
           {t("title")}
         </h1>
 
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {t("description")}
         </p>
       </div>
@@ -94,7 +94,7 @@ export default function LoginPage() {
 
             <Link
               href={PAGES.FORGOT_PASSWORD}
-              className="text-xs font-medium text-gray-500 hover:text-gray-900 hover:underline"
+              className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline"
             >
               {t("forgotPassword")}
             </Link>
@@ -124,12 +124,12 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-gray-500 mt-6">
+      <p className="text-center text-sm text-muted-foreground mt-6">
         {t("noAccount")}{" "}
 
         <Link
           href="/register"
-          className="font-medium text-gray-900 hover:underline"
+          className="font-medium text-foreground hover:underline"
         >
           {t("signUp")}
         </Link>

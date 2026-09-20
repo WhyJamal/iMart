@@ -28,7 +28,13 @@ export default async function AuthLayout({
       : "ru";
 
   return (
-    <div className="min-h-screen bg-red-700 flex items-center justify-center p-4">
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{
+        backgroundImage:
+          "linear-gradient(160deg, color-mix(in oklch, var(--primary) 90%, white), color-mix(in oklch, var(--primary) 80%, black))",
+      }}
+    >
       <div className="w-full max-w-sm">
         {children}
 

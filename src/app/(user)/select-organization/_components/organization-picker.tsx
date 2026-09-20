@@ -27,20 +27,20 @@ export function OrganizationPicker({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
-      <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center mb-6">
-        <Building2 className="w-5 h-5 text-blue-500" />
+    <div className="bg-card rounded-2xl border border-border shadow-sm p-8">
+      <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-900 flex items-center justify-center mb-6">
+        <Building2 className="w-5 h-5 text-blue-500 dark:text-blue-400" />
       </div>
 
       <div className="mb-7">
-        <h1 className="text-xl font-semibold tracking-tight text-gray-900">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
           {t("title")}
         </h1>
-        <p className="text-sm text-gray-500 mt-1">{t("description")}</p>
+        <p className="text-sm text-muted-foreground mt-1">{t("description")}</p>
       </div>
 
       {organizations.length === 0 ? (
-        <p className="text-sm text-gray-500">{t("empty")}</p>
+        <p className="text-sm text-muted-foreground">{t("empty")}</p>
       ) : (
         <div className="space-y-2">
           {organizations.map((org) => (
@@ -49,19 +49,19 @@ export function OrganizationPicker({
               type="button"
               disabled={isPending}
               onClick={() => handleSelect(org.organizationId)}
-              className="w-full flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-left hover:border-gray-300 hover:bg-gray-50 transition-colors disabled:opacity-60"
+              className="w-full flex items-center justify-between rounded-xl border border-border px-4 py-3 text-left hover:border-input hover:bg-muted/40 transition-colors disabled:opacity-60"
             >
               <div>
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-foreground">
                   {org.name}
                 </p>
-                <p className="text-xs text-gray-500">{org.role}</p>
+                <p className="text-xs text-muted-foreground">{org.role}</p>
               </div>
 
               {isPending && pendingId === org.organizationId ? (
-                <span className="text-xs text-gray-400">…</span>
+                <span className="text-xs text-muted-foreground">…</span>
               ) : (
-                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <ArrowRight className="w-4 h-4 text-muted-foreground" />
               )}
             </button>
           ))}

@@ -52,17 +52,17 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
-      <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center mb-6">
-        <KeyRound className="w-5 h-5 text-blue-500" />
+    <div className="bg-card rounded-2xl border border-border shadow-sm p-8">
+      <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-900 flex items-center justify-center mb-6">
+        <KeyRound className="w-5 h-5 text-blue-500 dark:text-blue-400" />
       </div>
 
       <div className="mb-7">
-        <h1 className="text-xl font-semibold tracking-tight text-gray-900">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
           {t("title")}
         </h1>
 
-        <p className="text-sm text-gray-500 mt-1">{t("description")}</p>
+        <p className="text-sm text-muted-foreground mt-1">{t("description")}</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -87,10 +87,10 @@ export default function ForgotPasswordPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-gray-500 mt-6">
+      <p className="text-center text-sm text-muted-foreground mt-6">
         <Link
           href={PAGES.LOGIN}
-          className="font-medium text-gray-900 hover:underline"
+          className="font-medium text-foreground hover:underline"
         >
           {t("backToLogin")}
         </Link>
