@@ -10,12 +10,13 @@ export default async function ProfilePage() {
   const theme = await getUserTheme(user.id);
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7]">
-      {/* Cover */}
+    <div className="min-h-screen bg-muted/40">
+      {/* Cover — asosiy rangdan (--primary) hosil qilingan gradient */}
       <div
         className="h-56"
         style={{
-          background: 'linear-gradient(to bottom, #b91c1c 0%, #b91c1c 40%, #f5f5f7 100%)',
+          background:
+            "linear-gradient(to bottom, var(--primary) 0%, var(--primary) 40%, var(--background) 100%)",
         }}
       />
 

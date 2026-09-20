@@ -119,7 +119,7 @@ export function ThemeForm({ initialTheme }: Props) {
         <div className="space-y-6">
           {/* Mode */}
           <div className="space-y-2">
-            <Label className="text-[13px] font-medium text-[#6e6e73]">
+            <Label className="text-[13px] font-medium text-muted-foreground">
               {t("mode")}
             </Label>
             <div className="grid grid-cols-3 gap-2 max-w-sm">
@@ -133,8 +133,8 @@ export function ThemeForm({ initialTheme }: Props) {
                     className={cn(
                       "flex flex-col items-center gap-1.5 rounded-lg border py-3 text-xs font-medium transition-colors",
                       draft.mode === mode
-                        ? "border-[#e30013] bg-[#e30013]/5 text-[#e30013]"
-                        : "border-[#d2d2d7] text-[#6e6e73] hover:bg-[#f5f5f7]"
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border text-muted-foreground hover:bg-muted"
                     )}
                   >
                     <Icon className="w-4 h-4" />
@@ -147,7 +147,7 @@ export function ThemeForm({ initialTheme }: Props) {
 
           {/* Rang */}
           <div className="space-y-2">
-            <Label className="text-[13px] font-medium text-[#6e6e73]">
+            <Label className="text-[13px] font-medium text-muted-foreground">
               {t("color")}
             </Label>
             <div className="flex gap-3">
@@ -176,7 +176,7 @@ export function ThemeForm({ initialTheme }: Props) {
 
           {/* Radius */}
           <div className="space-y-2">
-            <Label className="text-[13px] font-medium text-[#6e6e73]">
+            <Label className="text-[13px] font-medium text-muted-foreground">
               {t("radius")}
             </Label>
             <div className="grid grid-cols-4 gap-2 max-w-sm">
@@ -189,8 +189,8 @@ export function ThemeForm({ initialTheme }: Props) {
                     className={cn(
                       "flex flex-col items-center gap-2 rounded-lg border py-3 text-xs font-medium transition-colors",
                       draft.radius === radius
-                        ? "border-[#e30013] bg-[#e30013]/5 text-[#e30013]"
-                        : "border-[#d2d2d7] text-[#6e6e73] hover:bg-[#f5f5f7]"
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border text-muted-foreground hover:bg-muted"
                     )}
                   >
                     <span
@@ -208,14 +208,14 @@ export function ThemeForm({ initialTheme }: Props) {
 
           {/* Shrift */}
           <div className="space-y-2 max-w-xs">
-            <Label className="text-[13px] font-medium text-[#6e6e73]">
+            <Label className="text-[13px] font-medium text-muted-foreground">
               {t("font")}
             </Label>
             <Select
               value={draft.font}
               onValueChange={(font) => setDraft((d) => ({ ...d, font }))}
             >
-              <SelectTrigger className="h-10 rounded-lg border-[#d2d2d7] text-[15px]">
+              <SelectTrigger className="h-10 rounded-lg border-input text-[15px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -237,7 +237,7 @@ export function ThemeForm({ initialTheme }: Props) {
             lekin haqiqiy sahifaga "Saqlash" bosilgunicha ta'sir
             qilmaydi. */}
         <div className="space-y-2">
-          <Label className="text-[13px] font-medium text-[#6e6e73]">
+          <Label className="text-[13px] font-medium text-muted-foreground">
             {t("preview")}
           </Label>
           <div

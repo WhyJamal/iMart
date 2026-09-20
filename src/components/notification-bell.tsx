@@ -90,7 +90,10 @@ export function NotificationBell() {
         <button className="relative p-2 rounded-xl hover:bg-white/5 transition">
           <Bell className="w-4.5 h-4.5 text-white/70" />
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 min-w-3.5 h-3.5 px-0.5 flex items-center justify-center bg-indigo-500 rounded-full border-2 border-[#111827] text-[8px] font-bold text-white leading-none">
+            <span
+              className="absolute top-1 right-1 min-w-3.5 h-3.5 px-0.5 flex items-center justify-center bg-indigo-500 rounded-full border-2 text-[8px] font-bold text-white leading-none"
+              style={{ borderColor: "color-mix(in oklch, var(--primary) 25%, black)" }}
+            >
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}

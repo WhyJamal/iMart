@@ -91,7 +91,10 @@ export function HeaderSearch() {
       {showDropdown && (
         <div
           className="absolute left-0 right-0 top-[calc(100%+8px)] max-h-96 overflow-y-auto
-          rounded-lg border border-white/10 bg-[#1f0a0a] shadow-2xl z-50"
+          rounded-lg border border-white/10 shadow-2xl z-50"
+          style={{
+            backgroundColor: "color-mix(in oklch, var(--primary) 25%, black)",
+          }}
         >
           {!hasResults && !isPending && (
             <p className="px-4 py-6 text-sm text-white/40 text-center">

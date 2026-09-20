@@ -116,7 +116,7 @@ function AccountForm({ user }: Props) {
     <div className="pt-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-5">
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-[#6e6e73]">
+          <Label className="text-[13px] font-medium text-muted-foreground">
             {t("fields.firstName")}
           </Label>
 
@@ -124,12 +124,12 @@ function AccountForm({ user }: Props) {
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             disabled={isPending}
-            className="h-10 rounded-lg border-[#d2d2d7] text-[15px] focus-visible:ring-[#0071e3]/25 focus-visible:border-[#0071e3]"
+            className="h-10 rounded-lg border-input text-[15px] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:border-ring"
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-[#6e6e73]">
+          <Label className="text-[13px] font-medium text-muted-foreground">
             {t("fields.lastName")}
           </Label>
 
@@ -137,12 +137,12 @@ function AccountForm({ user }: Props) {
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             disabled={isPending}
-            className="h-10 rounded-lg border-[#d2d2d7] text-[15px] focus-visible:ring-[#0071e3]/25 focus-visible:border-[#0071e3]"
+            className="h-10 rounded-lg border-input text-[15px] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:border-ring"
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-[#6e6e73]">
+          <Label className="text-[13px] font-medium text-muted-foreground">
             {t("fields.email")}
           </Label>
 
@@ -151,12 +151,12 @@ function AccountForm({ user }: Props) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isPending}
-            className="h-10 rounded-lg border-[#d2d2d7] text-[15px] focus-visible:ring-[#0071e3]/25 focus-visible:border-[#0071e3]"
+            className="h-10 rounded-lg border-input text-[15px] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:border-ring"
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-[#6e6e73]">
+          <Label className="text-[13px] font-medium text-muted-foreground">
             {t("fields.language")}
           </Label>
 
@@ -167,7 +167,7 @@ function AccountForm({ user }: Props) {
             }
             disabled={isPending}
           >
-            <SelectTrigger className="h-10 rounded-lg border-[#d2d2d7] text-[15px] focus:ring-[#0071e3]/25">
+            <SelectTrigger className="h-10 rounded-lg border-input text-[15px] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:border-ring">
               <SelectValue />
             </SelectTrigger>
 
@@ -182,7 +182,7 @@ function AccountForm({ user }: Props) {
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-[#6e6e73]">
+          <Label className="text-[13px] font-medium text-muted-foreground">
             {t("fields.organization")}
           </Label>
 
@@ -192,12 +192,12 @@ function AccountForm({ user }: Props) {
               t("organization.unassigned")
             }
             disabled
-            className="h-10 rounded-lg border-[#d2d2d7] text-[15px] bg-[#f5f5f7] text-[#86868b] disabled:opacity-100"
+            className="h-10 rounded-lg border-input text-[15px] bg-muted text-muted-foreground disabled:opacity-100"
           />
         </div>
       </div>
 
-      <p className="mt-3 text-[12px] text-[#86868b]">
+      <p className="mt-3 text-[12px] text-muted-foreground">
         {t("organization.adminHint")}
       </p>
 
@@ -255,7 +255,7 @@ function SecurityForm() {
     <div className="pt-6">
       <div className="grid grid-cols-1 gap-y-5 max-w-md">
         <div className="space-y-1.5">
-          <Label className="text-[13px] font-medium text-[#6e6e73]">
+          <Label className="text-[13px] font-medium text-muted-foreground">
             {t("security.currentPassword")}
           </Label>
 
@@ -264,13 +264,13 @@ function SecurityForm() {
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             disabled={isPending}
-            className="h-10 rounded-lg border-[#d2d2d7] text-[15px] focus-visible:ring-[#0071e3]/25 focus-visible:border-[#0071e3]"
+            className="h-10 rounded-lg border-input text-[15px] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:border-ring"
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="space-y-1.5">
-            <Label className="text-[13px] font-medium text-[#6e6e73]">
+            <Label className="text-[13px] font-medium text-muted-foreground">
               {t("security.newPassword")}
             </Label>
 
@@ -279,12 +279,12 @@ function SecurityForm() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               disabled={isPending}
-              className="h-10 rounded-lg border-[#d2d2d7] text-[15px] focus-visible:ring-[#0071e3]/25 focus-visible:border-[#0071e3]"
+              className="h-10 rounded-lg border-input text-[15px] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:border-ring"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[13px] font-medium text-[#6e6e73]">
+            <Label className="text-[13px] font-medium text-muted-foreground">
               {t("security.confirmPassword")}
             </Label>
 
@@ -293,7 +293,7 @@ function SecurityForm() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={isPending}
-              className="h-10 rounded-lg border-[#d2d2d7] text-[15px] focus-visible:ring-[#0071e3]/25 focus-visible:border-[#0071e3]"
+              className="h-10 rounded-lg border-input text-[15px] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:border-ring"
             />
           </div>
         </div>
@@ -317,8 +317,8 @@ export default function AccountTabs({ user, initialTheme }: AccountTabsProps) {
   const [tab, setTab] = useState<TabId>("account");
 
   return (
-    <div className="rounded-[18px] border border-[#d2d2d7] bg-white px-7 py-6">
-      <div className="flex items-center gap-6 border-b border-[#d2d2d7]">
+    <div className="rounded-[18px] border border-border bg-card px-7 py-6">
+      <div className="flex items-center gap-6 border-b border-border">
         {TABS.map((item) => (
           <button
             key={item.id}
@@ -326,8 +326,8 @@ export default function AccountTabs({ user, initialTheme }: AccountTabsProps) {
             className={
               "pb-3 text-[15px] font-medium border-b-2 -mb-px transition-colors " +
               (tab === item.id
-                ? "text-[#1d1d1f] border-[#e30013]"
-                : "text-[#86868b] border-transparent hover:text-[#1d1d1f]")
+                ? "text-foreground border-primary"
+                : "text-muted-foreground border-transparent hover:text-foreground")
             }
           >
             {t(`tabs.${item.label}`)}
