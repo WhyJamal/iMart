@@ -112,11 +112,14 @@ export function ThemeForm({ initialTheme }: Props) {
     });
   };
 
+  const previewPalette =
+    PREVIEW_PALETTE[previewIsDark ? "dark" : "light"];
+
   return (
     <div className="pt-6 space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
         {/* Boshqaruvlar */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Mode */}
           <div className="space-y-2">
             <Label className="text-[13px] font-medium text-muted-foreground">
@@ -150,14 +153,14 @@ export function ThemeForm({ initialTheme }: Props) {
             <Label className="text-[13px] font-medium text-muted-foreground">
               {t("color")}
             </Label>
-            <div className="flex gap-3">
+            <div className="flex gap-3 max-w-xl overflow-x-auto flex-nowrap pb-2">
               {THEME_PRESET_NAMES.map((name) => (
                 <button
                   key={name}
                   type="button"
                   title={t(`colors.${name}`)}
                   onClick={() => setDraft((d) => ({ ...d, primary: name }))}
-                  className="relative w-9 h-9 rounded-full flex items-center justify-center ring-offset-2 transition-shadow"
+                  className="top-1 relative w-9 h-9 min-w-9 shrink-0 rounded-full flex items-center justify-center ring-offset-2 transition-shadow"
                   style={{
                     backgroundColor: themePresets[name].primary,
                     boxShadow:
@@ -227,73 +230,89 @@ export function ThemeForm({ initialTheme }: Props) {
               </SelectContent>
             </Select>
           </div>
+                      <Button
+              onClick={handleSave}
+              disabled={isPending || !isDirty}
+            >
+              {isPending ? t("saving") : t("save")}
+            </Button>
 
-          <Button onClick={handleSave} disabled={isPending || !isDirty}>
-            {isPending ? t("saving") : t("save")}
-          </Button>
+
         </div>
 
-        {/* Jonli preview — o'zgartirish paytida DARHOL ko'rinadi,
-            lekin haqiqiy sahifaga "Saqlash" bosilgunicha ta'sir
-            qilmaydi. */}
-        <div className="space-y-2">
-          <Label className="text-[13px] font-medium text-muted-foreground">
-            {t("preview")}
-          </Label>
-          <div
-            className={cn(
-              "rounded-2xl border overflow-hidden",
-              previewIsDark && "dark"
-            )}
-            style={{
-              ...previewVars,
-              // Ikkala palitradan mosini ANIQ (inherit'ga
-              // ishonmasdan) belgilaymiz — shu tufayli preview
-              // haqiqiy sahifaning joriy holatidan mustaqil ishlaydi.
-              "--background": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].background,
-              "--foreground": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].foreground,
-              "--card": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].card,
-              "--card-foreground": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].cardForeground,
-              "--border": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].border,
-              "--secondary": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].secondary,
-              "--secondary-foreground": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].secondaryForeground,
-              "--destructive": PREVIEW_PALETTE[previewIsDark ? "dark" : "light"].destructive,
-              backgroundColor: "var(--background)",
-              color: "var(--foreground)",
-              borderColor: "var(--border)",
-              fontFamily: "var(--font-sans)",
-            } as CSSProperties}
-          >
-            <Card className="border-0 rounded-none shadow-none">
-              <CardHeader>
-                <CardTitle className="text-base">{t("previewTitle")}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  <Button size="sm">{t("previewSamples.primary")}</Button>
-                  <Button size="sm" variant="secondary">
-                    {t("previewSamples.secondary")}
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    {t("previewSamples.outline")}
-                  </Button>
-                  <Button size="sm" variant="destructive">
-                    {t("previewSamples.destructive")}
-                  </Button>
-                </div>
+          <div className="space-y-2">
+            <Label className="text-[13px] font-medium text-muted-foreground">
+              {t("preview")}
+            </Label>
 
-                <Input placeholder={t("previewSamples.inputPlaceholder")} />
+            <div
+              className={cn(
+                "rounded-2xl border overflow-hidden",
+                previewIsDark && "dark"
+              )}
+              style={
+                {
+                  ...previewVars,
 
-                <div className="flex gap-2">
-                  <Badge>{t("previewSamples.badge")}</Badge>
-                  <Badge variant="secondary">
-                    {t("previewSamples.badgeSecondary")}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+                  "--background": previewPalette.background,
+                  "--foreground": previewPalette.foreground,
+                  "--card": previewPalette.card,
+                  "--card-foreground": previewPalette.cardForeground,
+                  "--border": previewPalette.border,
+                  "--secondary": previewPalette.secondary,
+                  "--secondary-foreground": previewPalette.secondaryForeground,
+                  "--destructive": previewPalette.destructive,
+
+                  backgroundColor: "var(--background)",
+                  color: "var(--foreground)",
+                  borderColor: "var(--border)",
+                  fontFamily: "var(--font-sans)",
+                } as CSSProperties
+              }
+            >
+              <Card className="border-0 rounded-none shadow-none">
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    {t("previewTitle")}
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm">
+                      {t("previewSamples.primary")}
+                    </Button>
+
+                    <Button size="sm" variant="secondary">
+                      {t("previewSamples.secondary")}
+                    </Button>
+
+                    <Button size="sm" variant="outline">
+                      {t("previewSamples.outline")}
+                    </Button>
+
+                    <Button size="sm" variant="destructive">
+                      {t("previewSamples.destructive")}
+                    </Button>
+                  </div>
+
+                  <Input
+                    placeholder={t("previewSamples.inputPlaceholder")}
+                  />
+
+                  <div className="flex gap-2">
+                    <Badge>
+                      {t("previewSamples.badge")}
+                    </Badge>
+
+                    <Badge variant="secondary">
+                      {t("previewSamples.badgeSecondary")}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
       </div>
     </div>
   );

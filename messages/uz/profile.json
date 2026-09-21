@@ -49,10 +49,25 @@
     "color": "Asosiy rang",
     "colors": {
       "red": "Qizil",
-      "blue": "Ko'k",
+      "blue": "Ko‘k",
       "green": "Yashil",
       "violet": "Binafsha",
-      "orange": "To'q sariq"
+      "orange": "To‘q sariq",
+      "yellow": "Sariq",
+      "amber": "Qahrabo",
+      "lime": "Laym",
+      "emerald": "Zumrad",
+      "teal": "Ko‘kimtir yashil",
+      "cyan": "Moviy",
+      "sky": "Osmonrang",
+      "indigo": "Indigo",
+      "purple": "Siyohrang",
+      "fuchsia": "Fuksiya",
+      "pink": "Pushti",
+      "rose": "Atirgul",
+      "gray": "Kulrang",
+      "slate": "Slategrey",
+      "zinc": "Ruxrang"
     },
     "radius": "Burchak radiusi",
     "radii": {

@@ -52,7 +52,22 @@
       "blue": "Blue",
       "green": "Green",
       "violet": "Violet",
-      "orange": "Orange"
+      "orange": "Orange",
+      "yellow": "Yellow",
+      "amber": "Amber",
+      "lime": "Lime",
+      "emerald": "Emerald",
+      "teal": "Teal",
+      "cyan": "Cyan",
+      "sky": "Sky",
+      "indigo": "Indigo",
+      "purple": "Purple",
+      "fuchsia": "Fuchsia",
+      "pink": "Pink",
+      "rose": "Rose",
+      "gray": "Gray",
+      "slate": "Slate",
+      "zinc": "Zinc"
     },
     "radius": "Corner radius",
     "radii": {
