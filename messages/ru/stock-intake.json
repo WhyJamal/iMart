@@ -45,6 +45,7 @@
     "unmatchedProducts": "Не найдено в базе: {list}",
     "emptyFile": "В файле не найдено подходящих строк",
     "fileReadError": "Ошибка при чтении файла",
-    "loadedRows": "Загружено строк: {count}"
+    "loadedRows": "Загружено строк: {count}",
+    "downloadTemplate": "Скачать шаблон"
   }
 }

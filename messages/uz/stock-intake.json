@@ -45,6 +45,7 @@
     "unmatchedProducts": "Bazadan topilmadi: {list}",
     "emptyFile": "Faylda mos qator topilmadi",
     "fileReadError": "Faylni o'qishda xatolik yuz berdi",
-    "loadedRows": "{count} ta qator yuklandi"
+    "loadedRows": "{count} ta qator yuklandi",
+    "downloadTemplate": "Shablon yuklab olish"
   }
 }

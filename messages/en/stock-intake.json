@@ -45,6 +45,7 @@
     "unmatchedProducts": "Not found in catalog: {list}",
     "emptyFile": "No matching rows found in the file",
     "fileReadError": "Error reading the file",
-    "loadedRows": "{count} rows loaded"
+    "loadedRows": "{count} rows loaded",
+    "downloadTemplate": "Download template"
   }
 }

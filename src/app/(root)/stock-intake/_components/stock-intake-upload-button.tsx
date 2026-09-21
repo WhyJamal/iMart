@@ -27,6 +27,7 @@ import {
 import { createStockIntake } from "@/actions/stock-intake-actions";
 import { readExcelRows } from "@/lib/excel";
 import { matchIntakeExcelRows } from "@/lib/stock-intake-import";
+import { TemplatePreview } from "./template-preview";
 import type { IPointOption } from "@/types/point.types";
 import type { IWarehouse } from "@/types/warehouse.types";
 
@@ -35,6 +36,7 @@ interface ProductOption {
   name: string;
   code: string;
   unit: string;
+  price: number;
 }
 
 interface Props {
@@ -125,10 +127,10 @@ export function StockIntakeUploadButton({ products, points, warehouses, defaultP
     <>
       <Button
         variant="outline"
-        className="gap-1.5"
+        className="gap-1.5 text-emerald-600 border-emerald-200 hover:text-emerald-700"
         onClick={() => setOpen(true)}
       >
-        <Upload className="w-4 h-4 text-green-500" />
+        <Upload className="w-4 h-4" />
         {t("uploadExcel")}
       </Button>
 
@@ -139,6 +141,8 @@ export function StockIntakeUploadButton({ products, points, warehouses, defaultP
           </DialogHeader>
 
           <div className="space-y-3 py-2">
+            <TemplatePreview products={products} />
+
             <div className="space-y-1.5">
               <Label>{t("point")}</Label>
               <Select value={pointId} onValueChange={handlePointChange}>

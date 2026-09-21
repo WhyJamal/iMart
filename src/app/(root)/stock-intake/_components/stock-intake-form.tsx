@@ -18,8 +18,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 import { createStockIntake, updateStockIntake } from "@/actions/stock-intake-actions";
+import { TemplatePreview } from "./template-preview";
 import { readExcelRows } from "@/lib/excel";
 import { matchIntakeExcelRows } from "@/lib/stock-intake-import";
 import { PAGES } from "@/config/pages.config";
@@ -75,6 +83,7 @@ export function StockIntakeForm({
   const tExport = useTranslations("product.export");
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   const [pointId, setPointId] = useState(initialData?.pointId ?? defaultPointId ?? "");
   const [note, setNote] = useState(initialData?.note ?? "");
@@ -87,12 +96,12 @@ export function StockIntakeForm({
   const [lines, setLines] = useState<LineItem[]>(
     initialData?.items?.length
       ? initialData.items.map((item) => ({
-        _key: crypto.randomUUID(),
-        productId: item.productId,
-        qty: String(item.qty),
-        unitCost: item.unitCost !== null ? String(item.unitCost) : "",
-        warehouseCellId: item.warehouseCellId,
-      }))
+          _key: crypto.randomUUID(),
+          productId: item.productId,
+          qty: String(item.qty),
+          unitCost: item.unitCost !== null ? String(item.unitCost) : "",
+          warehouseCellId: item.warehouseCellId,
+        }))
       : [newLine()]
   );
 
@@ -172,6 +181,7 @@ export function StockIntakeForm({
         }))
       );
       toast.success(t("loadedRows", { count: matched.length }));
+      setUploadModalOpen(false);
     } catch (err) {
       console.error(err);
       toast.error(t("fileReadError"));
@@ -275,6 +285,16 @@ export function StockIntakeForm({
         <div className="flex items-center justify-between">
           <Label className="text-sm">{t("linesTitle")}</Label>
 
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-1.5 text-emerald-600 hover:text-emerald-700"
+            onClick={() => setUploadModalOpen(true)}
+          >
+            <Upload className="w-3.5 h-3.5" />
+            {t("uploadExcel")}
+          </Button>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -282,19 +302,35 @@ export function StockIntakeForm({
             className="hidden"
             onChange={handleFileUpload}
           />
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-1.5 text-emerald-600 hover:text-emerald-700"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Upload className="w-3.5 h-3.5" />
-            {t("uploadExcel")}
-          </Button>
+
+          <Dialog open={uploadModalOpen} onOpenChange={setUploadModalOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{t("uploadExcel")}</DialogTitle>
+              </DialogHeader>
+
+              <div className="py-2 space-y-3">
+                <TemplatePreview products={products} />
+
+                {!defaultCellId && (
+                  <p className="text-xs text-destructive">{t("selectCellFirst")}</p>
+                )}
+              </div>
+
+              <DialogFooter>
+                <Button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={!defaultCellId}
+                >
+                  {t("chooseFile")}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="space-y-2">
-          <div className="grid grid-cols-[minmax(0,1fr)_70px_280px_110px_36px] gap-2 text-xs font-medium text-muted-foreground px-1">
+          <div className="grid grid-cols-[1fr_90px_120px_110px_36px] gap-2 text-xs font-medium text-muted-foreground px-1">
             <span>{t("product")}</span>
             <span>{t("unit")}</span>
             <span>{t("cell")}</span>
@@ -307,7 +343,7 @@ export function StockIntakeForm({
             return (
               <div
                 key={line._key}
-                className="grid grid-cols-[minmax(0,1fr)_70px_280px_110px_36px] gap-2 items-center"
+                className="grid grid-cols-[1fr_90px_120px_110px_36px] gap-2 items-center"
               >
                 <Select
                   value={line.productId}
