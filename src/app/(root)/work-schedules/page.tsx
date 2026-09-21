@@ -88,7 +88,7 @@ export default async function WorkSchedulesPage({
             </Button>
           </div>
 
-          <div className="rounded-xl border bg-white overflow-hidden">
+          <div className="rounded-xl border border-border bg-card overflow-hidden">
             <TemplateList
               templates={templates}
               canManage
@@ -116,7 +116,7 @@ export default async function WorkSchedulesPage({
             </Button>
           </div>
 
-          <div className="rounded-xl border bg-white overflow-hidden">
+          <div className="rounded-xl border border-border bg-card overflow-hidden">
             <ScheduleList
               schedules={schedules}
               canManage

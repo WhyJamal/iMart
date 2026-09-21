@@ -10,7 +10,7 @@ export default async function ProfilePage() {
   const theme = await getUserTheme(user.id);
 
   return (
-    <div className="min-h-screen bg-muted/40">
+    <div className="min-h-screen bg-background">
       {/* Cover — asosiy rangdan (--primary) hosil qilingan gradient */}
       <div
         className="h-56"

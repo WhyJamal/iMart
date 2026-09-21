@@ -10,15 +10,15 @@ const KIND_STYLES: Record<
   string
 > = {
   workday:
-    "bg-white text-foreground border-border",
+    "bg-card text-foreground border-border",
   weekend:
     "bg-muted text-muted-foreground border-transparent",
   holiday:
     "bg-destructive/15 text-destructive border-transparent font-semibold",
   short:
-    "bg-amber-100 text-amber-800 border-transparent font-semibold",
+    "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-400 border-transparent font-semibold",
   "moved-workday":
-    "bg-blue-100 text-blue-800 border-transparent font-semibold",
+    "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-400 border-transparent font-semibold",
 };
 
 interface Props {
@@ -45,7 +45,7 @@ export function CalendarMonth({
   });
 
   return (
-    <div className="rounded-xl border bg-white p-3">
+    <div className="rounded-xl border border-border bg-card p-3">
       <h3 className="text-sm font-semibold mb-2 text-center">
         {monthLabel}
       </h3>

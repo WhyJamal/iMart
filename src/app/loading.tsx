@@ -2,7 +2,7 @@ import "@/assets/loading.css"
 
 export default function Loading() {
     return (
-        <div className="flex h-screen w-screen items-center justify-center bg-white">
+        <div className="flex h-screen w-screen items-center justify-center bg-background">
             <div className="mover" />
         </div>
     )
@@ -12,7 +12,7 @@ export default function Loading() {
 
 // export default function Loading() {
 //     return (
-//         <div className="fixed inset-0 flex items-center justify-center bg-white">
+//         <div className="fixed inset-0 flex items-center justify-center bg-background">
 //             <Logo />
 //         </div>
 //     );

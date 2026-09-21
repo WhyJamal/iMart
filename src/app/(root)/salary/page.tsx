@@ -64,7 +64,7 @@ export default async function SalaryPage({
             {t("employees")}
           </h2>
 
-          <div className="rounded-xl border bg-white overflow-hidden">
+          <div className="rounded-xl border border-border bg-card overflow-hidden">
             <EmployeeSalaryList
               employees={employees}
               canManage={canManage}

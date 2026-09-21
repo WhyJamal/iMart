@@ -850,7 +850,7 @@ export default function POSTerminal({
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col h-full bg-slate-100 dark:bg-black select-none">
+    <div className="flex flex-col h-full bg-slate-100 dark:bg-muted/40 select-none">
       <div className="flex-1 flex gap-3 p-3 overflow-hidden">
 
         {/* Left: search + cart */}

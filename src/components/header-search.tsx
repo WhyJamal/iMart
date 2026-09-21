@@ -81,7 +81,7 @@ export function HeaderSearch() {
         placeholder={t("placeholder")}
         className="w-full bg-white/5 border border-white/10 rounded pl-9 pr-9 py-2 text-sm
         text-white placeholder-white/40 focus:outline-none focus:ring-2
-        focus:ring-red-500 focus:bg-white/10 transition-all duration-150"
+        focus:ring-primary/60 focus:bg-white/10 transition-all duration-150"
       />
 
       {isPending && (

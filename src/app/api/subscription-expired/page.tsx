@@ -2,7 +2,7 @@ export default function SubscriptionExpiredPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="max-w-sm text-center space-y-3">
-        <h1 className="text-xl font-bold text-gray-900">
+        <h1 className="text-xl font-bold text-foreground">
           Obuna muddati tugagan
         </h1>
         <p className="text-sm text-muted-foreground">

@@ -14,7 +14,7 @@ export default function Loading() {
       <Skeleton className="h-9 w-72" />
 
       <div className="rounded-xl border overflow-hidden">
-        <div className="bg-gray-50/70 px-4 py-3 flex gap-6 border-b">
+        <div className="bg-muted/40 px-4 py-3 flex gap-6 border-b">
           {["w-10", "w-24", "w-28", "w-20", "w-16"].map((w, i) => (
             <Skeleton key={i} className={`h-4 ${w}`} />
           ))}

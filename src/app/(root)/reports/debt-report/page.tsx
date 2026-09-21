@@ -37,7 +37,7 @@ export default async function DebtReportPage() {
 
       <div className="grid md:grid-cols-2 gap-4">
         {/* Bizga qarzdorlar (mijozlar) */}
-        <div className="bg-white rounded-2xl shadow-sm border p-5 space-y-4">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold">{t("owedToUs.title")}</h2>
             <span className="text-lg font-bold text-emerald-600">
@@ -67,7 +67,7 @@ export default async function DebtReportPage() {
         </div>
 
         {/* Biz qarzdormiz (yetkazib beruvchilar) */}
-        <div className="bg-white rounded-2xl shadow-sm border p-5 space-y-4">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold">{t("weOwe.title")}</h2>
             <span className="text-lg font-bold text-amber-600">

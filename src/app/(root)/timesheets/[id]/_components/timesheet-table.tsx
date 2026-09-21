@@ -146,7 +146,7 @@ export function TimesheetTable({
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border bg-white pb-5">
+      <div className="overflow-x-auto rounded-xl border border-border bg-card pb-5">
         <table className="text-sm border-collapse w-full">
           <thead>
             <tr className="bg-muted/50">
@@ -180,7 +180,7 @@ export function TimesheetTable({
           <tbody>
             {timesheet.users.map((u) => (
               <tr key={u.userId} className="border-t">
-                <td className="sticky left-0 bg-white px-3 py-1.5 font-medium border-r">
+                <td className="sticky left-0 bg-card px-3 py-1.5 font-medium border-r border-border">
                   {u.userName}
                 </td>
 
@@ -218,7 +218,7 @@ export function TimesheetTable({
                       key={i}
                       className={`px-0.5 py-0.5 text-center ${
                         red
-                          ? "bg-red-50 text-red-600"
+                          ? "bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400"
                           : ""
                       } ${
                         entry?.isManual

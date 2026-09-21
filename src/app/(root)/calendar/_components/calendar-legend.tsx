@@ -3,11 +3,11 @@
 import { useTranslations } from "next-intl";
 
 const ITEMS = [
-  { swatch: "bg-white border border-border", key: "workday" },
+  { swatch: "bg-card border border-border", key: "workday" },
   { swatch: "bg-muted", key: "weekend" },
   { swatch: "bg-destructive/15", key: "holiday" },
-  { swatch: "bg-amber-100", key: "short" },
-  { swatch: "bg-blue-100", key: "movedWorkday" },
+  { swatch: "bg-amber-100 dark:bg-amber-950", key: "short" },
+  { swatch: "bg-blue-100 dark:bg-blue-950", key: "movedWorkday" },
 ] as const;
 
 export function CalendarLegend() {
