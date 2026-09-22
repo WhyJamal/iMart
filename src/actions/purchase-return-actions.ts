@@ -317,7 +317,9 @@ export async function createPurchaseReturn(
         });
       }
 
-      // Pul ta'minotchidan qaytariladi — kassa/bank balansiga kirim (IN)
+      // Pul ta'minotchidan qaytariladi — kassa/bank balansiga kirim (IN).
+      // Asl xarid qaysi nuqtaga bo'lgan bo'lsa, qaytarish ham o'sha
+      // nuqta hisobiga yoziladi.
       await recordCashFlow(tx, {
         organizationId: session.organizationId,
         docType: "PURCHASE_RETURN",
@@ -327,6 +329,7 @@ export async function createPurchaseReturn(
         amount: totalAmount,
         note: reason ?? undefined,
         createdBy: session.userId,
+        pointId: purchase.pointId,
       });
 
       return doc;

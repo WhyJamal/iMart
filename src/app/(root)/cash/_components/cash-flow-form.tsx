@@ -23,22 +23,35 @@ import { Separator } from "@/components/ui/separator";
 import { createCashFlow } from "@/actions/cash-actions";
 
 import type {
-  CashDocType,
   CashDirection,
   CashMethod,
 } from "@/types/cash.types";
 
+import type { CreateCashFlowInput } from "@/schema/cash.schema";
+
+import type { IPointOption } from "@/types/point.types";
+
 import { useTranslations } from "next-intl";
 
+// Radix Select bo'sh string qiymatni qabul qilmaydi — "nuqtasiz
+// (umumiy)" tanlovi shu sentinel bilan ifodalanadi va yuborishda
+// null'ga aylantiriladi.
+const NO_POINT = "__none__";
+
 interface Props {
+  points: IPointOption[];
+  /** Foydalanuvchining o'z nuqtasi — standart tanlov */
+  defaultPointId?: string | null;
+  /** Saqlangandan/yopilgandan keyin qaytiladigan manzil (filtr bilan) */
+  closeHref?: string;
   onClose?: () => void;
 }
 
+// Qo'lda kiritiladigan turlar — createCashFlow schema'si bilan bir xil
+type ManualDocType = CreateCashFlowInput["docType"];
+
 const DOC_TYPE_OPTIONS: {
-  value: Exclude<
-    CashDocType,
-    "SALE" | "PURCHASE" | "SALE_RETURN" | "PURCHASE_RETURN" | "PAYROLL"
-  >;
+  value: ManualDocType;
   label: string;
   direction: CashDirection | null;
 }[] = [
@@ -64,25 +77,30 @@ const DOC_TYPE_OPTIONS: {
   },
 ];
 
-export function CashFlowForm({ onClose }: Props) {
+export function CashFlowForm({
+  points,
+  defaultPointId,
+  closeHref = "/cash",
+  onClose,
+}: Props) {
   const router = useRouter();
 
   const t = useTranslations("cash.form");
 
   const [isPending, startTransition] = useTransition();
 
-  const [docType, setDocType] = useState<
-    Exclude<
-      CashDocType,
-      "SALE" | "PURCHASE" | "SALE_RETURN" | "PURCHASE_RETURN" | "PAYROLL"
-    >
-  >("DEPOSIT");
+  const [docType, setDocType] =
+    useState<ManualDocType>("DEPOSIT");
 
   const [direction, setDirection] =
     useState<CashDirection>("IN");
 
   const [method, setMethod] =
     useState<CashMethod>("CASH");
+
+  const [pointId, setPointId] = useState<string>(
+    defaultPointId ?? NO_POINT
+  );
 
   const [amount, setAmount] = useState<number>(0);
 
@@ -98,7 +116,7 @@ export function CashFlowForm({ onClose }: Props) {
     if (onClose) {
       onClose();
     } else {
-      router.push("/cash");
+      router.push(closeHref);
     }
   };
 
@@ -126,6 +144,7 @@ export function CashFlowForm({ onClose }: Props) {
         method,
         amount: Number(amount),
         note: note.trim() || undefined,
+        pointId: pointId === NO_POINT ? null : pointId,
       });
 
       if (result.success) {
@@ -135,7 +154,7 @@ export function CashFlowForm({ onClose }: Props) {
 
         onClose?.();
 
-        if (!onClose) router.push("/cash");
+        if (!onClose) router.push(closeHref);
       } else {
         toast.error(result.error);
       }
@@ -204,6 +223,32 @@ export function CashFlowForm({ onClose }: Props) {
             </Select>
           </div>
         )}
+
+        <div className="space-y-1.5">
+          <Label>{t("point")}</Label>
+
+          <Select value={pointId} onValueChange={setPointId}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+
+            <SelectContent>
+              {points.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.name}
+                </SelectItem>
+              ))}
+
+              <SelectItem value={NO_POINT}>
+                {t("noPoint")}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
+          <p className="text-xs text-muted-foreground">
+            {t("pointDescription")}
+          </p>
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">

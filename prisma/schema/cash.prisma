@@ -32,6 +32,7 @@ model CashFlow {
   organizationId String
   cashRegisterId String?  // method === CASH bo'lganda to'ldiriladi
   bankAccountId  String?  // method === CARD | QR bo'lganda to'ldiriladi
+  pointId        String?  // qaysi nuqta (foyda markazi) hisobiga tegishli; null = umumiy / nuqtasiz
 
   docType        String   // SALE | PURCHASE | DEPOSIT | WITHDRAWAL | EXPENSE | ADJUSTMENT
   docId          String?  // bog'liq hujjat id (Sale/Purchase), qo'lda kiritilganda null
@@ -49,7 +50,9 @@ model CashFlow {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   cashRegister   CashRegister? @relation(fields: [cashRegisterId], references: [id], onDelete: Cascade)
   bankAccount    BankAccount?  @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+  point          Point?        @relation(fields: [pointId], references: [id], onDelete: SetNull)
 
   @@index([organizationId, createdAt])
+  @@index([organizationId, pointId, createdAt])
   @@index([docType, docId])
 }

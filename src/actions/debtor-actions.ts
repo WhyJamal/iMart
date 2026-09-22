@@ -226,6 +226,8 @@ export async function createDebtorPayment(input: {
   amount: number;
   method: "CASH" | "CARD" | "QR";
   note?: string;
+  // undefined — sessiyaning o'z nuqtasi olinadi; null — "nuqtasiz"
+  pointId?: string | null;
 }): Promise<ActionResult<{ id: string }>> {
   try {
     const session = await getServerSession();
@@ -242,6 +244,16 @@ export async function createDebtorPayment(input: {
       where: { id: input.debtorId, organizationId: session.organizationId },
     });
     if (!debtor) return { success: false, error: "Mijoz topilmadi" };
+
+    const pointId =
+      input.pointId === undefined ? session.pointId : input.pointId;
+    if (pointId) {
+      const point = await prisma.point.findFirst({
+        where: { id: pointId, organizationId: session.organizationId },
+        select: { id: true },
+      });
+      if (!point) return { success: false, error: "Nuqta topilmadi" };
+    }
 
     const balances = await getDebtorBalances(session.organizationId);
     const currentDebt = balances.get(debtor.id) ?? 0;
@@ -272,6 +284,7 @@ export async function createDebtorPayment(input: {
         amount,
         note: `Qarz to'lovi: ${debtor.name}`,
         createdBy: session.userId,
+        pointId,
       });
 
       return created;

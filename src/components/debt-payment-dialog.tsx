@@ -25,6 +25,12 @@ import {
 } from "@/components/ui/dialog";
 
 import type { ActionResult } from "@/types/action-result.types";
+import type { IPointOption } from "@/types/point.types";
+
+// Radix Select bo'sh string qiymatni qabul qilmaydi — "nuqtasiz
+// (umumiy)" tanlovi shu sentinel bilan ifodalanadi va yuborishda
+// null'ga aylantiriladi.
+const NO_POINT = "__none__";
 
 interface Props {
   name: string;
@@ -33,7 +39,11 @@ interface Props {
     amount: number;
     method: "CASH" | "CARD" | "QR";
     note?: string;
+    pointId?: string | null;
   }) => Promise<ActionResult<unknown>>;
+  /** Berilsa — to'lov qaysi nuqta hisobiga yozilishini tanlash imkoni qo'shiladi */
+  points?: IPointOption[];
+  defaultPointId?: string | null;
   labels: {
     trigger: string;
     title: string;
@@ -47,10 +57,19 @@ interface Props {
     card: string;
     qr: string;
     success: string;
+    point?: string;
+    noPoint?: string;
   };
 }
 
-export function DebtPaymentDialog({ name, debt, onSubmit, labels }: Props) {
+export function DebtPaymentDialog({
+  name,
+  debt,
+  onSubmit,
+  points,
+  defaultPointId,
+  labels,
+}: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -58,6 +77,9 @@ export function DebtPaymentDialog({ name, debt, onSubmit, labels }: Props) {
   const [amount, setAmount] = useState(String(debt));
   const [method, setMethod] = useState<"CASH" | "CARD" | "QR">("CASH");
   const [note, setNote] = useState("");
+  const [pointId, setPointId] = useState<string>(
+    defaultPointId ?? NO_POINT
+  );
 
   const handleSubmit = () => {
     const value = Number(amount);
@@ -68,6 +90,7 @@ export function DebtPaymentDialog({ name, debt, onSubmit, labels }: Props) {
         amount: value,
         method,
         note: note.trim() || undefined,
+        ...(points ? { pointId: pointId === NO_POINT ? null : pointId } : {}),
       });
 
       if (result.success) {
@@ -136,6 +159,25 @@ export function DebtPaymentDialog({ name, debt, onSubmit, labels }: Props) {
               </SelectContent>
             </Select>
           </div>
+
+          {points && (
+            <div className="space-y-1.5">
+              <Label>{labels.point}</Label>
+              <Select value={pointId} onValueChange={setPointId}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {points.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value={NO_POINT}>{labels.noPoint}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-1.5">
             <Label>{labels.note}</Label>

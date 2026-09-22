@@ -24,6 +24,8 @@
     "historyEmpty": "Hozircha harakatlar yo‘q",
     "historyDebt": "Qarz",
     "historyPayment": "To‘lov",
+    "point": "Nuqta",
+    "noPoint": "Nuqtasiz (umumiy)",
     "historyBalance": "Qoldiq"
   }
 }

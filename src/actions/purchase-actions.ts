@@ -252,6 +252,7 @@ export async function createPurchase(
           method: paymentMethod.toUpperCase() as CashMethod,
           amount: paidAmount,
           createdBy: session.userId,
+          pointId,
         });
       }
 

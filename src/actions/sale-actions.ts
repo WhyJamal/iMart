@@ -289,6 +289,7 @@ export async function createSale(
           method: parsed.data.paymentMethod.toUpperCase() as CashMethod,
           amount: effectiveTotal,
           createdBy: session.userId,
+          pointId,
         });
       }
 

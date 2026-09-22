@@ -8,11 +8,19 @@ import {
   getCashRegister,
   getBankAccount,
   getCashFlows,
+  getCashPointSummary,
 } from "@/actions/cash-actions";
+import { getPointOptions } from "@/actions/point-actions";
+import { getServerSession } from "@/lib/auth";
 
 import { CashFlowList } from "./_components/cash-flow-list";
 import { CashFlowForm } from "./_components/cash-flow-form";
+import { CashFilters } from "./_components/cash-filters";
+import { CashPointSummary } from "./_components/cash-point-summary";
+import { CashTransferDialog } from "./_components/cash-transfer-dialog";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
+
+import type { ICashFilter } from "@/types/cash.types";
 
 import { getTranslations } from "next-intl/server";
 
@@ -23,17 +31,46 @@ const fmt = (n: number) => n.toLocaleString("uz-UZ") + " so'm";
 export default async function CashPage({
   searchParams,
 }: {
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{
+    new?: string;
+    point?: string;
+    from?: string;
+    to?: string;
+  }>;
 }) {
-  const { new: isNew } = await searchParams;
+  const { new: isNew, point, from, to } = await searchParams;
 
   const t = await getTranslations("cash");
 
-  const [register, bank, flows] = await Promise.all([
+  const session = await getServerSession();
+
+  const filter: ICashFilter = {
+    pointId: point || undefined,
+    dateFrom: from || undefined,
+    dateTo: to || undefined,
+  };
+
+  const [register, bank, flows, summary, points] = await Promise.all([
     getCashRegister(),
     getBankAccount(),
-    getCashFlows(),
+    getCashFlows(filter),
+    getCashPointSummary(filter),
+    getPointOptions(),
   ]);
+
+  // Yangi harakat drawer'ini ochganda ham, yopganda ham joriy filtr
+  // saqlanib qolishi uchun havolalar shu yerda yig'iladi.
+  const filterParams = new URLSearchParams();
+  if (point) filterParams.set("point", point);
+  if (from) filterParams.set("from", from);
+  if (to) filterParams.set("to", to);
+
+  const closeHref = filterParams.toString()
+    ? `/cash?${filterParams.toString()}`
+    : "/cash";
+
+  filterParams.set("new", "1");
+  const newHref = `/cash?${filterParams.toString()}`;
 
   return (
     <>
@@ -49,12 +86,19 @@ export default async function CashPage({
             </p>
           </div>
 
-          <Button asChild>
-            <Link href="/cash?new=1">
-              <Plus className="w-4 h-4 mr-1" />
-              {t("newMovement")}
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <CashTransferDialog
+              points={points}
+              defaultPointId={session?.pointId ?? null}
+            />
+
+            <Button asChild>
+              <Link href={newHref}>
+                <Plus className="w-4 h-4 mr-1" />
+                {t("newMovement")}
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -91,11 +135,19 @@ export default async function CashPage({
           </div>
         </div>
 
+        <CashFilters points={points} />
+
+        <CashPointSummary rows={summary} />
+
         <CashFlowList flows={flows} />
       </div>
 
       <DrawerBackdrop isOpen={isNew === "1"}>
-        <CashFlowForm />
+        <CashFlowForm
+          points={points}
+          defaultPointId={session?.pointId ?? null}
+          closeHref={closeHref}
+        />
       </DrawerBackdrop>
     </>
   );

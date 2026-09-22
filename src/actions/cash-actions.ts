@@ -3,14 +3,22 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
-import type { CashFlow } from "@/generated/prisma/client";
-import { CreateCashFlowSchema, type CreateCashFlowInput } from "@/schema/cash.schema";
+import { checkPermission } from "@/lib/permissions";
+import {
+  CreateCashFlowSchema,
+  type CreateCashFlowInput,
+  CreateCashTransferSchema,
+  type CreateCashTransferInput,
+} from "@/schema/cash.schema";
 import type { ActionResult } from "@/types/action-result.types";
 import type { TxClient } from "@/types/prisma.types";
+import { CASH_NO_POINT } from "@/types/cash.types";
 import type {
   TCashFlowSerialized,
   TCashRegisterSerialized,
   TBankAccountSerialized,
+  ICashFilter,
+  ICashPointSummary,
   CashDocType,
   CashDirection,
   CashMethod,
@@ -58,6 +66,11 @@ export async function getOrCreateBankAccount(
  * qo'shadi. Faqat "CASH" usulidagi harakatlar kassa balansiga ta'sir
  * qiladi; karta/QR orqali to'lovlar ham audit uchun yoziladi, lekin
  * naqd qoldiqni o'zgartirmaydi.
+ *
+ * pointId — yozuv qaysi nuqta (foyda markazi) hisobiga tegishli.
+ * Berilmasa (yoki null) yozuv "umumiy / nuqtasiz" bo'ladi. Chaqiruvchi
+ * pointId shu tashkilotga tegishli ekanini o'zi tekshiradi (odatda u
+ * allaqachon Sale/Purchase/PayrollAccrual'dan olingan bo'ladi).
  */
 export async function recordCashFlow(
   tx: TxClient,
@@ -70,6 +83,7 @@ export async function recordCashFlow(
     amount: number;
     note?: string | null;
     createdBy?: string | null;
+    pointId?: string | null;
   }
 ) {
   const isCash = params.method === "CASH";
@@ -83,6 +97,7 @@ export async function recordCashFlow(
       organizationId: params.organizationId,
       cashRegisterId: isCash ? register.id : null,
       bankAccountId: isCash ? null : register.id,
+      pointId: params.pointId ?? null,
       docType: params.docType,
       docId: params.docId,
       direction: params.direction,
@@ -160,19 +175,142 @@ export async function getBankAccount(): Promise<TBankAccountSerialized> {
   return { ...account, balance: Number(account.balance) };
 }
 
-export async function getCashFlows(): Promise<TCashFlowSerialized[]> {
+/**
+ * Filtr -> Prisma where. Barcha so'rovlar (ro'yxat va nuqtalar
+ * bo'yicha yig'indi) bir xil filtrni ishlatishi uchun bitta joyda.
+ */
+function buildCashWhere(organizationId: string, filter?: ICashFilter) {
+  const where: {
+    organizationId: string;
+    pointId?: string | null;
+    createdAt?: { gte?: Date; lte?: Date };
+  } = { organizationId };
+
+  if (filter?.pointId === CASH_NO_POINT) {
+    where.pointId = null;
+  } else if (filter?.pointId) {
+    where.pointId = filter.pointId;
+  }
+
+  const from = filter?.dateFrom
+    ? new Date(`${filter.dateFrom}T00:00:00`)
+    : null;
+  const to = filter?.dateTo
+    ? new Date(`${filter.dateTo}T23:59:59.999`)
+    : null;
+
+  if (from && !Number.isNaN(from.getTime())) {
+    where.createdAt = { ...where.createdAt, gte: from };
+  }
+  if (to && !Number.isNaN(to.getTime())) {
+    where.createdAt = { ...where.createdAt, lte: to };
+  }
+
+  return where;
+}
+
+export async function getCashFlows(
+  filter?: ICashFilter
+): Promise<TCashFlowSerialized[]> {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
   const entries = await prisma.cashFlow.findMany({
-    where: { organizationId: session.organizationId },
+    where: buildCashWhere(session.organizationId, filter),
+    include: { point: { select: { name: true } } },
     orderBy: { createdAt: "desc" },
   });
 
-  return entries.map((entry: CashFlow) => ({
+  return entries.map(({ point, ...entry }: (typeof entries)[number]) => ({
     ...entry,
     amount: Number(entry.amount),
+    pointName: point?.name ?? null,
   }));
+}
+
+/**
+ * Nuqtalar (foyda markazlari) bo'yicha pul oqimi: har bir nuqta uchun
+ * naqd/bank kirim-chiqim va sof natija. Filtrdagi pointId shu yerda
+ * ham hisobga olinadi (bitta nuqta tanlansa — faqat o'sha qator).
+ */
+export async function getCashPointSummary(
+  filter?: ICashFilter
+): Promise<ICashPointSummary[]> {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const grouped = await prisma.cashFlow.groupBy({
+    by: ["pointId", "direction", "method"],
+    where: buildCashWhere(session.organizationId, filter),
+    _sum: { amount: true },
+  });
+
+  const pointIds = [
+    ...new Set(
+      grouped
+        .map((g: (typeof grouped)[number]) => g.pointId)
+        .filter((id: string | null): id is string => id !== null)
+    ),
+  ];
+
+  const points = pointIds.length
+    ? await prisma.point.findMany({
+        where: { organizationId: session.organizationId, id: { in: pointIds } },
+        select: { id: true, name: true },
+      })
+    : [];
+  const nameById = new Map<string, string>(
+    points.map((p: { id: string; name: string }) => [p.id, p.name])
+  );
+
+  const rows = new Map<string, ICashPointSummary>();
+
+  for (const g of grouped as {
+    pointId: string | null;
+    direction: string;
+    method: string;
+    _sum: { amount: unknown };
+  }[]) {
+    const key = g.pointId ?? CASH_NO_POINT;
+    let row = rows.get(key);
+    if (!row) {
+      row = {
+        pointId: g.pointId,
+        pointName: g.pointId ? nameById.get(g.pointId) ?? null : null,
+        cashIn: 0,
+        cashOut: 0,
+        bankIn: 0,
+        bankOut: 0,
+        totalIn: 0,
+        totalOut: 0,
+        net: 0,
+      };
+      rows.set(key, row);
+    }
+
+    const amount = Number(g._sum.amount ?? 0);
+    const isCash = g.method === "CASH";
+
+    if (g.direction === "IN") {
+      if (isCash) row.cashIn += amount;
+      else row.bankIn += amount;
+      row.totalIn += amount;
+    } else {
+      if (isCash) row.cashOut += amount;
+      else row.bankOut += amount;
+      row.totalOut += amount;
+    }
+  }
+
+  const result = [...rows.values()];
+  for (const r of result) r.net = r.totalIn - r.totalOut;
+
+  // Eng foydali nuqtalar tepada; "nuqtasiz" qator doim eng oxirida.
+  return result.sort((a, b) => {
+    if (a.pointId === null) return 1;
+    if (b.pointId === null) return -1;
+    return b.net - a.net;
+  });
 }
 
 // ─── Mutations ────────────────────────────────────────────────────────────────
@@ -194,6 +332,21 @@ export async function createCashFlow(
 
     const { docType, direction, method, amount, note } = parsed.data;
 
+    // pointId berilmagan (undefined) bo'lsa — foydalanuvchining o'z
+    // nuqtasi avtomatik olinadi; null — aniq "nuqtasiz (umumiy)".
+    const pointId =
+      parsed.data.pointId === undefined
+        ? session.pointId
+        : parsed.data.pointId;
+
+    if (pointId) {
+      const point = await prisma.point.findFirst({
+        where: { id: pointId, organizationId: session.organizationId },
+        select: { id: true },
+      });
+      if (!point) return { success: false, error: "Point not found" };
+    }
+
     const entry = await prisma.$transaction(async (tx: TxClient) => {
       return recordCashFlow(tx, {
         organizationId: session.organizationId,
@@ -204,6 +357,7 @@ export async function createCashFlow(
         amount,
         note,
         createdBy: session.userId,
+        pointId,
       });
     });
 
@@ -261,5 +415,110 @@ export async function deleteCashFlow(id: string): Promise<ActionResult<undefined
   } catch (err) {
     console.error("[deleteCashFlow]", err);
     return { success: false, error: "Failed to delete cash flow entry" };
+  }
+}
+
+/**
+ * Ikki nuqta (foyda markazi) orasida pul o'tkazish. Umumiy kassa/bank
+ * balansi o'zgarmaydi (bitta OUT + bitta IN, bir xil summa) — faqat
+ * har bir nuqtaning pul oqim hisobotidagi ulushi o'zgaradi. Ikkala
+ * yozuv bir xil docId bilan bog'lanadi, shuning uchun keyinchalik
+ * ikkalasi birga bekor qilinishi mumkin (deleteCashTransfer).
+ */
+export async function createCashTransfer(
+  input: CreateCashTransferInput
+): Promise<ActionResult<{ id: string }>> {
+  try {
+    const session = await getServerSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
+    const denied = checkPermission(session.role, "cash:write");
+    if (denied) return denied;
+
+    const parsed = CreateCashTransferSchema.safeParse(input);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+
+    const { fromPointId, toPointId, method, amount, note } = parsed.data;
+
+    for (const id of [fromPointId, toPointId]) {
+      if (!id) continue;
+      const point = await prisma.point.findFirst({
+        where: { id, organizationId: session.organizationId },
+        select: { id: true },
+      });
+      if (!point) return { success: false, error: "Point not found" };
+    }
+
+    const transferId = crypto.randomUUID();
+
+    await prisma.$transaction(async (tx: TxClient) => {
+      await recordCashFlow(tx, {
+        organizationId: session.organizationId,
+        docType: "CASH_TRANSFER",
+        docId: transferId,
+        direction: "OUT",
+        method,
+        amount,
+        note,
+        createdBy: session.userId,
+        pointId: fromPointId,
+      });
+
+      await recordCashFlow(tx, {
+        organizationId: session.organizationId,
+        docType: "CASH_TRANSFER",
+        docId: transferId,
+        direction: "IN",
+        method,
+        amount,
+        note,
+        createdBy: session.userId,
+        pointId: toPointId,
+      });
+    });
+
+    revalidatePath("/cash");
+
+    return { success: true, data: { id: transferId } };
+  } catch (err) {
+    console.error("[createCashTransfer]", err);
+    return { success: false, error: "Failed to record transfer" };
+  }
+}
+
+export async function deleteCashTransfer(
+  docId: string
+): Promise<ActionResult<undefined>> {
+  try {
+    const session = await getServerSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
+    const denied = checkPermission(session.role, "cash:write");
+    if (denied) return denied;
+
+    const entries = await prisma.cashFlow.findMany({
+      where: {
+        docType: "CASH_TRANSFER",
+        docId,
+        organizationId: session.organizationId,
+      },
+      select: { id: true },
+    });
+    if (entries.length === 0) {
+      return { success: false, error: "Transfer not found" };
+    }
+
+    await prisma.$transaction(async (tx: TxClient) => {
+      await reverseCashFlowsByDoc(tx, "CASH_TRANSFER", docId);
+    });
+
+    revalidatePath("/cash");
+
+    return { success: true, data: undefined };
+  } catch (err) {
+    console.error("[deleteCashTransfer]", err);
+    return { success: false, error: "Failed to delete transfer" };
   }
 }

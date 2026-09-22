@@ -382,6 +382,7 @@ export async function confirmPayrollAccrual(
           amount,
           note: `Oylik: ${line.user.name}`,
           createdBy: session.userId,
+          pointId: accrual.pointId,
         });
       }
 

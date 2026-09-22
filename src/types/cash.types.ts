@@ -11,7 +11,8 @@ export type CashDocType =
   | "DEPOSIT"
   | "WITHDRAWAL"
   | "EXPENSE"
-  | "ADJUSTMENT";
+  | "ADJUSTMENT"
+  | "CASH_TRANSFER"; // nuqtalar orasida pul (profit-center) o'tkazish
 
 export type CashDirection = "IN" | "OUT";
 
@@ -23,7 +24,41 @@ export type TCashRegisterSerialized = Omit<CashRegister, "balance"> & {
 
 export type TCashFlowSerialized = Omit<CashFlow, "amount"> & {
   amount: number;
+  /** Point (foyda markazi) nomi; null — umumiy / nuqtasiz yozuv */
+  pointName: string | null;
 };
+
+/**
+ * Kassa sahifasidagi filtr. pointId === CASH_NO_POINT — faqat nuqtasiz
+ * (umumiy) yozuvlar; pointId berilmasa — barcha nuqtalar.
+ * Sanalar YYYY-MM-DD ko'rinishida (ikkala chegara ham kiradi).
+ */
+export const CASH_NO_POINT = "none";
+
+export interface ICashFilter {
+  pointId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+/**
+ * Bitta nuqta (foyda markazi) bo'yicha pul oqimi. pointId === null —
+ * hech qaysi nuqtaga biriktirilmagan (umumiy xarajatlar, eski yozuvlar).
+ * "net" — sof PUL oqimi (kirim − chiqim), bu buxgalteriya foydasi
+ * emas: xarid/ombor xarajatlari ham chiqim sifatida kiradi. Haqiqiy
+ * foyda (accrual) uchun Foyda-Zarar hisoboti ishlatiladi.
+ */
+export interface ICashPointSummary {
+  pointId: string | null;
+  pointName: string | null;
+  cashIn: number;
+  cashOut: number;
+  bankIn: number;
+  bankOut: number;
+  totalIn: number;
+  totalOut: number;
+  net: number;
+}
 
 export type TBankAccountSerialized = Omit<BankAccount, "balance"> & {
   balance: number;

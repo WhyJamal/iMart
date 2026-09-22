@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
 import { getContragents } from "@/actions/contragent-actions";
+import { getPointOptions } from "@/actions/point-actions";
 import { ContragentList } from "./_components/contragent-list";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
 import { ContragentForm } from "./_components/contragent-form";
@@ -26,7 +27,10 @@ export default async function ContragentsPage({
   }
 
   const { new: isNew, edit } = await searchParams;
-  const contragents = await getContragents();
+  const [contragents, points] = await Promise.all([
+    getContragents(),
+    getPointOptions(),
+  ]);
   const editTarget = edit
     ? contragents.find((c) => c.id === edit)
     : undefined;
@@ -52,7 +56,12 @@ export default async function ContragentsPage({
           </Button>
         </div>
 
-        <ContragentList contragents={contragents} canManage />
+        <ContragentList
+          contragents={contragents}
+          canManage
+          points={points}
+          defaultPointId={session.pointId}
+        />
       </div>
 
       <DrawerBackdrop isOpen={isNew === "1"}>

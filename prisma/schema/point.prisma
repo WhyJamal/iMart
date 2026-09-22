@@ -18,6 +18,7 @@ model Point {
   transfersFrom Transfer[] @relation("TransferFromPoint")
   transfersTo   Transfer[] @relation("TransferToPoint")
   stockIntakes  StockIntake[]
+  cashFlows     CashFlow[]
 
   @@index([organizationId])
 }

@@ -24,6 +24,8 @@
     "historyEmpty": "No transactions yet",
     "historyDebt": "Debt",
     "historyPayment": "Payment",
+    "point": "Point",
+    "noPoint": "No point (general)",
     "historyBalance": "Balance"
   }
 }

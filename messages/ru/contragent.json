@@ -48,6 +48,8 @@
     "historyEmpty": "Пока нет операций",
     "historyDebt": "Долг",
     "historyPayment": "Оплата",
+    "point": "Точка",
+    "noPoint": "Без точки (общие)",
     "historyBalance": "Остаток"
   }
 }

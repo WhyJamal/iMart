@@ -16,12 +16,15 @@ import { DebtPaymentDialog } from "@/components/debt-payment-dialog";
 import { DebtHistoryDialog } from "@/components/debt-history-dialog";
 import { createDebtorPayment, getDebtorLedger } from "@/actions/debtor-actions";
 import type { IDebtor } from "@/types/debtor.types";
+import type { IPointOption } from "@/types/point.types";
 
 interface Props {
   debtors: (IDebtor & { debt: number })[];
+  points?: IPointOption[];
+  defaultPointId?: string | null;
 }
 
-export function DebtorList({ debtors }: Props) {
+export function DebtorList({ debtors, points, defaultPointId }: Props) {
   const t = useTranslations("debtor.list");
 
   if (debtors.length === 0) {
@@ -65,6 +68,8 @@ export function DebtorList({ debtors }: Props) {
                 <DebtPaymentDialog
                   name={d.name}
                   debt={d.debt}
+                  points={points}
+                  defaultPointId={defaultPointId}
                   onSubmit={(input) =>
                     createDebtorPayment({ debtorId: d.id, ...input })
                   }
@@ -81,6 +86,8 @@ export function DebtorList({ debtors }: Props) {
                     card: t("payCard"),
                     qr: t("payQr"),
                     success: t("paymentSaved"),
+                    point: t("point"),
+                    noPoint: t("noPoint"),
                   }}
                 />
               )}

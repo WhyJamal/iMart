@@ -254,7 +254,9 @@ export async function createSaleReturn(
         });
       }
 
-      // Pul mijozga qaytariladi — kassa/bank balansidan chiqim (OUT)
+      // Pul mijozga qaytariladi — kassa/bank balansidan chiqim (OUT).
+      // Asl sotuv qaysi nuqtada bo'lgan bo'lsa, qaytarish ham o'sha
+      // nuqta hisobiga yoziladi.
       await recordCashFlow(tx, {
         organizationId: session.organizationId,
         docType: "SALE_RETURN",
@@ -264,6 +266,7 @@ export async function createSaleReturn(
         amount: totalAmount,
         note: reason ?? undefined,
         createdBy: session.userId,
+        pointId: sale.pointId,
       });
 
       return doc;

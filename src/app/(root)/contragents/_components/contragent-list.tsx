@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import type { IContragent } from "@/types/contragent.types";
+import type { IPointOption } from "@/types/point.types";
 import { PAGES } from "@/config/pages.config";
 import { useDeleteContragent } from "../_hooks/use-contragent-mutations";
 import { DebtPaymentDialog } from "@/components/debt-payment-dialog";
@@ -40,9 +41,16 @@ import {
 interface Props {
   contragents: IContragent[];
   canManage: boolean;
+  points?: IPointOption[];
+  defaultPointId?: string | null;
 }
 
-export function ContragentList({ contragents, canManage }: Props) {
+export function ContragentList({
+  contragents,
+  canManage,
+  points,
+  defaultPointId,
+}: Props) {
   const router = useRouter();
   const t = useTranslations("contragent.list");
 
@@ -121,6 +129,8 @@ export function ContragentList({ contragents, canManage }: Props) {
                     <DebtPaymentDialog
                       name={c.name}
                       debt={c.debt}
+                      points={points}
+                      defaultPointId={defaultPointId}
                       onSubmit={(input) =>
                         createSupplierPayment({
                           contragentId: c.id,
@@ -140,6 +150,8 @@ export function ContragentList({ contragents, canManage }: Props) {
                         card: t("payCard"),
                         qr: t("payQr"),
                         success: t("paymentSaved"),
+                        point: t("point"),
+                        noPoint: t("noPoint"),
                       }}
                     />
                   )}

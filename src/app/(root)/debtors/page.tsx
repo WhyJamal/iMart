@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
 import { getDebtors } from "@/actions/debtor-actions";
+import { getPointOptions } from "@/actions/point-actions";
 import { PAGES } from "@/config/pages.config";
 
 import { DebtorList } from "./_components/debtor-list";
@@ -17,7 +18,10 @@ export default async function DebtorsPage() {
     redirect(PAGES.HOME);
   }
 
-  const debtors = await getDebtors();
+  const [debtors, points] = await Promise.all([
+    getDebtors(),
+    getPointOptions(),
+  ]);
   const t = await getTranslations("debtor");
 
   return (
@@ -29,7 +33,11 @@ export default async function DebtorsPage() {
         </p>
       </div>
 
-      <DebtorList debtors={debtors} />
+      <DebtorList
+        debtors={debtors}
+        points={points}
+        defaultPointId={session.pointId}
+      />
     </div>
   );
 }

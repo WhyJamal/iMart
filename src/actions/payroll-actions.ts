@@ -142,6 +142,9 @@ export async function createPayrollPayment(
         },
       });
 
+      // Xodim qaysi nuqtaga biriktirilgan bo'lsa, to'lov ham o'sha
+      // nuqta hisobiga yoziladi (xodimning joriy nuqtasi yo'q bo'lsa —
+      // "nuqtasiz" bo'lib qoladi).
       await recordCashFlow(tx, {
         organizationId: session.organizationId,
         docType: "PAYROLL",
@@ -151,6 +154,7 @@ export async function createPayrollPayment(
         amount: totalAmount,
         note: note ?? `Oylik: ${user.name}`,
         createdBy: session.userId,
+        pointId: user.pointId,
       });
 
       return doc;

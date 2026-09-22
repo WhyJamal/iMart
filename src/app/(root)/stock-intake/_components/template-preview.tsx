@@ -29,7 +29,6 @@ export function TemplatePreview({ products }: { products: ProductOption[] }) {
     const rows = products.map((p) => ({
       [t("code")]: p.code,
       [t("name")]: p.name,
-      [t("unit")]: p.unit,
       [t("qty")]: "",
       [t("price")]: p.price,
     }));

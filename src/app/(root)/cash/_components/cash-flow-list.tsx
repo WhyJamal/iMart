@@ -38,7 +38,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { deleteCashFlow } from "@/actions/cash-actions";
+import { deleteCashFlow, deleteCashTransfer } from "@/actions/cash-actions";
 
 import type { TCashFlowSerialized } from "@/types/cash.types";
 
@@ -60,6 +60,12 @@ const fmtDate = (d: Date) =>
 const DOC_TYPE_LABELS: Record<string, string> = {
   SALE: "sale",
   PURCHASE: "purchase",
+  SALE_RETURN: "saleReturn",
+  PURCHASE_RETURN: "purchaseReturn",
+  PAYROLL: "payroll",
+  DEBT_COLLECT: "debtCollect",
+  DEBT_PAY: "debtPay",
+  CASH_TRANSFER: "transfer",
   DEPOSIT: "deposit",
   WITHDRAWAL: "withdrawal",
   EXPENSE: "expense",
@@ -87,9 +93,14 @@ function CashFlowRow({
     flow.docType === "SALE" ||
     flow.docType === "PURCHASE";
 
+  const isTransfer = flow.docType === "CASH_TRANSFER";
+
   const handleDelete = () => {
     startTransition(async () => {
-      const result = await deleteCashFlow(flow.id);
+      const result =
+        isTransfer && flow.docId
+          ? await deleteCashTransfer(flow.docId)
+          : await deleteCashFlow(flow.id);
 
       if (result.success) {
         toast.success(t("deleted"));
@@ -117,6 +128,14 @@ function CashFlowRow({
               ? t(DOC_TYPE_LABELS[flow.docType])
               : flow.docType}
           </Badge>
+        </TableCell>
+
+        <TableCell className="text-sm">
+          {flow.pointName ?? (
+            <span className="text-muted-foreground">
+              {t("noPoint")}
+            </span>
+          )}
         </TableCell>
 
         <TableCell className="text-muted-foreground text-sm">
@@ -214,6 +233,10 @@ export function CashFlowList({ flows }: Props) {
 
           <TableHead>
             {t("type")}
+          </TableHead>
+
+          <TableHead>
+            {t("point")}
           </TableHead>
 
           <TableHead>

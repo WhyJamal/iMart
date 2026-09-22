@@ -152,6 +152,8 @@ export async function createSupplierPayment(input: {
   amount: number;
   method: "CASH" | "CARD" | "QR";
   note?: string;
+  // undefined — sessiyaning o'z nuqtasi olinadi; null — "nuqtasiz"
+  pointId?: string | null;
 }): Promise<ActionResult<{ id: string }>> {
   try {
     const session = await getServerSession();
@@ -172,6 +174,16 @@ export async function createSupplierPayment(input: {
       },
     });
     if (!contragent) return { success: false, error: "Kontragent topilmadi" };
+
+    const pointId =
+      input.pointId === undefined ? session.pointId : input.pointId;
+    if (pointId) {
+      const point = await prisma.point.findFirst({
+        where: { id: pointId, organizationId: session.organizationId },
+        select: { id: true },
+      });
+      if (!point) return { success: false, error: "Nuqta topilmadi" };
+    }
 
     const debts = await getSupplierDebts(session.organizationId);
     const currentDebt = debts.get(contragent.id) ?? 0;
@@ -201,6 +213,7 @@ export async function createSupplierPayment(input: {
         amount,
         note: `Qarz to'lovi: ${contragent.name}`,
         createdBy: session.userId,
+        pointId,
       });
 
       return created;
