@@ -35,9 +35,10 @@ import type { IProfitLossReport } from "@/types/profit-loss.types";
  *   - InventoryRegister: warehouseCellId -> Warehouse.pointId orqali
  *     (registerning o'zida pointId yo'q).
  *   - WriteOff / PayrollAccrual: to'g'ridan-to'g'ri pointId bo'yicha.
- *   - CashFlow (qo'lda xarajatlar): CHEKLOV — bu modelda pointId
- *     UMUMAN yo'q, shuning uchun manualExpenses nuqta tanlansa ham
- *     har doim BUTUN TASHKILOT bo'yicha qolaveradi.
+ *   - CashFlow (qo'lda xarajatlar): to'g'ridan-to'g'ri pointId bo'yicha.
+ *     "Nuqtasiz (umumiy)" deb yozilgan xarajatlar (pointId = null)
+ *     faqat pointId FILTRLANMAGAN (butun tashkilot) hisobotga kiradi —
+ *     bitta nuqta tanlansa, ular o'sha nuqtaning hisobotiga kirmaydi.
  */
 export async function getProfitLossReport(input: {
   dateFrom: string; // YYYY-MM-DD
@@ -99,14 +100,13 @@ export async function getProfitLossReport(input: {
           },
           _sum: { totalAmount: true },
         }),
-        // CashFlow'da pointId yo'q — shuning uchun bu yerga pointId
-        // filtri QASDAN qo'shilmagan (yuqoridagi izohga qarang).
         prisma.cashFlow.aggregate({
           where: {
             organizationId,
             docType: "EXPENSE",
             direction: "OUT",
             createdAt: createdAtRange,
+            ...(pointId ? { pointId } : {}),
           },
           _sum: { amount: true },
         }),

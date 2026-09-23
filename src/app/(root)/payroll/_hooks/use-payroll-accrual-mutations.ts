@@ -1,7 +1,9 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { showPointFundsAwareError } from "@/lib/point-funds-error";
 import type {
   CreatePayrollAccrualInput,
   UpdateAccrualLineInput,
@@ -20,6 +22,7 @@ function useAction<TInput>(
   onSuccess?: () => void
 ) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const mutate = (input: TInput) => {
     startTransition(() => {
       void (async () => {
@@ -28,7 +31,7 @@ function useAction<TInput>(
           toast.success(successMsg);
           onSuccess?.();
         } else {
-          toast.error(result.error ?? "Xatolik yuz berdi");
+          showPointFundsAwareError(result.error ?? "Xatolik yuz berdi", router);
         }
       })();
     });

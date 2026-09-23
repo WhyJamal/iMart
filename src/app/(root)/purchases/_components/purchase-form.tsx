@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { showPointFundsAwareError } from "@/lib/point-funds-error";
 import { Plus, Trash2, PackagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -292,7 +293,7 @@ export function PurchaseForm({
       } else {
         router.push(PAGES.PURCHASES);
 
-        toast.error(result.error);
+        showPointFundsAwareError(result.error, router);
       }
     });
   };

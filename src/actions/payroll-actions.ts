@@ -165,6 +165,9 @@ export async function createPayrollPayment(
 
     return { success: true, data: { id: payment.id, totalAmount } };
   } catch (err) {
+    if (err instanceof Error && err.message.startsWith("POINT_FUNDS::")) {
+      return { success: false, error: err.message };
+    }
     console.error("[createPayrollPayment]", err);
     return { success: false, error: "Oylikni to'lab bo'lmadi" };
   }

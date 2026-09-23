@@ -398,6 +398,9 @@ export async function confirmPayrollAccrual(
 
     return { success: true, data: undefined };
   } catch (err) {
+    if (err instanceof Error && err.message.startsWith("POINT_FUNDS::")) {
+      return { success: false, error: err.message };
+    }
     console.error("[confirmPayrollAccrual]", err);
     return { success: false, error: "Hujjatni tasdiqlab bo'lmadi" };
   }

@@ -268,6 +268,9 @@ export async function createPurchase(
       data: { id: purchase.id, receiptNumber: purchase.receiptNumber },
     };
   } catch (err) {
+    if (err instanceof Error && err.message.startsWith("POINT_FUNDS::")) {
+      return { success: false, error: err.message };
+    }
     console.error("[createPurchase]", err);
     return { success: false, error: "Failed to create purchase" };
   }

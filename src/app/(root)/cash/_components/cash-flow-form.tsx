@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
+import { showPointFundsAwareError } from "@/lib/point-funds-error";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -156,7 +157,7 @@ export function CashFlowForm({
 
         if (!onClose) router.push(closeHref);
       } else {
-        toast.error(result.error);
+        showPointFundsAwareError(result.error, router);
       }
     });
   };

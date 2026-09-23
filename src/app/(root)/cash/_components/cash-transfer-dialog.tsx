@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { toast } from "sonner";
+import { showPointFundsAwareError } from "@/lib/point-funds-error";
 
 import { ArrowLeftRight } from "lucide-react";
 
@@ -53,6 +54,7 @@ interface Props {
  */
 export function CashTransferDialog({ points, defaultPointId }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const t = useTranslations("cash.transfer");
 
@@ -66,6 +68,36 @@ export function CashTransferDialog({ points, defaultPointId }: Props) {
   const [method, setMethod] = useState<CashMethod>("CASH");
   const [amount, setAmount] = useState<number>(0);
   const [note, setNote] = useState("");
+
+  // Boshqa sahifadan "mablag' yetarli emas" xabaridagi "O'tkazish"
+  // tugmasi bosilganda, /cash?transfer=1&toPoint=&amount= bilan
+  // keladi — oynani "Nuqtasiz (umumiy)"dan kerakli nuqtaga, kerakli
+  // summa bilan oldindan to'ldirib ochamiz.
+  /* eslint-disable react-hooks/set-state-in-effect --
+     URL query orqali (boshqa sahifadan) kelayotgan bir martalik
+     tashqi signalni oynaga aks ettiramiz; darhol o'zimiz query'ni
+     tozalaymiz, shuning uchun keyingi renderlarda qayta ishga
+     tushmaydi. */
+  useEffect(() => {
+    if (searchParams.get("transfer") !== "1") return;
+
+    const toPoint = searchParams.get("toPoint");
+    const prefillAmount = Number(searchParams.get("amount"));
+
+    setFromPointId(NO_POINT);
+    if (toPoint) setToPointId(toPoint);
+    if (prefillAmount > 0) setAmount(prefillAmount);
+    setOpen(true);
+
+    const next = new URLSearchParams(searchParams.toString());
+    next.delete("transfer");
+    next.delete("toPoint");
+    next.delete("amount");
+    const qs = next.toString();
+    router.replace(qs ? `/cash?${qs}` : "/cash");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const sameSelection = fromPointId === toPointId;
 
@@ -95,7 +127,7 @@ export function CashTransferDialog({ points, defaultPointId }: Props) {
         setNote("");
         router.refresh();
       } else {
-        toast.error(result.error);
+        showPointFundsAwareError(result.error, router);
       }
     });
   };

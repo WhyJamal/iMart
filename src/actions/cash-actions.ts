@@ -88,6 +88,51 @@ export async function recordCashFlow(
 ) {
   const isCash = params.method === "CASH";
 
+  // Nuqta (foyda markazi) balansi manfiy bo'lib qolishini oldini olish.
+  // "Nuqtasiz (umumiy)" pul cheksiz hisoblanadi — u yerdan istalgan
+  // vaqt aniq nuqtaga o'tkazish mumkin, shuning uchun faqat aniq nuqta
+  // tanlangan chiqimlar tekshiriladi.
+  if (params.direction === "OUT" && params.pointId) {
+    const grouped = await tx.cashFlow.groupBy({
+      by: ["direction"],
+      where: {
+        organizationId: params.organizationId,
+        pointId: params.pointId,
+        method: isCash ? "CASH" : { in: ["CARD", "QR"] },
+      },
+      _sum: { amount: true },
+    });
+
+    const inSum = Number(
+      (grouped as { direction: string; _sum: { amount: unknown } }[]).find(
+        (g) => g.direction === "IN"
+      )?._sum.amount ?? 0
+    );
+    const outSum = Number(
+      (grouped as { direction: string; _sum: { amount: unknown } }[]).find(
+        (g) => g.direction === "OUT"
+      )?._sum.amount ?? 0
+    );
+    const available = inSum - outSum;
+
+    if (available < params.amount) {
+      const shortfall = params.amount - available;
+      const point = await tx.point.findUnique({
+        where: { id: params.pointId },
+        select: { name: true },
+      });
+      const methodLabel = isCash ? "naqd" : "bank/karta";
+      const message =
+        `Nuqtada mablag' yetarli emas: "${point?.name ?? ""}" ${methodLabel} ` +
+        `balansi ${available.toLocaleString("uz-UZ")}, kerak ` +
+        `${params.amount.toLocaleString("uz-UZ")}. Umumiy pulni shu ` +
+        `nuqtaga o'tkazing.`;
+      throw new Error(
+        `POINT_FUNDS::${params.pointId}::${shortfall}::${message}`
+      );
+    }
+  }
+
   const register = isCash
     ? await getOrCreateCashRegister(tx, params.organizationId)
     : await getOrCreateBankAccount(tx, params.organizationId);
@@ -365,6 +410,9 @@ export async function createCashFlow(
 
     return { success: true, data: { id: entry.id } };
   } catch (err) {
+    if (err instanceof Error && err.message.startsWith("POINT_FUNDS::")) {
+      return { success: false, error: err.message };
+    }
     console.error("[createCashFlow]", err);
     return { success: false, error: "Failed to record cash flow" };
   }
@@ -483,6 +531,9 @@ export async function createCashTransfer(
 
     return { success: true, data: { id: transferId } };
   } catch (err) {
+    if (err instanceof Error && err.message.startsWith("POINT_FUNDS::")) {
+      return { success: false, error: err.message };
+    }
     console.error("[createCashTransfer]", err);
     return { success: false, error: "Failed to record transfer" };
   }

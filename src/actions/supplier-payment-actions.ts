@@ -224,6 +224,9 @@ export async function createSupplierPayment(input: {
 
     return { success: true, data: { id: payment.id } };
   } catch (err) {
+    if (err instanceof Error && err.message.startsWith("POINT_FUNDS::")) {
+      return { success: false, error: err.message };
+    }
     console.error("[createSupplierPayment]", err);
     return { success: false, error: "Failed to record payment" };
   }

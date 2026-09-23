@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { showPointFundsAwareError } from "@/lib/point-funds-error";
 import { Wallet } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -99,7 +100,7 @@ export function DebtPaymentDialog({
         setNote("");
         router.refresh();
       } else {
-        toast.error(result.error);
+        showPointFundsAwareError(result.error, router);
       }
     });
   };
