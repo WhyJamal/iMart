@@ -24,6 +24,7 @@
   "returns": "Sales Returns",
   "reports": "Reports",
   "materialReport": "Material Report",
+  "salesReport": "Sales report",
   "debtReport": "Debt Report",
   "system": "System",
   "settings": "Settings",

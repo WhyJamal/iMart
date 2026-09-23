@@ -1,0 +1,26 @@
+{
+  "title": "Sales report",
+  "description": "Quantity sold, revenue, cost and profit for each product — filterable by period, point and category",
+  "dateFrom": "From",
+  "dateTo": "To",
+  "loading": "Loading…",
+  "empty": "No sales found for the selected period/filter",
+  "filters": {
+    "all": "All",
+    "point": "Point",
+    "category": "Category",
+    "reset": "Reset"
+  },
+  "table": {
+    "product": "Product",
+    "category": "Category",
+    "qty": "Qty",
+    "unit": "Unit",
+    "avgPrice": "Avg. price",
+    "revenue": "Revenue",
+    "cost": "Cost",
+    "profit": "Profit",
+    "margin": "Margin",
+    "total": "Total"
+  }
+}

@@ -227,6 +227,16 @@ export default function POSTerminal({
   const [lastSaleId, setLastSaleId] = useState("");
   const [receiptOpen, setReceiptOpen] = useState(false);
 
+  // ─── Qatorni qo'lda narxlash (chegirma bilan sotish) ────────────────────────
+  // Kassir savatdagi qatorning YAKUNIY (soliq bilan) summasini qo'lda
+  // o'zgartira oladi — masalan, 21 000 so'mlik tovarni tanishga 20 000
+  // so'mga berish. Kiritilgan summa soliqni HAM ichiga oladi, shuning
+  // uchun teskari hisoblab item.price (birlik narxi, soliqsiz) qayta
+  // o'rnatiladi — checkout va receipt hech narsani bilmasdan, xuddi
+  // oddiy narx kabi ishlataveradi.
+  const [editingLineKey, setEditingLineKey] = useState<string | null>(null);
+  const [editingLineValue, setEditingLineValue] = useState("");
+
   // ─── Translated payment methods ─────────────────────────────────────────────
 
   const methods: { id: PayMethod; label: string }[] = [
@@ -452,6 +462,75 @@ export default function POSTerminal({
     (sum, item) => sum + item.qty,
     0
   );
+
+  // ─── Qator summasi (soliq bilan) ────────────────────────────────────────────
+
+  const lineKey = (
+    id: string,
+    warehouseCellId: string
+  ) => `${id}:${warehouseCellId}`;
+
+  const getLineTotalWithTax = (item: CartItem) =>
+    item.qty *
+    item.price *
+    (1 + taxPercent / 100);
+
+  const startLineEdit = (item: CartItem) => {
+    setEditingLineKey(
+      lineKey(item.id, item.warehouseCellId)
+    );
+
+    setEditingLineValue(
+      getLineTotalWithTax(item).toFixed(2)
+    );
+  };
+
+  const cancelLineEdit = () => {
+    setEditingLineKey(null);
+    setEditingLineValue("");
+  };
+
+  const commitLineEdit = (item: CartItem) => {
+    const parsed = parseFloat(
+      editingLineValue.replace(",", ".")
+    );
+
+    if (
+      Number.isNaN(parsed) ||
+      parsed < 0 ||
+      item.qty <= 0
+    ) {
+      cancelLineEdit();
+      return;
+    }
+
+    // Kiritilgan summa soliq bilan — avval soliqni chiqarib,
+    // so'ng birlik narxini (item.price) qayta hisoblaymiz.
+    const totalWithoutTax =
+      parsed / (1 + taxPercent / 100);
+
+    const newUnitPrice =
+      totalWithoutTax / item.qty;
+
+    setCart((previousCart) =>
+      previousCart.map((cartItem) =>
+        cartItem.id === item.id &&
+          cartItem.warehouseCellId ===
+          item.warehouseCellId
+          ? {
+            ...cartItem,
+            price: newUnitPrice,
+            // Narx qo'lda o'zgartirilgani uchun avvalgi
+            // aksiya belgisi endi to'g'ri emas — olib tashlaymiz.
+            discountPercent: undefined,
+            promotionName: undefined,
+          }
+          : cartItem
+      )
+    );
+
+    cancelLineEdit();
+  };
 
   // ─── Add product ────────────────────────────────────────────────────────────
 
@@ -1266,12 +1345,66 @@ export default function POSTerminal({
                               )}
                             </div>
 
-                            <div className="text-sm font-extrabold text-primary">
-                              {fmt(
-                                item.qty *
-                                item.price
-                              )}
-                            </div>
+                            {editingLineKey ===
+                              lineKey(
+                                item.id,
+                                item.warehouseCellId
+                              ) ? (
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                autoFocus
+                                value={
+                                  editingLineValue
+                                }
+                                onChange={(event) =>
+                                  setEditingLineValue(
+                                    event.target
+                                      .value
+                                  )
+                                }
+                                onBlur={() =>
+                                  commitLineEdit(
+                                    item
+                                  )
+                                }
+                                onKeyDown={(
+                                  event
+                                ) => {
+                                  if (
+                                    event.key ===
+                                    "Enter"
+                                  ) {
+                                    commitLineEdit(
+                                      item
+                                    );
+                                  } else if (
+                                    event.key ===
+                                    "Escape"
+                                  ) {
+                                    cancelLineEdit();
+                                  }
+                                }}
+                                className="w-24 h-7 rounded-lg border border-primary/40 px-2 text-right text-sm font-extrabold text-primary outline-none focus:ring-1 focus:ring-primary/40"
+                              />
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  startLineEdit(
+                                    item
+                                  )
+                                }
+                                className="text-sm font-extrabold text-primary underline decoration-dotted decoration-primary/40 underline-offset-2"
+                              >
+                                {fmt(
+                                  getLineTotalWithTax(
+                                    item
+                                  )
+                                )}
+                              </button>
+                            )}
 
                             <div className="mt-1 inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold text-primary">
                               −
@@ -1284,13 +1417,56 @@ export default function POSTerminal({
                               )}
                             </div>
                           </div>
+                        ) : editingLineKey ===
+                          lineKey(
+                            item.id,
+                            item.warehouseCellId
+                          ) ? (
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            autoFocus
+                            value={editingLineValue}
+                            onChange={(event) =>
+                              setEditingLineValue(
+                                event.target.value
+                              )
+                            }
+                            onBlur={() =>
+                              commitLineEdit(item)
+                            }
+                            onKeyDown={(event) => {
+                              if (
+                                event.key ===
+                                "Enter"
+                              ) {
+                                commitLineEdit(
+                                  item
+                                );
+                              } else if (
+                                event.key ===
+                                "Escape"
+                              ) {
+                                cancelLineEdit();
+                              }
+                            }}
+                            className="w-24 h-7 rounded-lg border border-primary/40 px-2 text-right text-sm font-bold outline-none focus:ring-1 focus:ring-primary/40"
+                          />
                         ) : (
-                          <p className="font-bold text-foreground">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              startLineEdit(item)
+                            }
+                            className="font-bold text-foreground underline decoration-dotted decoration-muted-foreground/40 underline-offset-2"
+                          >
                             {fmt(
-                              item.qty *
-                              item.price
+                              getLineTotalWithTax(
+                                item
+                              )
                             )}
-                          </p>
+                          </button>
                         )}
                       </div>
                     </div>
@@ -1473,21 +1649,21 @@ export default function POSTerminal({
 
           {/* Summary */}
           <div className="bg-card rounded-2xl shadow-sm p-4 sticky bottom-0">
-            <div className="flex justify-between items-center py-1 text-[11px] text-muted-foreground">
+            {/* <div className="flex justify-between items-center py-1 text-[11px] text-muted-foreground">
               <span>
                 {t("summary.subtotal")}
               </span>
               <span>{fmt(subtotal)}</span>
-            </div>
+            </div> */}
 
-            <div className="flex justify-between items-center py-1 text-[11px] text-muted-foreground">
+            {/* <div className="flex justify-between items-center py-1 text-[11px] text-muted-foreground">
               <span>
                 {t("summary.tax", {
                   percent: taxPercent,
                 })}
               </span>
               <span>{fmt(taxAmt)}</span>
-            </div>
+            </div> */}
 
             {tipAmt > 0 && (
               <div className="flex justify-between items-center py-1 text-[11px] text-muted-foreground">

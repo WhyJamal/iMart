@@ -180,6 +180,13 @@ export const SIDEBARITEMS: ISidebar[] = [
         permission: "reports:read",
       },
       {
+        id: "sales-report",
+        labelKey: "salesReport",
+        icon: "cart",
+        href: PAGES.SALES_REPORT,
+        permission: "reports:read",
+      },
+      {
         id: "debt-report",
         labelKey: "debtReport",
         icon: "badge-dollar",

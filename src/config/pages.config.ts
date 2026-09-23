@@ -27,6 +27,7 @@ export const PAGES = {
     
     // Reports
     MATERIAL_REPORT: "/reports/material-report",
+    SALES_REPORT: "/reports/sales-report",
     DEBT_REPORT: "/reports/debt-report",
     PROFIT_LOSS: "/reports/profit-loss",
 

@@ -1,0 +1,26 @@
+{
+  "title": "Sotishlar hisoboti",
+  "description": "Har bir mahsulot bo'yicha sotilgan miqdor, tushum, tannarx va foyda — davr, nuqta va kategoriya bo'yicha filtrlanadi",
+  "dateFrom": "Dan",
+  "dateTo": "Gacha",
+  "loading": "Yuklanmoqda…",
+  "empty": "Tanlangan davr/filtr bo'yicha sotuv topilmadi",
+  "filters": {
+    "all": "Barchasi",
+    "point": "Nuqta",
+    "category": "Kategoriya",
+    "reset": "Tozalash"
+  },
+  "table": {
+    "product": "Mahsulot",
+    "category": "Kategoriya",
+    "qty": "Miqdor",
+    "unit": "Birlik",
+    "avgPrice": "O'rtacha narx",
+    "revenue": "Tushum",
+    "cost": "Tannarx",
+    "profit": "Foyda",
+    "margin": "Rentabellik",
+    "total": "Jami"
+  }
+}
