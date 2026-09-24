@@ -5,7 +5,7 @@
 ## What can it do?
 
 - **POS (checkout)** — sell products by scanning or searching, multiple payment methods (cash, card, on credit), print receipts.
-- **Warehouse** — stock intake (the "Kirim" document, including bulk upload via Excel), stock levels per warehouse/cell, transfers, write-offs.
+- **Warehouse** — stock intake documents (including bulk upload via Excel), stock levels per warehouse/cell, transfers, write-offs.
 - **Debts** — sell to customers on credit, track debt payments, partial payments to suppliers.
 - **Promotions** — temporary discounts on products.
 - **Staff** — work schedules, timesheets, payroll calculation.

@@ -43,7 +43,7 @@ export default async function TimesheetDetailPage({
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-3">
         <Link
-          href={PAGES.PAYROLL}
+          href={PAGES.TIMESHEETS}
           className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border hover:bg-muted transition-colors"
         >
           <ChevronLeft className="h-5 w-5" />

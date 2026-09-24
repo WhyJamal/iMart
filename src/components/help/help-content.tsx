@@ -31,6 +31,12 @@ export async function HelpContent({ slug }: { slug: string }) {
         [&_p]:mb-3 [&_ul]:mb-3 [&_ul]:list-disc [&_ul]:pl-5
         [&_li]:mb-1 [&_strong]:font-semibold [&_hr]:my-5 [&_hr]:border-border
         [&_a]:text-primary [&_a]:underline
+        [&_p:has(>img)]:text-center
+        [&_img]:inline-block [&_img]:max-w-full [&_img]:rounded-xl
+        [&_img]:border [&_img]:border-border [&_img]:shadow-sm [&_img]:mt-4
+        [&_p:has(>img)+p]:text-center [&_p:has(>img)+p]:text-xs
+        [&_p:has(>img)+p]:text-muted-foreground [&_p:has(>img)+p]:mt-1.5
+        [&_p:has(>img)+p]:mb-4
       "
     >
       <ReactMarkdown>{markdown}</ReactMarkdown>

@@ -3,11 +3,14 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+
 import { showPointFundsAwareError } from "@/lib/point-funds-error";
+
 import type {
   CreatePayrollAccrualInput,
   UpdateAccrualLineInput,
 } from "@/schema/payroll-accrual.schema";
+
 import {
   createPayrollAccrual,
   deletePayrollAccrual,
@@ -16,47 +19,75 @@ import {
   confirmPayrollAccrual,
 } from "@/actions/payroll-accrual-actions";
 
-function useAction<TInput>(
-  fn: (input: TInput) => Promise<{ success: boolean; error?: string }>,
+import type { ActionResult } from "@/types/action-result.types";
+
+function useAction<TInput, TData = undefined>(
+  fn: (input: TInput) => Promise<ActionResult<TData>>,
   successMsg: string,
-  onSuccess?: () => void
+  onSuccess?: (data: TData | undefined) => void
 ) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
   const mutate = (input: TInput) => {
     startTransition(() => {
       void (async () => {
         const result = await fn(input);
+
         if (result.success) {
           toast.success(successMsg);
-          onSuccess?.();
+          onSuccess?.(result.data);
         } else {
-          showPointFundsAwareError(result.error ?? "Xatolik yuz berdi", router);
+          showPointFundsAwareError(
+            result.error ?? "Xatolik yuz berdi",
+            router
+          );
         }
       })();
     });
   };
+
   return { mutate, isPending };
 }
 
-export function useCreatePayrollAccrual(onSuccess?: () => void) {
-  return useAction<CreatePayrollAccrualInput>(
+export function useCreatePayrollAccrual(
+  onSuccess?: (data: { id: string } | undefined) => void
+) {
+  return useAction<CreatePayrollAccrualInput, { id: string }>(
     createPayrollAccrual,
     "Hujjat yaratildi",
     onSuccess
   );
 }
+
 export function useDeletePayrollAccrual(onSuccess?: () => void) {
-  return useAction<string>(deletePayrollAccrual, "Hujjat o'chirildi", onSuccess);
+  return useAction<string, undefined>(
+    deletePayrollAccrual,
+    "Hujjat o'chirildi",
+    onSuccess
+  );
 }
-export function useFillPayrollAccrual(onSuccess?: () => void) {
-  return useAction<string>(fillPayrollAccrual, "To'ldirildi", onSuccess);
+
+export function useFillPayrollAccrual(
+  onSuccess?: (data: { addedCount: number } | undefined) => void
+) {
+  return useAction<string, { addedCount: number }>(
+    fillPayrollAccrual,
+    "To'ldirildi",
+    onSuccess
+  );
 }
+
 export function useUpdateAccrualLine(onSuccess?: () => void) {
-  return useAction<UpdateAccrualLineInput>(updateAccrualLine, "Saqlandi", onSuccess);
+  return useAction<UpdateAccrualLineInput, undefined>(
+    updateAccrualLine,
+    "Saqlandi",
+    onSuccess
+  );
 }
+
 export function useConfirmPayrollAccrual(onSuccess?: () => void) {
-  return useAction<string>(
+  return useAction<string, undefined>(
     confirmPayrollAccrual,
     "Tasdiqlandi va to'landi",
     onSuccess

@@ -3,11 +3,6 @@
     "closeButton": "Close",
     "comingSoon": "Content for this section will be added soon.",
     "topics": {
-        "overview": "Overview",
-        "pos": "Checkout (POS)",
-        "stock-intake": "Stock Intake",
-        "debt": "Debts",
-        "reports": "Reports",
-        "settings": "Settings"
+        "overview": "Overview"
     }
 }

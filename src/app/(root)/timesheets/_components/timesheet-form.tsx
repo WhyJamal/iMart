@@ -40,9 +40,10 @@ export function TimesheetForm({ points, onClose }: Props) {
     else router.push("/timesheets");
   };
 
-  const { mutate, isPending } = useCreateTimesheet(() => {
-    router.refresh();
-    handleClose();
+  const { mutate, isPending } = useCreateTimesheet((data) => {
+    if (data?.id) {
+      router.push(`/timesheets/${data.id}`);
+    }
   });
 
   const handleSubmit = () => {

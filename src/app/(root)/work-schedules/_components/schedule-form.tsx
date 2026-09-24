@@ -41,10 +41,7 @@ export function ScheduleForm({ templates, calendars, onClose }: Props) {
     else router.push("/work-schedules");
   };
 
-  const { mutate, isPending } = useCreateWorkSchedule(() => {
-    router.refresh();
-    handleClose();
-  });
+  const { mutate, isPending } = useCreateWorkSchedule((data) => { if (!data?.id) return; router.push(`/work-schedules/${data.id}`); });
 
   const handleSubmit = () => {
     mutate({ name, year, templateId, workCalendarId });

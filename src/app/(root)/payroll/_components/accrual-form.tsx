@@ -64,9 +64,10 @@ export function AccrualForm({
   };
 
   const { mutate, isPending } =
-    useCreatePayrollAccrual(() => {
-      router.refresh();
-      handleClose();
+    useCreatePayrollAccrual((data) => {
+      if (data?.id) {
+        router.push(`${PAGES.PAYROLL}/${data.id}`);
+      }
     });
 
   const handleSubmit = () => {
