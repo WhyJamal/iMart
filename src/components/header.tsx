@@ -3,22 +3,20 @@ import { HeaderSearch } from "./header-search";
 import { NotificationBell } from "./notification-bell";
 import Image from "next/image";
 import Link from "next/link";
+import { HelpCircle } from "lucide-react";
 import { PAGES } from "@/config/pages.config";
 import { initials } from "@/utils/initials.util";
 import { getProfile } from "@/actions/user-actions";
+import { getTranslations } from "next-intl/server";
 
 export default async function Header() {
     const user = await getProfile();
+    const t = await getTranslations("help");
 
     return (
         <header
             className="h-14 w-full border-b border-white/10 bg-size-[16px_16px,100%_100%] flex items-center shrink-0 px-5 gap-4"
             style={{
-                // Header doim to'q (dark) fonli — lekin endi ottenkasi
-                // foydalanuvchining tanlagan asosiy rangiga (--primary)
-                // qarab o'zgaradi. color-mix() bitta rangdan ikkita
-                // to'q ottenka hosil qiladi, alohida saqlashning hojati
-                // yo'q.
                 backgroundImage:
                     "radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to right, color-mix(in oklch, var(--primary) 55%, black), color-mix(in oklch, var(--primary) 25%, black))",
             }}
@@ -46,6 +44,15 @@ export default async function Header() {
 
             <div className="flex items-center gap-2">
                 <DateTimeNow color="white" />
+
+                <Link
+                    href={PAGES.HELP("overview")}
+                    title={t("openButton")}
+                    prefetch={false}
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10"
+                >
+                    <HelpCircle className="w-5 h-5" />
+                </Link>
 
                 <NotificationBell />
 

@@ -1,0 +1,13 @@
+{
+    "openButton": "Помощь",
+    "closeButton": "Закрыть",
+    "comingSoon": "Текст этого раздела скоро появится.",
+    "topics": {
+        "overview": "Общая информация",
+        "pos": "Касса (POS)",
+        "stock-intake": "Приход (Склад)",
+        "debt": "Долги",
+        "reports": "Отчёты",
+        "settings": "Настройки"
+    }
+}

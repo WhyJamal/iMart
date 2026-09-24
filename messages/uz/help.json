@@ -1,0 +1,13 @@
+{
+    "openButton": "Yordam",
+    "closeButton": "Yopish",
+    "comingSoon": "Bu bo'lim matni tez orada qo'shiladi.",
+    "topics": {
+        "overview": "Umumiy ma'lumot",
+        "pos": "Kassa (POS)",
+        "stock-intake": "Kirim (Ombor)",
+        "debt": "Qarzdorlik",
+        "reports": "Hisobotlar",
+        "settings": "Sozlamalar"
+    }
+}

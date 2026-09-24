@@ -3,8 +3,10 @@ import Sidebar from "@/components/sidebar";
 
 export default function AppLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-muted/40">
@@ -17,6 +19,8 @@ export default function AppLayout({
           {children}
         </main>
       </div>
+
+      {modal}
     </div>
   );
 }

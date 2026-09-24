@@ -24,6 +24,9 @@ export const PAGES = {
     PROMOTIONS: "/promotions",
     SETTINGS: "/settings",
     STOCK_INTAKE: "/stock-intake",
+
+    // Help
+    HELP: (slug: string) => `/help/${slug}`,
     
     // Reports
     MATERIAL_REPORT: "/reports/material-report",
