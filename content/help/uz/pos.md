@@ -26,11 +26,3 @@ Pastdagi to'lov paneli orqali:
 
 Sotuv yakunlangach chiqadigan oynadan "Chek" tugmasini bosib, chekni chop etishingiz mumkin. Chek shabloni (qaysi ustunlar ko'rinishi, sarlavha/pastki matn) *Sozlamalar → Chek shabloni* bo'limidan sozlanadi.
 
-<!--
-  Rasm qo'shish namunasi — skrinshot qilib public/help-images/pos/
-  papkasiga saqlang, keyin quyidagi ikki qatorni izohdan chiqarib,
-  rasm yo'lini o'zingiznikiga almashtiring:
-
-  ![Kassa oynasi — mahsulot qo'shish](/help-images/pos/pos-asosiy.png)
-  *Kassa oynasining asosiy ko'rinishi*
--->
