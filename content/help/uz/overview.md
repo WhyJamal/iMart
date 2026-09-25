@@ -4,13 +4,13 @@
 
 ## Nimalarni qila oladi?
 
-- **Kassa (POS)** — mahsulotlarni skanerlab yoki qidirib sotish, turli to'lov usullari (naqd, karta, qarz), chek chop etish.
-- **Ombor** — mahsulotlar kirimi ("Kirim" hujjati, shu jumladan Excel orqali ommaviy yuklash), omborlar/yacheykalar bo'yicha qoldiqlar, transferlar, hisobdan chiqarish.
-- **Qarzdorlik** — mijozlarga nasiyaga sotish, qarz to'lovlarini kuzatish, yetkazib beruvchilarga qisman to'lov.
-- **Aksiyalar** — mahsulotlarga vaqtinchalik chegirmalar belgilash.
-- **Xodimlar** — ish jadvali, tabel (davomat), ish haqi hisob-kitobi.
-- **Hisobotlar** — material hisobot, savdo hisoboti, foyda-zarar (P&L), qarzdorlik hisoboti — barchasi nuqta (filial) bo'yicha filtrlanadi.
-- **Sozlamalar** — narxlash rejimi (nomenklatura narxi yoki o'rtacha tannarx), soliq foizi, chek shablonlari, mavzu (rang/qorong'i rejim).
+- **[Kassa (POS)](/help/pos)** — mahsulotlarni skanerlab yoki qidirib sotish, turli to'lov usullari (naqd, karta, qarz), chek chop etish.
+- **[Ombor](/help/warehouses)** — [mahsulotlar kirimi](/help/stock-intake) (shu jumladan Excel orqali ommaviy yuklash), omborlar/yacheykalar bo'yicha qoldiqlar, [ko'chirish](/help/transfers), [hisobdan chiqarish](/help/write-offs).
+- **[Qarzdorlik](/help/debtors)** — mijozlarga nasiyaga sotish, qarz to'lovlarini kuzatish, [kontragentlarga](/help/contragents) qisman to'lov.
+- **[Aksiyalar](/help/promotions)** — mahsulotlarga vaqtinchalik chegirmalar belgilash.
+- **Xodimlar** — [ish jadvali](/help/work-schedules), [tabel](/help/timesheets), [ish haqi hisob-kitobi](/help/payroll).
+- **Hisobotlar** — [material otchyot](/help/material-report), [sotishlar otchyoti](/help/sales-report), [foyda-zarar](/help/profit-loss), [qarzdorlik otchyoti](/help/debt-report) — barchasi nuqta (filial) bo'yicha filtrlanadi.
+- **[Sozlamalar](/help/settings)** — narxlash rejimi (nomenklatura narxi yoki o'rtacha tannarx), soliq foizi, chek shablonlari, mavzu (rang/qorong'i rejim).
 
 ## Kimlar uchun?
 

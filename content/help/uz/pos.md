@@ -20,9 +20,9 @@ Agar mahsulotga faol aksiya (chegirma) o'rnatilgan bo'lsa, savatga qo'shilganda 
 Pastdagi to'lov paneli orqali:
 
 - **Naqd** yoki **Karta** — to'liq summani kiriting, sotuv darhol yakunlanadi.
-- **Qarzga** — mijozni (qarzdorni) ro'yxatdan tanlang; summa uning qarziga yoziladi, keyinroq "Qarzdorlik" bo'limidan to'lovni qabul qilishingiz mumkin.
+- **Qarzga** — mijozni (qarzdorni) ro'yxatdan tanlang; summa uning qarziga yoziladi, keyinroq [Mijozlar (qarzdorlar)](/help/debtors) bo'limidan to'lovni qabul qilishingiz mumkin.
 
 ## Chek
 
-Sotuv yakunlangach chiqadigan oynadan "Chek" tugmasini bosib, chekni chop etishingiz mumkin. Chek shabloni (qaysi ustunlar ko'rinishi, sarlavha/pastki matn) *Sozlamalar → Chek shabloni* bo'limidan sozlanadi.
+Sotuv yakunlangach chiqadigan oynadan "Chek" tugmasini bosib, chekni chop etishingiz mumkin. Chek shabloni (qaysi ustunlar ko'rinishi, sarlavha/pastki matn) *[Sozlamalar](/help/settings) → Chek shabloni* bo'limidan sozlanadi.
 

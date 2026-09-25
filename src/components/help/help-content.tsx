@@ -1,7 +1,28 @@
+import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import ReactMarkdown from "react-markdown";
+import type { Components } from "react-markdown";
 
 import { getHelpMarkdown } from "@/lib/help/get-help-markdown";
+import { PAGES } from "@/config/pages.config";
+
+const markdownComponents: Components = {
+  a: ({ href, children }) => {
+    if (href?.startsWith(PAGES.HELP(""))) {
+      return (
+        <Link href={href} prefetch={false} replace>
+          {children}
+        </Link>
+      );
+    }
+
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        {children}
+      </a>
+    );
+  },
+};
 
 export async function HelpContent({ slug }: { slug: string }) {
   const [t, locale] = await Promise.all([
@@ -39,7 +60,9 @@ export async function HelpContent({ slug }: { slug: string }) {
         [&_p:has(>img)+p]:mb-4
       "
     >
-      <ReactMarkdown>{markdown}</ReactMarkdown>
+      <ReactMarkdown components={markdownComponents}>
+        {markdown}
+      </ReactMarkdown>
     </div>
   );
 }

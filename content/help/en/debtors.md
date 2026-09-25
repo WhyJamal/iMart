@@ -16,15 +16,14 @@ After selecting a debtor, a partial or full amount is entered through the "Recor
 
 ## Payment from the counterparties list
 
-Partial payments to suppliers (counterparties) work the same way, through the corresponding row in the counterparties list.
+Partial payments to suppliers ([counterparties](/help/contragents)) work the same way, through the corresponding row in the counterparties list.
 
 ## Debt report
 
-A summary of all debts is available under *Reports → Debt Report*.
+A summary of all debts is available under *Reports → [Debt Report](/help/debt-report)*.
 
 ![Debtor list](/help-images/debtors/debtors-list.png)
-  *List of debtors and their current outstanding amount*
+*List of debtors and their current outstanding amount*
 
 ![Record payment window](/help-images/debtors/accept-payment.png)
-  *Recording a debt payment*
-
+*Recording a debt payment*

@@ -1,6 +1,6 @@
 # Sotuvlar
 
-"Sotuvlar" sahifasida barcha yakunlangan sotuvlar ro'yxati keltiriladi.
+"Sotuvlar" sahifasida [Kassa](/help/pos)da amalga oshirilgan barcha yakunlangan sotuvlar ro'yxati keltiriladi.
 
 ## Ro'yxat
 

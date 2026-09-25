@@ -16,15 +16,14 @@ Qarzdorni tanlab, "To'lov qabul qilish" oynasi orqali qisman yoki to'liq summa k
 
 ## Kontragentlar ro'yxatidan to'lov
 
-Yetkazib beruvchilarga (kontragentlarga) qisman to'lov ham xuddi shu tarzda, kontragentlar ro'yxatidagi tegishli qator orqali amalga oshiriladi.
+Yetkazib beruvchilarga ([kontragentlarga](/help/contragents)) qisman to'lov ham xuddi shu tarzda, kontragentlar ro'yxatidagi tegishli qator orqali amalga oshiriladi.
 
 ## Qarzdorlik hisoboti
 
-Barcha qarzlar bo'yicha umumlashtirilgan ma'lumot *Hisobotlar → Qarzdorlik otchyoti* bo'limida mavjud.
-  
+Barcha qarzlar bo'yicha umumlashtirilgan ma'lumot *Hisobotlar → [Qarzdorlik otchyoti](/help/debt-report)* bo'limida mavjud.
+
 ![Qarzdorlar ro'yxati](/help-images/debtors/debtors-list.png)
-  *Qarzdorlar ro'yxati va ularning joriy qarz miqdori*
+*Qarzdorlar ro'yxati va ularning joriy qarz miqdori*
 
 ![To'lov qabul qilish oynasi](/help-images/debtors/accept-payment.png)
-  *Qarz bo'yicha to'lov qabul qilish oynasi*
-
+*Qarz bo'yicha to'lov qabul qilish oynasi*

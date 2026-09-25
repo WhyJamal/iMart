@@ -4,13 +4,13 @@
 
 ## What can it do?
 
-- **POS (checkout)** — sell products by scanning or searching, multiple payment methods (cash, card, on credit), print receipts.
-- **Warehouse** — stock intake documents (including bulk upload via Excel), stock levels per warehouse/cell, transfers, write-offs.
-- **Debts** — sell to customers on credit, track debt payments, partial payments to suppliers.
-- **Promotions** — temporary discounts on products.
-- **Staff** — work schedules, timesheets, payroll calculation.
-- **Reports** — material report, sales report, profit & loss (P&L), debt report — all filterable by point (branch).
-- **Settings** — pricing mode (catalog price or average cost), tax percentage, receipt templates, theme (color/dark mode).
+- **[POS (checkout)](/help/pos)** — sell products by scanning or searching, multiple payment methods (cash, card, on credit), print receipts.
+- **[Warehouse](/help/warehouses)** — [stock intake documents](/help/stock-intake) (including bulk upload via Excel), stock levels per warehouse/cell, [transfers](/help/transfers), [write-offs](/help/write-offs).
+- **[Debts](/help/debtors)** — sell to customers on credit, track debt payments, partial payments to [counterparties](/help/contragents).
+- **[Promotions](/help/promotions)** — temporary discounts on products.
+- **Staff** — [work schedules](/help/work-schedules), [timesheets](/help/timesheets), [payroll calculation](/help/payroll).
+- **Reports** — [material report](/help/material-report), [sales report](/help/sales-report), [profit & loss](/help/profit-loss), [debt report](/help/debt-report) — all filterable by point (branch).
+- **[Settings](/help/settings)** — pricing mode (catalog price or average cost), tax percentage, receipt templates, theme (color/dark mode).
 
 ## Who is it for?
 

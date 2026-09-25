@@ -20,8 +20,9 @@ If a product has an active promotion (discount), the price drops automatically w
 From the payment panel at the bottom:
 
 - **Cash** or **Card** — enter the full amount, the sale completes immediately.
-- **On credit** — pick a customer (debtor) from the list; the amount is added to their debt, and you can record a payment later from the Debts section.
+- **On credit** — pick a customer (debtor) from the list; the amount is added to their debt, and you can record a payment later from the [Clients (debtors)](/help/debtors) section.
 
 ## Receipt
 
-After a sale completes, click "Receipt" in the confirmation screen to print it. The receipt template (which columns show, header/footer text) is configured under *Settings → Receipt Template*.
+After a sale completes, click "Receipt" in the confirmation screen to print it. The receipt template (which columns show, header/footer text) is configured under *[Settings](/help/settings) → Receipt Template*.
+

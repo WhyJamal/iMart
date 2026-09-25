@@ -1,6 +1,6 @@
 # Stock Intake
 
-The Stock Intake document is used to receive products from the existing catalog into the warehouse — increasing the stock level in the corresponding cell.
+The Stock Intake document is used to receive products from the existing [catalog](/help/items) into the [warehouse](/help/warehouses) — increasing the stock level in the corresponding cell.
 
 ## Creating a document
 

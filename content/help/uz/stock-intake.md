@@ -1,6 +1,6 @@
 # Kirim (Ombor)
 
-"Kirim" hujjati orqali mavjud katalogdagi mahsulotlar omborga qabul qilinadi va tegishli katak (yacheyka) bo'yicha qoldiq oshiriladi.
+"Kirim" hujjati orqali mavjud [katalogdagi](/help/items) mahsulotlar [omborga](/help/warehouses) qabul qilinadi va tegishli katak (yacheyka) bo'yicha qoldiq oshiriladi.
 
 ## Yangi hujjat yaratish
 

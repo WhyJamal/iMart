@@ -1,6 +1,6 @@
 # Sales
 
-The "Sales" page lists all completed sales.
+The "Sales" page lists all completed sales made at [POS](/help/pos).
 
 ## List
 
