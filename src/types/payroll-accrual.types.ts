@@ -9,6 +9,7 @@ export interface IPayrollAccrualSummary {
   status: "DRAFT" | "CONFIRMED";
   lineCount: number;
   totalPayAmount: number;
+  createdByName: string | null;
   createdAt: Date;
 }
 

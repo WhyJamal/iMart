@@ -8,6 +8,7 @@ model Promotion {
   discountPercent Decimal @db.Decimal(5, 2)
   endsAt         DateTime
   comment        String?
+  createdBy      String? // aksiyani yaratgan foydalanuvchi id
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

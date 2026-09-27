@@ -154,6 +154,7 @@ export function DebtHistoryDialog({ name, fetchLedger, labels }: Props) {
                         </p>
                         <p className="text-xs text-muted-foreground mt-0.5">
                           {fmtDate(e.date)}
+                          {e.createdByName && ` · ${e.createdByName}`}
                         </p>
                       </div>
 

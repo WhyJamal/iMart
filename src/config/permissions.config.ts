@@ -28,6 +28,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "organization:manage",
     "notifications:broadcast",
     "stock-intake:create", "stock-intake:delete",
+    "audit:read",
   ],
   ADMIN: [
     "products:read", "products:write",
@@ -49,6 +50,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "organization:manage",
     "notifications:broadcast",
     "stock-intake:create", "stock-intake:delete",
+    "audit:read",
   ],
   MANAGER: [
     "products:read", "products:write",

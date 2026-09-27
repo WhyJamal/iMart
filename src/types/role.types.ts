@@ -35,4 +35,5 @@ export type Permission =
   | "notifications:broadcast"
   | "stock-intake:create"
   | "stock-intake:delete"
+  | "audit:read"
   ;

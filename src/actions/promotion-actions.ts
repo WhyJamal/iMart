@@ -7,6 +7,7 @@ import { checkPermission } from "@/lib/permissions";
 import { CreatePromotionSchema, type CreatePromotionInput } from "@/schema/promotion.schema";
 import type { ActionResult } from "@/types/action-result.types";
 import type { IPromotion, IPromotionDiscount } from "@/types/promotion.types";
+import { getUserNamesByIds } from "@/actions/user-actions";
 
 export async function getPromotions(): Promise<IPromotion[]> {
   const session = await getServerSession();
@@ -26,6 +27,10 @@ export async function getPromotions(): Promise<IPromotion[]> {
     orderBy: { endsAt: "asc" },
   });
 
+  const userNames = await getUserNamesByIds(
+    rows.map((r: (typeof rows)[number]) => r.createdBy)
+  );
+
   return rows.map((r: (typeof rows)[number]) => ({
     id: r.id,
     name: r.name,
@@ -38,6 +43,7 @@ export async function getPromotions(): Promise<IPromotion[]> {
     discountPercent: Number(r.discountPercent),
     endsAt: r.endsAt,
     comment: r.comment,
+    createdByName: r.createdBy ? userNames[r.createdBy] ?? null : null,
     createdAt: r.createdAt,
     items: r.items.map((i: (typeof r.items)[number]) => ({
       id: i.id,
@@ -117,6 +123,7 @@ export async function createPromotion(
         discountPercent: data.discountPercent,
         endsAt,
         comment: data.comment?.trim() || null,
+        createdBy: session.userId,
         items: { create: [...new Set(data.productIds)].map((productId) => ({ productId })) },
       },
     });

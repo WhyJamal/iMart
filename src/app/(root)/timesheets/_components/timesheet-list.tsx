@@ -41,6 +41,7 @@ export function TimesheetList({
   canManage,
 }: Props) {
   const t = useTranslations("timesheet.list");
+  const tCommon = useTranslations("common");
   const months = useTranslations("timesheet.months");
 
   const router = useRouter();
@@ -66,6 +67,7 @@ export function TimesheetList({
           <TableHead>{t("period")}</TableHead>
           <TableHead>{t("employees")}</TableHead>
           <TableHead>{t("status")}</TableHead>
+          <TableHead>{tCommon("createdBy")}</TableHead>
 
           {canManage && (
             <TableHead className="text-right">
@@ -115,6 +117,10 @@ export function TimesheetList({
                     ? t("confirmed")
                     : t("draft")}
                 </Badge>
+              </TableCell>
+
+              <TableCell className="text-muted-foreground text-sm">
+                {timesheet.createdByName ?? "—"}
               </TableCell>
 
               {canManage && (

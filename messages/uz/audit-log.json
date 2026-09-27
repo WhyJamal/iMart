@@ -1,0 +1,56 @@
+{
+    "title": "O'zgarishlar tarixi",
+    "description": "Kim, qachon, qaysi hujjatni yaratgani yoki o'chirgani",
+    "empty": "Hech qanday yozuv topilmadi",
+    "noAccess": "Bu sahifani ko'rish uchun ruxsatingiz yo'q.",
+    "filters": {
+        "user": "Foydalanuvchi",
+        "allUsers": "Barcha foydalanuvchilar",
+        "entityType": "Hujjat turi",
+        "allTypes": "Barcha turlar",
+        "action": "Harakat",
+        "allActions": "Barcha harakatlar",
+        "dateFrom": "Sanadan",
+        "dateTo": "Sanagacha",
+        "reset": "Tozalash"
+    },
+    "table": {
+        "date": "Sana",
+        "user": "Foydalanuvchi",
+        "action": "Harakat",
+        "entityType": "Hujjat turi",
+        "summary": "Tavsif"
+    },
+    "actions": {
+        "CREATE": "Yaratildi",
+        "UPDATE": "O'zgartirildi",
+        "DELETE": "O'chirildi"
+    },
+    "entityTypes": {
+        "Sale": "Sotuv",
+        "Purchase": "Xarid",
+        "StockIntake": "Kirim",
+        "Transfer": "Ko'chirish",
+        "WriteOff": "Hisobdan chiqarish",
+        "PurchaseReturn": "Yetkazib beruvchiga qaytarish",
+        "SaleReturn": "Sotuvni qaytarish",
+        "Promotion": "Aksiya",
+        "Debtor": "Qarzdor",
+        "DebtorPayment": "Qarz to'lovi",
+        "SupplierPayment": "Yetkazib beruvchiga to'lov",
+        "Contragent": "Kontragent",
+        "Point": "Nuqta",
+        "Warehouse": "Ombor",
+        "Product": "Mahsulot",
+        "User": "Foydalanuvchi",
+        "Organization": "Tashkilot",
+        "CashFlow": "Kassa harakati",
+        "PayrollAccrual": "Ish haqi hisob-kitobi"
+    },
+    "pagination": {
+        "prev": "Oldingi",
+        "next": "Keyingi",
+        "pageInfo": "{page}-sahifa, jami {total} ta yozuv"
+    },
+    "system": "Tizim"
+}

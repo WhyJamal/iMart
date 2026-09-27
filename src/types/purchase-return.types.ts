@@ -31,6 +31,7 @@ export type TSerializedPurchaseReturn = Omit<
   totalAmount: number;
   items: TSerializedPurchaseReturnItem[];
   contragentName?: string | null;
+  createdByName: string | null;
 };
 
 export interface IPurchaseReturnItem {

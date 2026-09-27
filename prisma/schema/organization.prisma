@@ -61,6 +61,7 @@ model Organization {
   supplierPayments   SupplierPayment[]
 
   notifications      Notification[]
+  auditLogs          AuditLog[]
   receiptTemplates   ReceiptTemplate[]
   stockIntakes       StockIntake[]
 

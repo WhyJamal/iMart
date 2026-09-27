@@ -6,6 +6,7 @@ export type TSaleItemWithProduct = SaleItem & {
 
 export type TSaleWithItems = Sale & {
   items: TSaleItemWithProduct[];
+  cashier?: { name: string } | null;
 };
 
 export type TSerializedSaleItem = Omit<
@@ -18,10 +19,11 @@ export type TSerializedSaleItem = Omit<
 
 export type TSerializedSale = Omit<
   TSaleWithItems,
-  "totalAmount" | "items"
+  "totalAmount" | "items" | "cashier"
 > & {
   totalAmount: number;
   items: TSerializedSaleItem[];
+  createdByName: string | null;
 };
 
 export interface ISaleItem {

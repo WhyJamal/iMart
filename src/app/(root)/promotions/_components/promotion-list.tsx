@@ -76,6 +76,7 @@ export function PromotionList({
 
 function PromotionCard({ promotion: p }: { promotion: IPromotion }) {
   const t = useTranslations("promotion.list");
+  const tCommon = useTranslations("common");
 
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -124,6 +125,12 @@ function PromotionCard({ promotion: p }: { promotion: IPromotion }) {
 
           <p className="text-xs text-muted-foreground mt-1">
             {p.pointName} · {p.warehouseName} · {p.warehouseCellName}
+            {p.createdByName && (
+              <>
+                {" "}
+                · {tCommon("createdBy")}: {p.createdByName}
+              </>
+            )}
           </p>
         </div>
 

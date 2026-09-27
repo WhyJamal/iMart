@@ -63,6 +63,9 @@ function Row({ intake }: { intake: IStockIntakeListItem }) {
       <TableCell>{intake.itemsCount}</TableCell>
       <TableCell>{intake.totalQty}</TableCell>
       <TableCell className="text-muted-foreground text-sm">
+        {intake.createdByName ?? "—"}
+      </TableCell>
+      <TableCell className="text-muted-foreground text-sm">
         {fmtDate(intake.createdAt)}
       </TableCell>
       <TableCell onClick={(e) => e.stopPropagation()} className="text-right">
@@ -94,6 +97,7 @@ function Row({ intake }: { intake: IStockIntakeListItem }) {
 
 export function StockIntakeList({ intakes }: { intakes: IStockIntakeListItem[] }) {
   const t = useTranslations("stock-intake.list");
+  const tCommon = useTranslations("common");
 
   if (intakes.length === 0) {
     return (
@@ -112,6 +116,7 @@ export function StockIntakeList({ intakes }: { intakes: IStockIntakeListItem[] }
           <TableHead>{t("point")}</TableHead>
           <TableHead>{t("itemsCount")}</TableHead>
           <TableHead>{t("totalQty")}</TableHead>
+          <TableHead>{tCommon("createdBy")}</TableHead>
           <TableHead>{t("date")}</TableHead>
           <TableHead />
         </TableRow>

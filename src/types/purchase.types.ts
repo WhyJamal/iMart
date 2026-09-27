@@ -17,4 +17,5 @@ export type TSerializedPurchaseItem = Omit<TPurchaseItemWithProduct, "qty" | "un
 export type TSerializedPurchase = Omit<TPurchaseWithItems, "items"> & {
   items: TSerializedPurchaseItem[];
   contragentName?: string | null;
+  createdByName: string | null;
 };

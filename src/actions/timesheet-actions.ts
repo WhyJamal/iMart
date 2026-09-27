@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { checkPermission } from "@/lib/permissions";
+import { getUserNamesByIds } from "@/actions/user-actions";
 import {
   CreateTimesheetSchema,
   SetTimesheetEntrySchema,
@@ -44,6 +45,10 @@ export async function getTimesheets(): Promise<ITimesheetSummary[]> {
     orderBy: [{ year: "desc" }, { month: "desc" }],
   });
 
+  const userNames = await getUserNamesByIds(
+    rows.map((r: (typeof rows)[number]) => r.createdBy)
+  );
+
   // Har bir timesheet uchun user soni (entries'dagi distinct userId)
   const withUserCount = await Promise.all(
     rows.map(async (r: (typeof rows)[number]) => {
@@ -60,6 +65,7 @@ export async function getTimesheets(): Promise<ITimesheetSummary[]> {
         month: r.month,
         status: r.status as "DRAFT" | "CONFIRMED",
         userCount: distinctUsers.length,
+        createdByName: r.createdBy ? userNames[r.createdBy] ?? null : null,
         createdAt: r.createdAt,
       };
     })

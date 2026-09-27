@@ -6,6 +6,7 @@ export interface ITimesheetSummary {
   month: number;
   status: "DRAFT" | "CONFIRMED";
   userCount: number;
+  createdByName: string | null;
   createdAt: Date;
 }
 

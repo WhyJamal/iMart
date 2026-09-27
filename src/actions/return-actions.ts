@@ -17,6 +17,7 @@ import type {
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
 import { applyStockMovement } from "@/actions/stock-actions";
+import { getUserNamesByIds } from "@/actions/user-actions";
 import type { SaleItem } from "@/generated/prisma/client";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -46,9 +47,14 @@ export async function getSaleReturns(): Promise<TSerializedSaleReturn[]> {
     orderBy: { createdAt: "desc" },
   });
 
+  const userNames = await getUserNamesByIds(
+    returns.map((r: { createdBy: string | null }) => r.createdBy)
+  );
+
   return (returns as TSaleReturnWithItems[]).map((r) => ({
     ...r,
     totalAmount: Number(r.totalAmount),
+    createdByName: r.createdBy ? userNames[r.createdBy] ?? null : null,
     items: r.items.map((item: TSaleReturnWithItems["items"][number]) => ({
       ...item,
       qty: Number(item.qty),

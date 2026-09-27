@@ -17,6 +17,7 @@ export interface IPromotion {
   discountPercent: number;
   endsAt: Date;
   comment: string | null;
+  createdByName: string | null;
   createdAt: Date;
   items: IPromotionItem[];
 }

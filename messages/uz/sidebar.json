@@ -28,5 +28,6 @@
   "debtReport": "Qarzdorlik otchyoti",
   "system": "Tizim",
   "settings": "Sozlamalar",
-  "profitLoss": "Foyda-zarar"
+  "profitLoss": "Foyda-zarar",
+  "auditLog": "O'zgarishlar tarixi"
 }

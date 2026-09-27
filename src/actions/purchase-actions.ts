@@ -14,6 +14,8 @@ import type { TPurchaseItemWithProduct, TPurchaseWithItems } from "@/types/purch
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
 import { applyStockMovement } from "@/actions/stock-actions";
+import { logAudit } from "@/actions/audit-actions";
+import { getUserNamesByIds } from "@/actions/user-actions";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -40,9 +42,14 @@ export async function getPurchases() {
     orderBy: { createdAt: "desc" },
   });
 
+  const userNames = await getUserNamesByIds(
+    purchases.map((p: TPurchaseWithItems) => p.createdBy)
+  );
+
   return purchases.map((purchase: TPurchaseWithItems) => ({
     ...purchase,
     contragentName: purchase.contragent?.name ?? null,
+    createdByName: purchase.createdBy ? userNames[purchase.createdBy] ?? null : null,
     paidAmount: Number(purchase.paidAmount),
     items: purchase.items.map((item: TPurchaseItemWithProduct) => ({
       ...item,
@@ -203,6 +210,7 @@ export async function createPurchase(
           note: note?.trim() || null,
           paymentMethod,
           paidAmount,
+          createdBy: session.userId,
           postedAt: new Date(),
           items: {
             create: items.map((item) => ({
@@ -313,6 +321,15 @@ export async function deletePurchase(
     revalidatePath("/purchases");
     revalidatePath("/products");
     revalidatePath("/cash");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "Purchase",
+      entityId: purchase.id,
+      summary: `Xarid ${purchase.receiptNumber} o'chirildi`,
+    });
 
     return { success: true, data: undefined };
   } catch (err) {

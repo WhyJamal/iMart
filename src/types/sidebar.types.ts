@@ -25,6 +25,7 @@ export type TIcon =
     | "file-bar-chart"
     | "trending-up"
     | "package-plus"
+    | "history"
     ;
 
     export type TItem = {

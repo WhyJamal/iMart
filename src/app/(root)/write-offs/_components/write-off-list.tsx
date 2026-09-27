@@ -107,6 +107,10 @@ function WriteOffRow({
         </TableCell>
 
         <TableCell className="text-muted-foreground text-sm">
+          {writeOff.createdByName ?? "—"}
+        </TableCell>
+
+        <TableCell className="text-muted-foreground text-sm">
           {fmtDate(writeOff.createdAt)}
         </TableCell>
 
@@ -158,7 +162,7 @@ function WriteOffRow({
 
       {expanded && (
         <TableRow className="bg-muted/30">
-          <TableCell colSpan={8} className="py-0">
+          <TableCell colSpan={9} className="py-0">
             <div className="py-3 px-6">
               <table className="w-full text-sm">
                 <thead>
@@ -231,6 +235,7 @@ function WriteOffRow({
 
 export function WriteOffList({ writeOffs }: Props) {
   const t = useTranslations("write-off.list");
+  const tCommon = useTranslations("common");
 
   if (writeOffs.length === 0) {
     return (
@@ -252,6 +257,7 @@ export function WriteOffList({ writeOffs }: Props) {
           <TableHead>{t("products")}</TableHead>
           <TableHead>{t("amount")}</TableHead>
           <TableHead>{t("reason")}</TableHead>
+          <TableHead>{tCommon("createdBy")}</TableHead>
           <TableHead>{t("date")}</TableHead>
           <TableHead className="text-right">
             {t("actions")}

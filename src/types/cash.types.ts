@@ -26,6 +26,7 @@ export type TCashFlowSerialized = Omit<CashFlow, "amount"> & {
   amount: number;
   /** Point (foyda markazi) nomi; null — umumiy / nuqtasiz yozuv */
   pointName: string | null;
+  createdByName: string | null;
 };
 
 /**

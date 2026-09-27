@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { checkPermission } from "@/lib/permissions";
 import { recordCashFlow } from "@/actions/cash-actions";
+import { getUserNamesByIds } from "@/actions/user-actions";
 import type { ActionResult } from "@/types/action-result.types";
 import type { TxClient } from "@/types/prisma.types";
 import type { CashMethod } from "@/types/cash.types";
@@ -139,20 +140,32 @@ export async function getDebtorLedger(
         organizationId: session.organizationId,
         paymentMethod: "debt",
       },
-      select: { id: true, saleNumber: true, totalAmount: true, createdAt: true },
+      select: { id: true, saleNumber: true, totalAmount: true, createdAt: true, cashierId: true },
     }),
     prisma.debtorPayment.findMany({
       where: { debtorId, organizationId: session.organizationId },
     }),
   ]);
 
-  type Raw = { date: Date; type: "debt" | "payment"; label: string; amount: number };
+  const userNames = await getUserNamesByIds([
+    ...sales.map((s: (typeof sales)[number]) => s.cashierId),
+    ...payments.map((p: (typeof payments)[number]) => p.createdBy),
+  ]);
+
+  type Raw = {
+    date: Date;
+    type: "debt" | "payment";
+    label: string;
+    amount: number;
+    createdByName: string | null;
+  };
 
   const debtEvents: Raw[] = sales.map((s: (typeof sales)[number]) => ({
     date: s.createdAt,
     type: "debt" as const,
     label: `Sotuv #${s.saleNumber}`,
     amount: Number(s.totalAmount),
+    createdByName: s.cashierId ? userNames[s.cashierId] ?? null : null,
   }));
 
   const paymentEvents: Raw[] = payments.map(
@@ -161,6 +174,7 @@ export async function getDebtorLedger(
       type: "payment" as const,
       label: pay.note ? `To'lov (${pay.method}) — ${pay.note}` : `To'lov (${pay.method})`,
       amount: Number(pay.amount),
+      createdByName: pay.createdBy ? userNames[pay.createdBy] ?? null : null,
     })
   );
 

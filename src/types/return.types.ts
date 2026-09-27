@@ -28,6 +28,7 @@ export type TSerializedSaleReturn = Omit<
 > & {
   totalAmount: number;
   items: TSerializedSaleReturnItem[];
+  createdByName: string | null;
 };
 
 export interface ISaleReturnItem {

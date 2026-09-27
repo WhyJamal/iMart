@@ -104,6 +104,10 @@ function ReturnRow({ ret }: { ret: TSerializedSaleReturn }) {
         </TableCell>
 
         <TableCell className="text-muted-foreground text-sm">
+          {ret.createdByName ?? "—"}
+        </TableCell>
+
+        <TableCell className="text-muted-foreground text-sm">
           {fmtDate(ret.createdAt)}
         </TableCell>
 
@@ -155,7 +159,7 @@ function ReturnRow({ ret }: { ret: TSerializedSaleReturn }) {
 
       {expanded && (
         <TableRow className="bg-muted/30">
-          <TableCell colSpan={8} className="py-0">
+          <TableCell colSpan={9} className="py-0">
             <div className="py-3 px-6">
               <table className="w-full text-sm">
                 <thead>
@@ -224,6 +228,7 @@ function ReturnRow({ ret }: { ret: TSerializedSaleReturn }) {
 
 export function ReturnList({ returns }: Props) {
   const t = useTranslations("sale-return.list");
+  const tCommon = useTranslations("common");
 
   if (returns.length === 0) {
     return (
@@ -245,6 +250,7 @@ export function ReturnList({ returns }: Props) {
           <TableHead>{t("items")}</TableHead>
           <TableHead>{t("total")}</TableHead>
           <TableHead>{t("reason")}</TableHead>
+          <TableHead>{tCommon("createdBy")}</TableHead>
           <TableHead>{t("date")}</TableHead>
           <TableHead className="text-right">
             {t("actions")}

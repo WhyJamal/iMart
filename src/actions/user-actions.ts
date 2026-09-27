@@ -22,6 +22,30 @@ import type { TxClient } from "@/types/prisma.types";
 import { PAGES } from "@/config/pages.config";
 import { isLocale, type TLocale } from "@/config/locales.config";
 
+// ─── Ko'p hujjatga bir vaqtda "kim yaratdi" ismini biriktirish ──────────────
+//
+// Ko'p hujjat turida (Transfer, WriteOff, PurchaseReturn, Return,
+// StockIntake, Purchase, Promotion) yaratuvchi faqat createdBy: String?
+// sifatida (Prisma relation'siz) saqlanadi — shuning uchun ro'yxatni
+// chiqarishda ID -> ism xaritasi shu funksiya bilan bitta so'rovda
+// olinadi (har bir qator uchun alohida so'rov yubormaslik uchun).
+export async function getUserNamesByIds(
+  ids: (string | null | undefined)[]
+): Promise<Record<string, string>> {
+  const uniqueIds = Array.from(
+    new Set(ids.filter((id): id is string => Boolean(id)))
+  );
+
+  if (uniqueIds.length === 0) return {};
+
+  const users = await prisma.user.findMany({
+    where: { id: { in: uniqueIds } },
+    select: { id: true, name: true },
+  });
+
+  return Object.fromEntries(users.map((u: { id: string; name: string }) => [u.id, u.name]));
+}
+
 export async function getProfile() {
   const session = await getServerSession();
 

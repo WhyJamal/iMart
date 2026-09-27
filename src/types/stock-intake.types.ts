@@ -27,5 +27,6 @@ export interface IStockIntakeListItem {
   pointName: string | null;
   itemsCount: number;
   totalQty: number;
+  createdByName: string | null;
   createdAt: string;
 }

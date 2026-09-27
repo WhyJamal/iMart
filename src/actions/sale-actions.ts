@@ -11,6 +11,7 @@ import type { TSaleWithItems, TSerializedSale } from "@/types/sale.types";
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
 import { applyStockMovement, getItemPrice } from "@/actions/stock-actions";
+import { logAudit } from "@/actions/audit-actions";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -42,6 +43,9 @@ export async function getSales(): Promise<TSerializedSale[]> {
           },
         },
       },
+      cashier: {
+        select: { name: true },
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -51,6 +55,7 @@ export async function getSales(): Promise<TSerializedSale[]> {
   return (sales as TSaleWithItems[]).map((sale) => ({
     ...sale,
     totalAmount: Number(sale.totalAmount),
+    createdByName: sale.cashier?.name ?? null,
     items: sale.items.map((item) => ({
       ...item,
       qty: Number(item.qty),
@@ -350,6 +355,15 @@ export async function deleteSale(
     revalidatePath("/sales");
     revalidatePath("/products");
     revalidatePath("/cash");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "Sale",
+      entityId: sale.id,
+      summary: `Sotuv ${sale.saleNumber} o'chirildi`,
+    });
 
     return { success: true, data: undefined };
   } catch (err) {

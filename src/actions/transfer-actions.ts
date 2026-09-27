@@ -9,6 +9,8 @@ import type { ActionResult } from "@/types/action-result.types";
 import type { TxClient } from "@/types/prisma.types";
 import type { ITransferStockRow, TSerializedTransfer } from "@/types/transfer.types";
 import { applyStockMovement } from "@/actions/stock-actions";
+import { logAudit } from "@/actions/audit-actions";
+import { getUserNamesByIds } from "@/actions/user-actions";
 
 function generateTransferNumber(): string {
   const ts = Date.now().toString(36).toUpperCase();
@@ -36,9 +38,14 @@ export async function getTransfers(): Promise<TSerializedTransfer[]> {
     orderBy: { createdAt: "desc" },
   });
 
+  const userNames = await getUserNamesByIds(
+    transfers.map((t: { createdBy: string | null }) => t.createdBy)
+  );
+
   return transfers.map((transfer) => ({
     ...transfer,
     totalAmount: Number(transfer.totalAmount),
+    createdByName: transfer.createdBy ? userNames[transfer.createdBy] ?? null : null,
     items: transfer.items.map((item) => ({
       ...item,
       qty: Number(item.qty),
@@ -296,6 +303,16 @@ export async function deleteTransfer(id: string): Promise<ActionResult<undefined
     revalidatePath("/transfers");
     revalidatePath("/warehouses");
     revalidatePath("/products");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "Transfer",
+      entityId: transfer.id,
+      summary: `Ko'chirish ${transfer.transferNumber} o'chirildi`,
+    });
+
     return { success: true, data: undefined };
   } catch (err) {
     console.error("[deleteTransfer]", err);

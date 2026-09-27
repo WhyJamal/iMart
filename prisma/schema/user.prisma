@@ -36,6 +36,7 @@ model User {
   payrollPayments PayrollPayment[]
 
   notifications   Notification[]
+  auditLogs       AuditLog[]
   cashierSales    Sale[]
   themeSettings   UserThemeSettings?
 

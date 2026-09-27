@@ -161,6 +161,10 @@ function CashFlowRow({
         </TableCell>
 
         <TableCell className="text-muted-foreground text-sm">
+          {flow.createdByName ?? "—"}
+        </TableCell>
+
+        <TableCell className="text-muted-foreground text-sm">
           {fmtDate(flow.createdAt)}
         </TableCell>
 
@@ -212,6 +216,7 @@ function CashFlowRow({
 
 export function CashFlowList({ flows }: Props) {
   const t = useTranslations("cash.list");
+  const tCommon = useTranslations("common");
 
   if (flows.length === 0) {
     return (
@@ -249,6 +254,10 @@ export function CashFlowList({ flows }: Props) {
 
           <TableHead>
             {t("note")}
+          </TableHead>
+
+          <TableHead>
+            {tCommon("createdBy")}
           </TableHead>
 
           <TableHead>

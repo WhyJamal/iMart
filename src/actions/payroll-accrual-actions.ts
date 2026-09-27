@@ -19,6 +19,7 @@ import type {
 } from "@/types/payroll-accrual.types";
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
+import { getUserNamesByIds } from "@/actions/user-actions";
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
@@ -35,6 +36,10 @@ export async function getPayrollAccruals(): Promise<IPayrollAccrualSummary[]> {
     orderBy: [{ year: "desc" }, { month: "desc" }, { createdAt: "desc" }],
   });
 
+  const userNames = await getUserNamesByIds(
+    rows.map((r: (typeof rows)[number]) => r.createdBy)
+  );
+
   return rows.map((r: (typeof rows)[number]) => ({
     id: r.id,
     pointId: r.pointId,
@@ -47,6 +52,7 @@ export async function getPayrollAccruals(): Promise<IPayrollAccrualSummary[]> {
       (sum: number, l: { payAmount: unknown }) => sum + Number(l.payAmount),
       0
     ),
+    createdByName: r.createdBy ? userNames[r.createdBy] ?? null : null,
     createdAt: r.createdAt,
   }));
 }

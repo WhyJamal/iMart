@@ -28,5 +28,6 @@
   "debtReport": "Debt Report",
   "system": "System",
   "settings": "Settings",
-  "profitLoss": "Profit & Loss"
+  "profitLoss": "Profit & Loss",
+  "auditLog": "Audit Log"
 }

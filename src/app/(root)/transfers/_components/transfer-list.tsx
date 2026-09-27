@@ -115,6 +115,10 @@ function TransferRow({
         </TableCell>
 
         <TableCell className="text-muted-foreground text-sm">
+          {transfer.createdByName ?? "—"}
+        </TableCell>
+
+        <TableCell className="text-muted-foreground text-sm">
           {fmtDate(transfer.createdAt)}
         </TableCell>
 
@@ -168,7 +172,7 @@ function TransferRow({
 
       {expanded && (
         <TableRow className="bg-muted/30">
-          <TableCell colSpan={10} className="py-0">
+          <TableCell colSpan={11} className="py-0">
             <div className="py-3 px-6">
               <table className="w-full text-sm">
                 <thead>
@@ -255,6 +259,7 @@ export function TransferList({
   transfers: TSerializedTransfer[];
 }) {
   const t = useTranslations("transfer.list");
+  const tCommon = useTranslations("common");
 
   if (!transfers.length) {
     return (
@@ -277,6 +282,7 @@ export function TransferList({
           <TableHead>{t("products")}</TableHead>
           <TableHead>{t("amount")}</TableHead>
           <TableHead>{t("comment")}</TableHead>
+          <TableHead>{tCommon("createdBy")}</TableHead>
           <TableHead>{t("date")}</TableHead>
           <TableHead className="text-right">
             {t("actions")}

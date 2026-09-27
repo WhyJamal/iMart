@@ -29,6 +29,7 @@ import {
     FileBarChart,
     TrendingUp,
     PackagePlus,
+    History,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -57,6 +58,7 @@ const icons = {
     "file-bar-chart": FileBarChart,
     "trending-up": TrendingUp,
     "package-plus": PackagePlus,
+    history: History,
 };
 
 export function SidebarNavItem({

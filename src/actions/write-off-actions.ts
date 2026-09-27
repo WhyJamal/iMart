@@ -16,6 +16,8 @@ import type {
     IWriteOffStockRow,
 } from "@/types/write-off.types";
 import { applyStockMovement } from "@/actions/stock-actions";
+import { logAudit } from "@/actions/audit-actions";
+import { getUserNamesByIds } from "@/actions/user-actions";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -45,9 +47,14 @@ export async function getWriteOffs(): Promise<TSerializedWriteOff[]> {
         orderBy: { createdAt: "desc" },
     });
 
+    const userNames = await getUserNamesByIds(
+        writeOffs.map((w: { createdBy: string | null }) => w.createdBy)
+    );
+
     return (writeOffs as TWriteOffWithItems[]).map((w) => ({
         ...w,
         totalAmount: Number(w.totalAmount),
+        createdByName: w.createdBy ? userNames[w.createdBy] ?? null : null,
         items: w.items.map((item) => ({
             ...item,
             qty: Number(item.qty),
@@ -309,6 +316,15 @@ export async function deleteWriteOff(
         revalidatePath("/write-offs");
         revalidatePath("/warehouses");
         revalidatePath("/products");
+
+        await logAudit({
+            organizationId: session.organizationId,
+            userId: session.userId,
+            action: "DELETE",
+            entityType: "WriteOff",
+            entityId: writeOff.id,
+            summary: `Hisobdan chiqarish ${writeOff.writeOffNumber} o'chirildi`,
+        });
 
         return { success: true, data: undefined };
     } catch (err) {

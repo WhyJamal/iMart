@@ -121,6 +121,10 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
         </TableCell>
 
         <TableCell className="text-muted-foreground text-sm">
+          {sale.createdByName ?? "—"}
+        </TableCell>
+
+        <TableCell className="text-muted-foreground text-sm">
           {fmtDate(sale.createdAt)}
         </TableCell>
 
@@ -186,7 +190,7 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
 
       {expanded && (
         <TableRow className="bg-muted/30">
-          <TableCell colSpan={6} className="py-0">
+          <TableCell colSpan={7} className="py-0">
             <div className="py-3 px-6">
               <table className="w-full text-sm">
                 <thead>
@@ -255,6 +259,7 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
 
 export function SaleList({ sales }: Props) {
   const t = useTranslations("sales.list");
+  const tCommon = useTranslations("common");
 
   if (sales.length === 0) {
     return (
@@ -284,6 +289,10 @@ export function SaleList({ sales }: Props) {
 
           <TableHead>
             {t("total")}
+          </TableHead>
+
+          <TableHead>
+            {tCommon("createdBy")}
           </TableHead>
 
           <TableHead>

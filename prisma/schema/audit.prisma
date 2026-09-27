@@ -1,0 +1,31 @@
+// AuditLog — tizimdagi muhim harakatlarni (yaratish/o'zgartirish/o'chirish)
+// KIM, QACHON, NIMANI qilgani bo'yicha o'zgarmas (immutable) yozuv sifatida
+// saqlaydi. Notification'dan farqi: bu hech qachon o'qilgan/o'chirilgan
+// deb belgilanmaydi va foydalanuvchiga emas — faqat ko'rib chiqish
+// (audit) uchun OWNER/ADMIN'ga mo'ljallangan.
+//
+// action/entityType — String + TS union pattern (loyihadagi boshqa
+// modellar kabi, masalan Role) — src/types/audit.types.ts.
+// summary — tayyor, inson o'qiy oladigan matn (masalan "Sotuv
+// SALE-A1B2 o'chirildi") — ro'yxatda to'g'ridan-to'g'ri shu
+// ko'rsatiladi, har safar entityType'dan tarjima yig'ishga hojat yo'q.
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String? // null = tizim tomonidan (masalan kelajakdagi avtomatik trigger)
+
+  action     String // CREATE | UPDATE | DELETE
+  entityType String // "Sale", "Purchase", "StockIntake", ...
+  entityId   String?
+
+  summary String
+
+  createdAt DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@index([entityType, entityId])
+  @@index([userId])
+}

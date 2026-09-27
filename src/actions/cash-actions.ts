@@ -13,6 +13,7 @@ import {
 import type { ActionResult } from "@/types/action-result.types";
 import type { TxClient } from "@/types/prisma.types";
 import { CASH_NO_POINT } from "@/types/cash.types";
+import { getUserNamesByIds } from "@/actions/user-actions";
 import type {
   TCashFlowSerialized,
   TCashRegisterSerialized,
@@ -266,10 +267,15 @@ export async function getCashFlows(
     orderBy: { createdAt: "desc" },
   });
 
+  const userNames = await getUserNamesByIds(
+    entries.map((e: (typeof entries)[number]) => e.createdBy)
+  );
+
   return entries.map(({ point, ...entry }: (typeof entries)[number]) => ({
     ...entry,
     amount: Number(entry.amount),
     pointName: point?.name ?? null,
+    createdByName: entry.createdBy ? userNames[entry.createdBy] ?? null : null,
   }));
 }
 

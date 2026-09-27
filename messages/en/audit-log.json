@@ -1,0 +1,56 @@
+{
+    "title": "Audit Log",
+    "description": "Who created or deleted which document, and when",
+    "empty": "No records found",
+    "noAccess": "You don't have permission to view this page.",
+    "filters": {
+        "user": "User",
+        "allUsers": "All users",
+        "entityType": "Document type",
+        "allTypes": "All types",
+        "action": "Action",
+        "allActions": "All actions",
+        "dateFrom": "From date",
+        "dateTo": "To date",
+        "reset": "Reset"
+    },
+    "table": {
+        "date": "Date",
+        "user": "User",
+        "action": "Action",
+        "entityType": "Document type",
+        "summary": "Description"
+    },
+    "actions": {
+        "CREATE": "Created",
+        "UPDATE": "Updated",
+        "DELETE": "Deleted"
+    },
+    "entityTypes": {
+        "Sale": "Sale",
+        "Purchase": "Purchase",
+        "StockIntake": "Stock Intake",
+        "Transfer": "Transfer",
+        "WriteOff": "Write-off",
+        "PurchaseReturn": "Supplier Return",
+        "SaleReturn": "Sale Return",
+        "Promotion": "Promotion",
+        "Debtor": "Debtor",
+        "DebtorPayment": "Debt Payment",
+        "SupplierPayment": "Supplier Payment",
+        "Contragent": "Counterparty",
+        "Point": "Location",
+        "Warehouse": "Warehouse",
+        "Product": "Product",
+        "User": "User",
+        "Organization": "Organization",
+        "CashFlow": "Cash Movement",
+        "PayrollAccrual": "Payroll"
+    },
+    "pagination": {
+        "prev": "Previous",
+        "next": "Next",
+        "pageInfo": "Page {page}, {total} records total"
+    },
+    "system": "System"
+}

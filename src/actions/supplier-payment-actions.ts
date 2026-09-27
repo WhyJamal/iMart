@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { checkPermission } from "@/lib/permissions";
 import { recordCashFlow } from "@/actions/cash-actions";
+import { getUserNamesByIds } from "@/actions/user-actions";
 import type { ActionResult } from "@/types/action-result.types";
 import type { TxClient } from "@/types/prisma.types";
 import type { CashMethod } from "@/types/cash.types";
@@ -93,6 +94,7 @@ export async function getContragentLedger(
         receiptNumber: true,
         paidAmount: true,
         createdAt: true,
+        createdBy: true,
         items: { select: { qty: true, unitCost: true } },
       },
     }),
@@ -101,7 +103,18 @@ export async function getContragentLedger(
     }),
   ]);
 
-  type Raw = { date: Date; type: "debt" | "payment"; label: string; amount: number };
+  const userNames = await getUserNamesByIds([
+    ...purchases.map((p: (typeof purchases)[number]) => p.createdBy),
+    ...payments.map((p: (typeof payments)[number]) => p.createdBy),
+  ]);
+
+  type Raw = {
+    date: Date;
+    type: "debt" | "payment";
+    label: string;
+    amount: number;
+    createdByName: string | null;
+  };
 
   const debtEvents: Raw[] = purchases
     .map((p: (typeof purchases)[number]) => {
@@ -117,6 +130,7 @@ export async function getContragentLedger(
             type: "debt" as const,
             label: `Xarid #${p.receiptNumber}`,
             amount: unpaid,
+            createdByName: p.createdBy ? userNames[p.createdBy] ?? null : null,
           }
         : null;
     })
@@ -128,6 +142,7 @@ export async function getContragentLedger(
       type: "payment" as const,
       label: pay.note ? `To'lov (${pay.method}) — ${pay.note}` : `To'lov (${pay.method})`,
       amount: Number(pay.amount),
+      createdByName: pay.createdBy ? userNames[pay.createdBy] ?? null : null,
     })
   );
 

@@ -61,6 +61,7 @@ export function AccrualList({
   canManage,
 }: Props) {
   const t = useTranslations("payroll.list");
+  const tCommon = useTranslations("common");
   const months = useTranslations("payroll.months");
 
   const router = useRouter();
@@ -91,6 +92,7 @@ export function AccrualList({
           <TableHead>{t("employees")}</TableHead>
           <TableHead>{t("amount")}</TableHead>
           <TableHead>{t("status")}</TableHead>
+          <TableHead>{tCommon("createdBy")}</TableHead>
 
           {canManage && (
             <TableHead className="text-right">
@@ -144,6 +146,10 @@ export function AccrualList({
                   ? t("confirmed")
                   : t("draft")}
               </Badge>
+            </TableCell>
+
+            <TableCell className="text-muted-foreground text-sm">
+              {a.createdByName ?? "—"}
             </TableCell>
 
             {canManage && (

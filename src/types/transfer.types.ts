@@ -25,6 +25,7 @@ export interface TSerializedTransfer {
   note: string | null;
   totalAmount: number;
   createdBy: string | null;
+  createdByName: string | null;
   createdAt: Date;
   items: TSerializedTransferItem[];
 }

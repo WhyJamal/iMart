@@ -23,9 +23,10 @@ export const PAGES = {
     DEBTORS: "/debtors",
     PROMOTIONS: "/promotions",
     SETTINGS: "/settings",
+    AUDIT_LOG: "/audit-log",
     STOCK_INTAKE: "/stock-intake",
 
-    // Help
+    // Yordam (help)
     HELP: (slug: string) => `/help/${slug}`,
     
     // Reports

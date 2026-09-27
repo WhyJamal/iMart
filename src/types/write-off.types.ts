@@ -21,6 +21,7 @@ export type TSerializedWriteOffItem = Omit<
 export type TSerializedWriteOff = Omit<TWriteOffWithItems, "totalAmount" | "items"> & {
   totalAmount: number;
   items: TSerializedWriteOffItem[];
+  createdByName: string | null;
 };
 
 /**

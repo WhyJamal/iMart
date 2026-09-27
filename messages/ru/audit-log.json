@@ -1,0 +1,56 @@
+{
+    "title": "История изменений",
+    "description": "Кто, когда и какой документ создал или удалил",
+    "empty": "Записи не найдены",
+    "noAccess": "У вас нет прав для просмотра этой страницы.",
+    "filters": {
+        "user": "Пользователь",
+        "allUsers": "Все пользователи",
+        "entityType": "Тип документа",
+        "allTypes": "Все типы",
+        "action": "Действие",
+        "allActions": "Все действия",
+        "dateFrom": "С даты",
+        "dateTo": "По дату",
+        "reset": "Сбросить"
+    },
+    "table": {
+        "date": "Дата",
+        "user": "Пользователь",
+        "action": "Действие",
+        "entityType": "Тип документа",
+        "summary": "Описание"
+    },
+    "actions": {
+        "CREATE": "Создано",
+        "UPDATE": "Изменено",
+        "DELETE": "Удалено"
+    },
+    "entityTypes": {
+        "Sale": "Продажа",
+        "Purchase": "Закупка",
+        "StockIntake": "Приход",
+        "Transfer": "Перемещение",
+        "WriteOff": "Списание",
+        "PurchaseReturn": "Возврат поставщику",
+        "SaleReturn": "Возврат продажи",
+        "Promotion": "Акция",
+        "Debtor": "Должник",
+        "DebtorPayment": "Оплата долга",
+        "SupplierPayment": "Оплата поставщику",
+        "Contragent": "Контрагент",
+        "Point": "Точка",
+        "Warehouse": "Склад",
+        "Product": "Товар",
+        "User": "Пользователь",
+        "Organization": "Организация",
+        "CashFlow": "Движение кассы",
+        "PayrollAccrual": "Начисление зарплаты"
+    },
+    "pagination": {
+        "prev": "Назад",
+        "next": "Далее",
+        "pageInfo": "Стр. {page}, всего {total} записей"
+    },
+    "system": "Система"
+}

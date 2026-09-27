@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { checkPermission } from "@/lib/permissions";
 import { applyStockMovement } from "@/actions/stock-actions";
+import { logAudit } from "@/actions/audit-actions";
+import { getUserNamesByIds } from "@/actions/user-actions";
 import { StockIntakeSchema, type StockIntakeInput } from "@/schema/stock-intake.schema";
 import type { ActionResult } from "@/types/action-result.types";
 import type { TxClient } from "@/types/prisma.types";
@@ -31,6 +33,10 @@ export async function getStockIntakes(): Promise<IStockIntakeListItem[]> {
     orderBy: { createdAt: "desc" },
   });
 
+  const userNames = await getUserNamesByIds(
+    rows.map((r: (typeof rows)[number]) => r.createdBy)
+  );
+
   return rows.map((r: (typeof rows)[number]) => ({
     id: r.id,
     number: r.number,
@@ -40,6 +46,7 @@ export async function getStockIntakes(): Promise<IStockIntakeListItem[]> {
       (sum: number, i: (typeof r.items)[number]) => sum + Number(i.qty),
       0
     ),
+    createdByName: r.createdBy ? userNames[r.createdBy] ?? null : null,
     createdAt: r.createdAt.toISOString(),
   }));
 }
@@ -367,6 +374,15 @@ export async function deleteStockIntake(id: string): Promise<ActionResult> {
 
     revalidatePath("/stock-intake");
     revalidatePath("/products");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "StockIntake",
+      entityId: existing.id,
+      summary: `Kirim ${existing.number} o'chirildi`,
+    });
 
     return { success: true, data: undefined };
   } catch (err) {

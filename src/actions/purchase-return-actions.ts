@@ -17,6 +17,7 @@ import type {
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
 import { applyStockMovement } from "@/actions/stock-actions";
+import { getUserNamesByIds } from "@/actions/user-actions";
 import type { PurchaseItem } from "@/generated/prisma/client";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -54,9 +55,14 @@ export async function getPurchaseReturns(): Promise<
     orderBy: { createdAt: "desc" },
   });
 
+  const userNames = await getUserNamesByIds(
+    returns.map((r: { createdBy: string | null }) => r.createdBy)
+  );
+
   return (returns as TPurchaseReturnWithItems[]).map((r) => ({
     ...r,
     contragentName: r.purchase.contragent?.name ?? null,
+    createdByName: r.createdBy ? userNames[r.createdBy] ?? null : null,
     totalAmount: Number(r.totalAmount),
     items: r.items.map((item: TPurchaseReturnWithItems["items"][number]) => ({
       ...item,

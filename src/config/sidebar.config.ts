@@ -213,6 +213,13 @@ export const SIDEBARITEMS: ISidebar[] = [
         href: PAGES.SETTINGS,
         permission: "organization:manage",
       },
+      {
+        id: "audit-log",
+        labelKey: "auditLog",
+        icon: "history",
+        href: PAGES.AUDIT_LOG,
+        permission: "audit:read",
+      },
     ],
   },
 ];

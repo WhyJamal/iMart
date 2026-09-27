@@ -47,6 +47,8 @@ interface Purchase {
   contragentName?: string | null;
   note: string | null;
   postedAt: Date | null;
+  paidAmount: number;
+  createdByName: string;
   createdAt: Date;
   items: PurchaseItem[];
 }
@@ -130,6 +132,10 @@ function PurchaseRow({ purchase }: { purchase: Purchase }) {
         </TableCell>
 
         <TableCell className="text-muted-foreground text-sm">
+          {purchase.createdByName ?? "—"}
+        </TableCell>
+
+        <TableCell className="text-muted-foreground text-sm">
           {fmtDate(purchase.createdAt)}
         </TableCell>
 
@@ -181,7 +187,7 @@ function PurchaseRow({ purchase }: { purchase: Purchase }) {
 
       {expanded && (
         <TableRow className="bg-muted/30">
-          <TableCell colSpan={7} className="py-0">
+          <TableCell colSpan={8} className="py-0">
             <div className="py-3 px-6">
               {purchase.note && (
                 <p className="text-xs text-muted-foreground mb-2 italic">
@@ -256,6 +262,7 @@ function PurchaseRow({ purchase }: { purchase: Purchase }) {
 
 export function PurchaseList({ purchases }: Props) {
   const t = useTranslations("purchase.list");
+  const tCommon = useTranslations("common");
 
   if (purchases.length === 0) {
     return (
@@ -295,6 +302,10 @@ export function PurchaseList({ purchases }: Props) {
 
           <TableHead>
             {t("total")}
+          </TableHead>
+
+          <TableHead>
+            {tCommon("createdBy")}
           </TableHead>
 
           <TableHead>

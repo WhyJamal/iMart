@@ -43,4 +43,5 @@ export interface IDebtLedgerEntry {
   label: string;
   amount: number; // har doim musbat; ishorasi `type`dan bilinadi
   balance: number;
+  createdByName: string | null;
 }
