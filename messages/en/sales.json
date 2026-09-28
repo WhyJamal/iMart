@@ -1,7 +1,6 @@
 {
     "title": "Sales",
     "description": "All completed transactions",
-    
     "list": {
         "saleNumber": "Sale #",
         "items": "Items",
@@ -21,6 +20,8 @@
         "unitPrice": "Unit price",
         "saleTotal": "Total",
         "currency": "sum",
-        "deleted": "Sale deleted and stock restored"
+        "deleted": "Sale deleted and stock restored",
+        "paymentMethod": "Payment method",
+        "allPaymentMethods": "All payment methods"
     }
 }

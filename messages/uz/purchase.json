@@ -2,7 +2,6 @@
     "title": "Xaridlar",
     "description": "Omborga kirimlar — har bir xarid mahsulot qoldig‘ini oshiradi",
     "newPurchase": "Yangi xarid",
-    
     "list": {
         "receiptNumber": "Kirim raqami",
         "contragent": "Kontragent",
@@ -25,7 +24,14 @@
         "purchaseTotal": "Jami",
         "currency": "so‘m",
         "note": "Izoh",
-        "deleted": "Xarid o‘chirildi"
+        "deleted": "Xarid o‘chirildi",
+        "allContragents": "Barcha kontragentlar",
+        "createdByFilter": "Yaratgan",
+        "allUsers": "Barcha foydalanuvchilar",
+        "dateFrom": "Sanadan",
+        "dateTo": "Sanagacha",
+        "resetFilters": "Filtrlarni tozalash",
+        "pageOf": "{page} / {totalPages}"
     },
     "form": {
         "editPurchaseReceipt": "Xarid kirimini tahrirlash",

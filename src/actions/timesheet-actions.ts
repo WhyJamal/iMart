@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { checkPermission } from "@/lib/permissions";
 import { getUserNamesByIds } from "@/actions/user-actions";
+import { logAudit } from "@/actions/audit-actions";
 import {
   CreateTimesheetSchema,
   SetTimesheetEntrySchema,
@@ -196,6 +197,16 @@ export async function createTimesheet(
     });
 
     revalidatePath("/timesheets");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "Timesheet",
+      entityId: timesheet.id,
+      summary: `Tabel (${year}-${month}) yaratildi`,
+    });
+
     return { success: true, data: { id: timesheet.id } };
   } catch (err) {
     console.error("[createTimesheet]", err);
@@ -221,6 +232,16 @@ export async function deleteTimesheet(
     await prisma.timesheet.delete({ where: { id } });
 
     revalidatePath("/timesheets");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "Timesheet",
+      entityId: existing.id,
+      summary: `Tabel (${existing.year}-${existing.month}) o'chirildi`,
+    });
+
     return { success: true, data: undefined };
   } catch (err) {
     console.error("[deleteTimesheet]", err);

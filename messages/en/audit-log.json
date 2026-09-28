@@ -45,7 +45,9 @@
         "User": "User",
         "Organization": "Organization",
         "CashFlow": "Cash Movement",
-        "PayrollAccrual": "Payroll"
+        "PayrollAccrual": "Payroll",
+        "PayrollPayment": "Payroll Payment",
+        "Timesheet": "Timesheet"
     },
     "pagination": {
         "prev": "Previous",

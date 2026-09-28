@@ -231,6 +231,15 @@ export async function createTransfer(
     revalidatePath("/warehouses");
     revalidatePath("/products");
 
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "Transfer",
+      entityId: created.id,
+      summary: `Ko'chirish ${created.transferNumber} yaratildi`,
+    });
+
     return { success: true, data: { id: created.id, transferNumber: created.transferNumber } };
   } catch (err) {
     console.error("[createTransfer]", err);

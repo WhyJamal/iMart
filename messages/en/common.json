@@ -1,4 +1,13 @@
 {
     "exit": "Chiqish",
-    "createdBy": "Created by"
+    "list": {
+        "createdBy": "Created by",
+        "createdByFilter": "Created by",
+        "allUsers": "All users",
+        "dateFrom": "Date from",
+        "dateTo": "Date to",
+        "resetFilters": "Reset filters",
+        "pageOf": "{page} / {totalPages}"
+    },
+    "methods": { "cash": "Cash", "card": "Card" }
 }

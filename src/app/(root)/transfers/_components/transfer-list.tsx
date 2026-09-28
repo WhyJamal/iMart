@@ -259,7 +259,7 @@ export function TransferList({
   transfers: TSerializedTransfer[];
 }) {
   const t = useTranslations("transfer.list");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("common.list");
 
   if (!transfers.length) {
     return (

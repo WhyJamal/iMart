@@ -235,7 +235,7 @@ function WriteOffRow({
 
 export function WriteOffList({ writeOffs }: Props) {
   const t = useTranslations("write-off.list");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("common.list");
 
   if (writeOffs.length === 0) {
     return (

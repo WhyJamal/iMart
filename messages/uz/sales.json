@@ -1,7 +1,6 @@
 {
     "title": "Sotuvlar",
     "description": "Barcha yakunlangan operatsiyalar",
-    
     "list": {
         "saleNumber": "Sotuv raqami",
         "items": "Mahsulotlar",
@@ -21,6 +20,8 @@
         "unitPrice": "Birlik narxi",
         "saleTotal": "Jami",
         "currency": "so‘m",
-        "deleted": "Sotuv o‘chirildi va qoldiq tiklandi"
+        "deleted": "Sotuv o‘chirildi va qoldiq tiklandi",
+        "paymentMethod": "To'lov usuli",
+        "allPaymentMethods": "Barcha to'lov usullari"
     }
 }

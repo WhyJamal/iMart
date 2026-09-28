@@ -228,7 +228,7 @@ function ReturnRow({ ret }: { ret: TSerializedSaleReturn }) {
 
 export function ReturnList({ returns }: Props) {
   const t = useTranslations("sale-return.list");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("common.list");
 
   if (returns.length === 0) {
     return (

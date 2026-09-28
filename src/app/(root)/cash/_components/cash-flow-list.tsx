@@ -216,7 +216,7 @@ function CashFlowRow({
 
 export function CashFlowList({ flows }: Props) {
   const t = useTranslations("cash.list");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("common.list");
 
   if (flows.length === 0) {
     return (

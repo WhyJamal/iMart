@@ -18,6 +18,7 @@ import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
 import { applyStockMovement } from "@/actions/stock-actions";
 import { getUserNamesByIds } from "@/actions/user-actions";
+import { logAudit } from "@/actions/audit-actions";
 import type { SaleItem } from "@/generated/prisma/client";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -283,6 +284,15 @@ export async function createSaleReturn(
     revalidatePath("/products");
     revalidatePath("/cash");
 
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "SaleReturn",
+      entityId: saleReturn.id,
+      summary: `Sotuvni qaytarish ${saleReturn.returnNumber} yaratildi`,
+    });
+
     return {
       success: true,
       data: { id: saleReturn.id, returnNumber: saleReturn.returnNumber },
@@ -331,6 +341,15 @@ export async function deleteSaleReturn(
     revalidatePath("/sales");
     revalidatePath("/products");
     revalidatePath("/cash");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "SaleReturn",
+      entityId: saleReturn.id,
+      summary: `Sotuvni qaytarish ${saleReturn.returnNumber} o'chirildi`,
+    });
 
     return { success: true, data: undefined };
   } catch (err) {

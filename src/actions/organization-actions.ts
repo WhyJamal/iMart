@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 import { checkPermission } from "@/lib/permissions";
+import { logAudit } from "@/actions/audit-actions";
 import {
   UpdateOrganizationSettingsSchema,
   type UpdateOrganizationSettingsInput,
@@ -61,6 +62,15 @@ export async function updateOrganizationSettings(
 
     revalidatePath("/settings");
     revalidatePath("/pos");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "UPDATE",
+      entityType: "Organization",
+      entityId: session.organizationId,
+      summary: `Sozlamalar o'zgartirildi: narxlash rejimi ${organization.pricingMode}, soliq ${Number(organization.taxPercent)}%`,
+    });
 
     return {
       success: true,

@@ -8,6 +8,7 @@ import { CreatePromotionSchema, type CreatePromotionInput } from "@/schema/promo
 import type { ActionResult } from "@/types/action-result.types";
 import type { IPromotion, IPromotionDiscount } from "@/types/promotion.types";
 import { getUserNamesByIds } from "@/actions/user-actions";
+import { logAudit } from "@/actions/audit-actions";
 
 export async function getPromotions(): Promise<IPromotion[]> {
   const session = await getServerSession();
@@ -130,6 +131,16 @@ export async function createPromotion(
 
     revalidatePath("/promotions");
     revalidatePath("/pos");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "Promotion",
+      entityId: promotion.id,
+      summary: `Aksiya "${promotion.name}" yaratildi`,
+    });
+
     return { success: true, data: { id: promotion.id } };
   } catch (err) {
     console.error("[createPromotion]", err);
@@ -152,6 +163,16 @@ export async function deletePromotion(id: string): Promise<ActionResult<undefine
     await prisma.promotion.delete({ where: { id } });
     revalidatePath("/promotions");
     revalidatePath("/pos");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "Promotion",
+      entityId: promotion.id,
+      summary: `Aksiya "${promotion.name}" o'chirildi`,
+    });
+
     return { success: true, data: undefined };
   } catch (err) {
     console.error("[deletePromotion]", err);

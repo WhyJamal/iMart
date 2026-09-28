@@ -9,9 +9,17 @@ import type { TxClient } from "@/types/prisma.types";
 import type { IProduct } from "@/types/product.types";
 import type { TSaleWithItems, TSerializedSale } from "@/types/sale.types";
 import type { CashMethod } from "@/types/cash.types";
+import type { Prisma } from "@/generated/prisma/client";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
 import { applyStockMovement, getItemPrice } from "@/actions/stock-actions";
 import { logAudit } from "@/actions/audit-actions";
+import {
+  dateRangeFilter,
+  paginated,
+  resolvePagination,
+  type ListFilters,
+  type Paginated,
+} from "@/lib/pagination";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -23,14 +31,35 @@ function generateSaleNumber(): string {
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
-export async function getSales(): Promise<TSerializedSale[]> {
+export interface SaleFilters extends ListFilters {
+  paymentMethod?: string;
+}
+
+export async function getSales(
+  filters: SaleFilters = {}
+): Promise<Paginated<TSerializedSale>> {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
+  const where: Prisma.SaleWhereInput = {
+    organizationId: session.organizationId,
+  };
+
+  // createdBy filtri Sale'da cashierId ga mos keladi
+  if (filters.createdBy) where.cashierId = filters.createdBy;
+  if (filters.paymentMethod) {
+    where.paymentMethod =
+      filters.paymentMethod as Prisma.SaleWhereInput["paymentMethod"];
+  }
+
+  const createdAt = dateRangeFilter(filters.dateFrom, filters.dateTo);
+  if (createdAt) where.createdAt = createdAt;
+
+  const total = await prisma.sale.count({ where });
+  const window = resolvePagination(total, filters);
+
   const sales = await prisma.sale.findMany({
-    where: {
-      organizationId: session.organizationId,
-    },
+    where,
     include: {
       items: {
         include: {
@@ -50,9 +79,11 @@ export async function getSales(): Promise<TSerializedSale[]> {
     orderBy: {
       createdAt: "desc",
     },
+    skip: window.skip,
+    take: window.pageSize,
   });
 
-  return (sales as TSaleWithItems[]).map((sale) => ({
+  const items: TSerializedSale[] = (sales as TSaleWithItems[]).map((sale) => ({
     ...sale,
     totalAmount: Number(sale.totalAmount),
     createdByName: sale.cashier?.name ?? null,
@@ -62,6 +93,43 @@ export async function getSales(): Promise<TSerializedSale[]> {
       unitPrice: Number(item.unitPrice),
     })),
   }));
+
+  return paginated(items, total, window);
+}
+
+/**
+ * Filtr select'lari uchun variantlar: kassirlar va to'lov usullari
+ * haqiqatda mavjud Sale yozuvlaridan olinadi (distinct).
+ */
+export async function getSaleFilterOptions() {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const [cashierRows, methodRows] = await Promise.all([
+    prisma.sale.findMany({
+      where: { organizationId: session.organizationId },
+      select: { cashierId: true, cashier: { select: { name: true } } },
+      distinct: ["cashierId"],
+    }),
+    prisma.sale.findMany({
+      where: { organizationId: session.organizationId },
+      select: { paymentMethod: true },
+      distinct: ["paymentMethod"],
+    }),
+  ]);
+
+  const creators = cashierRows
+    .filter((r: { cashierId: string | null }) => Boolean(r.cashierId))
+    .map((r: { cashierId: string | null; cashier: { name: string } | null }) => ({
+      id: r.cashierId as string,
+      name: r.cashier?.name ?? (r.cashierId as string),
+    }));
+
+  const paymentMethods = methodRows.map((r: { paymentMethod: unknown }) =>
+    String(r.paymentMethod)
+  );
+
+  return { creators, paymentMethods };
 }
 
 export async function getSaleById(id: string) {
@@ -304,6 +372,15 @@ export async function createSale(
     revalidatePath("/sales");
     revalidatePath("/products");
     revalidatePath("/cash");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "Sale",
+      entityId: sale.id,
+      summary: `Sotuv ${sale.saleNumber} yaratildi`,
+    });
 
     return {
       success: true,

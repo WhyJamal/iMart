@@ -17,6 +17,8 @@
   import type { SalaryType } from "@/types/salary.types";
   import type { IPayrollPayment} from "@/types/payroll.types";
   import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
+  import { getUserNamesByIds } from "@/actions/user-actions";
+  import { logAudit } from "@/actions/audit-actions";
 
 export async function getPayrollHistory(): Promise<IPayrollPayment[]> {
   const session = await getServerSession();
@@ -163,6 +165,15 @@ export async function createPayrollPayment(
     revalidatePath("/payroll");
     revalidatePath("/cash");
 
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "PayrollPayment",
+      entityId: payment.id,
+      summary: `Ish haqi to'lovi (${user.name}, ${totalAmount} so'm) yaratildi`,
+    });
+
     return { success: true, data: { id: payment.id, totalAmount } };
   } catch (err) {
     if (err instanceof Error && err.message.startsWith("POINT_FUNDS::")) {
@@ -195,6 +206,19 @@ export async function deletePayrollPayment(
 
     revalidatePath("/payroll");
     revalidatePath("/cash");
+
+    const [userName] = Object.values(
+      await getUserNamesByIds([payment.userId])
+    );
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "PayrollPayment",
+      entityId: payment.id,
+      summary: `Ish haqi to'lovi (${userName ?? payment.userId}, ${payment.totalAmount} so'm) o'chirildi`,
+    });
 
     return { success: true, data: undefined };
   } catch (err) {

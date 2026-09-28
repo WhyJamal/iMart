@@ -16,6 +16,14 @@ import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
 import { applyStockMovement } from "@/actions/stock-actions";
 import { logAudit } from "@/actions/audit-actions";
 import { getUserNamesByIds } from "@/actions/user-actions";
+import {
+  dateRangeFilter,
+  paginated,
+  resolvePagination,
+  type ListFilters,
+  type Paginated,
+} from "@/lib/pagination";
+import { Prisma } from "@/generated/prisma/client";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -27,26 +35,32 @@ function generateReceiptNumber(): string {
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
-export async function getPurchases() {
-  const session = await getServerSession();
-  if (!session) throw new Error("Unauthorized");
+export interface PurchaseFilters extends ListFilters {
+  contragentId?: string;
+}
 
-  const purchases = await prisma.purchase.findMany({
-    where: { organizationId: session.organizationId },
-    include: {
-      items: {
-        include: { product: { select: { id: true, name: true, code: true } } },
-      },
-      contragent: { select: { id: true, name: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+type TSerializedPurchaseItem = Omit<
+  TPurchaseItemWithProduct,
+  "qty" | "unitCost"
+> & {
+  qty: number;
+  unitCost: number;
+};
 
-  const userNames = await getUserNamesByIds(
-    purchases.map((p: TPurchaseWithItems) => p.createdBy)
-  );
+type TSerializedPurchaseListItem = Omit<
+  TPurchaseWithItems,
+  "paidAmount" | "items"
+> & {
+  contragentName: string | null;
+  createdByName: string | null;
+  paidAmount: number;
+  items: TSerializedPurchaseItem[];
+};
 
-  return purchases.map((purchase: TPurchaseWithItems) => ({
+export type PaginatedPurchases = Paginated<TSerializedPurchaseListItem>;
+
+function mapPurchaseFactory(userNames: Record<string, string>) {
+  return (purchase: TPurchaseWithItems): TSerializedPurchaseListItem => ({
     ...purchase,
     contragentName: purchase.contragent?.name ?? null,
     createdByName: purchase.createdBy ? userNames[purchase.createdBy] ?? null : null,
@@ -56,7 +70,82 @@ export async function getPurchases() {
       qty: Number(item.qty),
       unitCost: Number(item.unitCost),
     })),
+  });
+}
+
+export async function getPurchases(
+  filters: PurchaseFilters = {}
+): Promise<PaginatedPurchases> {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const where: Prisma.PurchaseWhereInput = {
+    organizationId: session.organizationId,
+  };
+
+  if (filters.contragentId) where.contragentId = filters.contragentId;
+  if (filters.createdBy) where.createdBy = filters.createdBy;
+
+  const createdAt = dateRangeFilter(filters.dateFrom, filters.dateTo);
+  if (createdAt) where.createdAt = createdAt;
+
+  const total = await prisma.purchase.count({ where });
+  const window = resolvePagination(total, filters);
+
+  const purchases = await prisma.purchase.findMany({
+    where,
+    include: {
+      items: {
+        include: { product: { select: { id: true, name: true, code: true } } },
+      },
+      contragent: { select: { id: true, name: true } },
+    },
+    orderBy: { createdAt: "desc" },
+    skip: window.skip,
+    take: window.pageSize,
+  });
+
+  const userNames = await getUserNamesByIds(
+    purchases.map((p: TPurchaseWithItems) => p.createdBy)
+  );
+  const mapPurchase = mapPurchaseFactory(userNames);
+
+  return paginated(purchases.map(mapPurchase), total, window);
+}
+
+/**
+ * Options for the filter selects on the purchase list page.
+ * Contragents come straight from the Contragent table; creators are
+ * derived from distinct Purchase.createdBy values actually in use.
+ */
+export async function getPurchaseFilterOptions() {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const [contragents, creatorRows] = await Promise.all([
+    prisma.contragent.findMany({
+      where: { organizationId: session.organizationId, type: "SUPPLIER" },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.purchase.findMany({
+      where: { organizationId: session.organizationId },
+      select: { createdBy: true },
+      distinct: ["createdBy"],
+    }),
+  ]);
+
+  const creatorIds = creatorRows
+    .map((r: { createdBy: string | null }) => r.createdBy)
+    .filter((id: string | null): id is string => Boolean(id));
+
+  const names = await getUserNamesByIds(creatorIds);
+  const creators = creatorIds.map((id: string) => ({
+    id,
+    name: names[id] ?? id,
   }));
+
+  return { contragents, creators };
 }
 
 export async function getPurchaseById(id: string) {
@@ -74,10 +163,12 @@ export async function getPurchaseById(id: string) {
     },
   });
 
-  if (!purchase) return null;  
+  if (!purchase) return null;
 
+  // Decimal maydonlar Client Component'ga o'tmaydi — number'ga o'giramiz.
   return {
     ...purchase,
+    paidAmount: Number(purchase.paidAmount),
     items: purchase.items.map((item: TPurchaseItemWithProduct) => ({
       ...item,
       qty: Number(item.qty),
@@ -271,6 +362,15 @@ export async function createPurchase(
     revalidatePath("/products");
     revalidatePath("/cash");
 
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "Purchase",
+      entityId: purchase.id,
+      summary: `Xarid ${purchase.receiptNumber} yaratildi`,
+    });
+
     return {
       success: true,
       data: { id: purchase.id, receiptNumber: purchase.receiptNumber },
@@ -458,6 +558,15 @@ export async function updatePurchase(
     revalidatePath("/purchases");
     revalidatePath("/products");
     revalidatePath("/warehouses");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "UPDATE",
+      entityType: "Purchase",
+      entityId: id,
+      summary: `Xarid ${existing.receiptNumber} o'zgartirildi`,
+    });
 
     return { success: true, data: { id } };
   } catch (err) {

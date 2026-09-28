@@ -48,7 +48,7 @@ interface Purchase {
   note: string | null;
   postedAt: Date | null;
   paidAmount: number;
-  createdByName: string;
+  createdByName: string | null;
   createdAt: Date;
   items: PurchaseItem[];
 }
@@ -262,7 +262,7 @@ function PurchaseRow({ purchase }: { purchase: Purchase }) {
 
 export function PurchaseList({ purchases }: Props) {
   const t = useTranslations("purchase.list");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("common.list");
 
   if (purchases.length === 0) {
     return (

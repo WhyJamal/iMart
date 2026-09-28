@@ -76,7 +76,7 @@ export function PromotionList({
 
 function PromotionCard({ promotion: p }: { promotion: IPromotion }) {
   const t = useTranslations("promotion.list");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("common.list");
 
   const router = useRouter();
   const [pending, startTransition] = useTransition();

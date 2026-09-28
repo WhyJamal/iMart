@@ -6,6 +6,7 @@ import { getServerSession } from "@/lib/auth";
 import { checkPermission } from "@/lib/permissions";
 import { recordCashFlow } from "@/actions/cash-actions";
 import { getUserNamesByIds } from "@/actions/user-actions";
+import { logAudit } from "@/actions/audit-actions";
 import type { ActionResult } from "@/types/action-result.types";
 import type { TxClient } from "@/types/prisma.types";
 import type { CashMethod } from "@/types/cash.types";
@@ -306,6 +307,15 @@ export async function createDebtorPayment(input: {
 
     revalidatePath("/debtors");
     revalidatePath("/cash");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "DebtorPayment",
+      entityId: payment.id,
+      summary: `Qarz to'lovi qabul qilindi: ${debtor.name}, ${amount} so'm`,
+    });
 
     return { success: true, data: { id: payment.id } };
   } catch (err) {

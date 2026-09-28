@@ -18,6 +18,7 @@ import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
 import { applyStockMovement } from "@/actions/stock-actions";
 import { getUserNamesByIds } from "@/actions/user-actions";
+import { logAudit } from "@/actions/audit-actions";
 import type { PurchaseItem } from "@/generated/prisma/client";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -346,6 +347,15 @@ export async function createPurchaseReturn(
     revalidatePath("/products");
     revalidatePath("/cash");
 
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "PurchaseReturn",
+      entityId: purchaseReturn.id,
+      summary: `Yetkazib beruvchiga qaytarish ${purchaseReturn.returnNumber} yaratildi`,
+    });
+
     return {
       success: true,
       data: { id: purchaseReturn.id, returnNumber: purchaseReturn.returnNumber },
@@ -394,6 +404,15 @@ export async function deletePurchaseReturn(
     revalidatePath("/purchases");
     revalidatePath("/products");
     revalidatePath("/cash");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "PurchaseReturn",
+      entityId: purchaseReturn.id,
+      summary: `Yetkazib beruvchiga qaytarish ${purchaseReturn.returnNumber} o'chirildi`,
+    });
 
     return { success: true, data: undefined };
   } catch (err) {

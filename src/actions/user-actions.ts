@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession, getAuthUser } from "@/lib/auth";
 import { checkPermission, hasPermission } from "@/lib/permissions";
 import { findOrgUser } from "@/lib/membership";
+import { logAudit } from "@/actions/audit-actions";
 import {
   CreateUserSchema,
   UpdateUserRoleSchema,
@@ -235,6 +236,15 @@ export async function createUser(
 
     revalidatePath(PAGES.USERS);
 
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "User",
+      entityId: user.id,
+      summary: `Foydalanuvchi ${user.name} yaratildi (rol: ${role})`,
+    });
+
     return { success: true, data: { id: user.id } };
   } catch (err) {
     console.error("[createUser]", err);
@@ -276,6 +286,16 @@ export async function updateUserRole(
     });
 
     revalidatePath("/users");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "UPDATE",
+      entityType: "User",
+      entityId: userId,
+      summary: `Foydalanuvchi ${target.name} roli o'zgartirildi: ${role}`,
+    });
+
     return { success: true, data: undefined };
   } catch (err) {
     console.error("[updateUserRole]", err);
@@ -317,6 +337,16 @@ export async function updateUserPoint(
     });
 
     revalidatePath("/users");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "UPDATE",
+      entityType: "User",
+      entityId: userId,
+      summary: `Foydalanuvchi ${target.name} nuqtasi o'zgartirildi`,
+    });
+
     return { success: true, data: undefined };
   } catch (err) {
     console.error("[updateUserPoint]", err);
@@ -352,6 +382,16 @@ export async function deleteOrgUser(
     });
 
     revalidatePath(PAGES.USERS);
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "User",
+      entityId: userId,
+      summary: `Foydalanuvchi ${target.name} tashkilotdan chiqarildi`,
+    });
+
     return { success: true, data: undefined };
   } catch (err) {
     console.error("[deleteOrgUser]", err);

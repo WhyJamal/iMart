@@ -45,7 +45,9 @@
         "User": "Пользователь",
         "Organization": "Организация",
         "CashFlow": "Движение кассы",
-        "PayrollAccrual": "Начисление зарплаты"
+        "PayrollAccrual": "Начисление зарплаты",
+        "PayrollPayment": "Выплата зарплаты",
+        "Timesheet": "Табель"
     },
     "pagination": {
         "prev": "Назад",

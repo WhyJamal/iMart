@@ -259,7 +259,7 @@ function SaleRow({ sale }: { sale: TSerializedSale }) {
 
 export function SaleList({ sales }: Props) {
   const t = useTranslations("sales.list");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("common.list");
 
   if (sales.length === 0) {
     return (

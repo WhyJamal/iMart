@@ -97,7 +97,7 @@ function Row({ intake }: { intake: IStockIntakeListItem }) {
 
 export function StockIntakeList({ intakes }: { intakes: IStockIntakeListItem[] }) {
   const t = useTranslations("stock-intake.list");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("common.list");
 
   if (intakes.length === 0) {
     return (

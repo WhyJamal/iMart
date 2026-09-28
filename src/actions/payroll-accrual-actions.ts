@@ -20,6 +20,7 @@ import type {
 import type { CashMethod } from "@/types/cash.types";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
 import { getUserNamesByIds } from "@/actions/user-actions";
+import { logAudit } from "@/actions/audit-actions";
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
@@ -130,6 +131,16 @@ export async function createPayrollAccrual(
     });
 
     revalidatePath("/payroll");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "PayrollAccrual",
+      entityId: accrual.id,
+      summary: `Ish haqi hisob-kitobi (${year}-${month}) yaratildi`,
+    });
+
     return { success: true, data: { id: accrual.id } };
   } catch (err) {
     console.error("[createPayrollAccrual]", err);
@@ -160,6 +171,16 @@ export async function deletePayrollAccrual(
     });
 
     revalidatePath("/payroll");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "PayrollAccrual",
+      entityId: accrual.id,
+      summary: `Ish haqi hisob-kitobi (${accrual.year}-${accrual.month}) o'chirildi`,
+    });
+
     return { success: true, data: undefined };
   } catch (err) {
     console.error("[deletePayrollAccrual]", err);
@@ -401,6 +422,15 @@ export async function confirmPayrollAccrual(
     revalidatePath("/payroll");
     revalidatePath(`/payroll/${id}`);
     revalidatePath("/cash");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "UPDATE",
+      entityType: "PayrollAccrual",
+      entityId: accrual.id,
+      summary: `Ish haqi hisob-kitobi (${accrual.year}-${accrual.month}) tasdiqlandi`,
+    });
 
     return { success: true, data: undefined };
   } catch (err) {

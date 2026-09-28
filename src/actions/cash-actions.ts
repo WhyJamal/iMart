@@ -14,6 +14,7 @@ import type { ActionResult } from "@/types/action-result.types";
 import type { TxClient } from "@/types/prisma.types";
 import { CASH_NO_POINT } from "@/types/cash.types";
 import { getUserNamesByIds } from "@/actions/user-actions";
+import { logAudit } from "@/actions/audit-actions";
 import type {
   TCashFlowSerialized,
   TCashRegisterSerialized,
@@ -414,6 +415,15 @@ export async function createCashFlow(
 
     revalidatePath("/cash");
 
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "CashFlow",
+      entityId: entry.id,
+      summary: `Kassa harakati yaratildi (${direction === "IN" ? "kirim" : "chiqim"}, ${amount} so'm)`,
+    });
+
     return { success: true, data: { id: entry.id } };
   } catch (err) {
     if (err instanceof Error && err.message.startsWith("POINT_FUNDS::")) {
@@ -464,6 +474,15 @@ export async function deleteCashFlow(id: string): Promise<ActionResult<undefined
     });
 
     revalidatePath("/cash");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "CashFlow",
+      entityId: entry.id,
+      summary: `Kassa harakati (${entry.amount} so'm) o'chirildi`,
+    });
 
     return { success: true, data: undefined };
   } catch (err) {
@@ -535,6 +554,15 @@ export async function createCashTransfer(
 
     revalidatePath("/cash");
 
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "CashFlow",
+      entityId: transferId,
+      summary: `Nuqtalararo o'tkazish yaratildi (${amount} so'm)`,
+    });
+
     return { success: true, data: { id: transferId } };
   } catch (err) {
     if (err instanceof Error && err.message.startsWith("POINT_FUNDS::")) {
@@ -572,6 +600,15 @@ export async function deleteCashTransfer(
     });
 
     revalidatePath("/cash");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "DELETE",
+      entityType: "CashFlow",
+      entityId: docId,
+      summary: `Nuqtalararo o'tkazish o'chirildi`,
+    });
 
     return { success: true, data: undefined };
   } catch (err) {

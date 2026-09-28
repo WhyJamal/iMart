@@ -239,7 +239,7 @@ export function PurchaseReturnList({
   returns,
 }: Props) {
   const t = useTranslations("purchase-return.list");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("common.list");
 
   if (returns.length === 0) {
     return (

@@ -222,6 +222,15 @@ export async function createStockIntake(
     revalidatePath("/stock-intake");
     revalidatePath("/products");
 
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "CREATE",
+      entityType: "StockIntake",
+      entityId: doc.id,
+      summary: `Kirim ${doc.number} yaratildi`,
+    });
+
     return { success: true, data: { id: doc.id, number: doc.number } };
   } catch (err) {
     console.error("[createStockIntake]", err);
@@ -328,6 +337,15 @@ export async function updateStockIntake(
 
     revalidatePath("/stock-intake");
     revalidatePath("/products");
+
+    await logAudit({
+      organizationId: session.organizationId,
+      userId: session.userId,
+      action: "UPDATE",
+      entityType: "StockIntake",
+      entityId: id,
+      summary: `Kirim ${existing.number} o'zgartirildi`,
+    });
 
     return { success: true, data: { id } };
   } catch (err) {

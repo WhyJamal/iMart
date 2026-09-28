@@ -2,7 +2,6 @@
     "title": "Покупки",
     "description": "Поступления на склад — каждая покупка увеличивает остаток",
     "newPurchase": "Новая покупка",
-    
     "list": {
         "receiptNumber": "Номер накладной",
         "contragent": "Контрагент",
@@ -25,7 +24,14 @@
         "purchaseTotal": "Итого",
         "currency": "сум",
         "note": "Примечание",
-        "deleted": "Покупка удалена"
+        "deleted": "Покупка удалена",
+        "allContragents": "Все контрагенты",
+        "createdByFilter": "Создал",
+        "allUsers": "Все пользователи",
+        "dateFrom": "Дата от",
+        "dateTo": "Дата до",
+        "resetFilters": "Сбросить фильтры",
+        "pageOf": "{page} / {totalPages}"
     },
     "form": {
         "editPurchaseReceipt": "Редактировать накладную",

@@ -2,7 +2,6 @@
     "title": "Purchases",
     "description": "Inventory receipts — each purchase increases stock",
     "newPurchase": "New purchase",
-    
     "list": {
         "receiptNumber": "Receipt #",
         "contragent": "Contragent",
@@ -25,7 +24,14 @@
         "purchaseTotal": "Total",
         "currency": "sum",
         "note": "Note",
-        "deleted": "Purchase deleted"
+        "deleted": "Purchase deleted",
+        "allContragents": "All contragents",
+        "createdByFilter": "Created by",
+        "allUsers": "All users",
+        "dateFrom": "Date from",
+        "dateTo": "Date to",
+        "resetFilters": "Reset filters",
+        "pageOf": "{page} / {totalPages}"
     },
     "form": {
         "editPurchaseReceipt": "Edit Purchase Receipt",

@@ -61,7 +61,7 @@ export function AccrualList({
   canManage,
 }: Props) {
   const t = useTranslations("payroll.list");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("common.list");
   const months = useTranslations("payroll.months");
 
   const router = useRouter();

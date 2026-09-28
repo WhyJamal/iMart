@@ -1,4 +1,13 @@
 {
     "exit": "Chiqish",
-    "createdBy": "Yaratdi"
+    "list": {
+        "createdBy": "Yaratdi",
+        "createdByFilter": "Yaratgan",
+        "allUsers": "Barcha foydalanuvchilar",
+        "dateFrom": "Sanadan",
+        "dateTo": "Sanagacha",
+        "resetFilters": "Filtrlarni tozalash",
+        "pageOf": "{page} / {totalPages}"
+    },
+    "methods": { "cash": "Naqd", "card": "Karta" }
 }

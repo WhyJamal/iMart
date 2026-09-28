@@ -24,7 +24,9 @@ export type AuditEntityType =
   | "User"
   | "Organization"
   | "CashFlow"
-  | "PayrollAccrual";
+  | "PayrollAccrual"
+  | "PayrollPayment"
+  | "Timesheet";
 
 export const AUDIT_ACTIONS: AuditAction[] = ["CREATE", "UPDATE", "DELETE"];
 
@@ -48,6 +50,8 @@ export const AUDIT_ENTITY_TYPES: AuditEntityType[] = [
   "Organization",
   "CashFlow",
   "PayrollAccrual",
+  "PayrollPayment",
+  "Timesheet",
 ];
 
 export interface IAuditLog {

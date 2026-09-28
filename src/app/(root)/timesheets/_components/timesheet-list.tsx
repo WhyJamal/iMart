@@ -41,7 +41,7 @@ export function TimesheetList({
   canManage,
 }: Props) {
   const t = useTranslations("timesheet.list");
-  const tCommon = useTranslations("common");
+  const tCommon = useTranslations("common.list");
   const months = useTranslations("timesheet.months");
 
   const router = useRouter();

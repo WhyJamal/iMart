@@ -45,7 +45,9 @@
         "User": "Foydalanuvchi",
         "Organization": "Tashkilot",
         "CashFlow": "Kassa harakati",
-        "PayrollAccrual": "Ish haqi hisob-kitobi"
+        "PayrollAccrual": "Ish haqi hisob-kitobi",
+        "PayrollPayment": "Ish haqi to'lovi",
+        "Timesheet": "Tabel"
     },
     "pagination": {
         "prev": "Oldingi",

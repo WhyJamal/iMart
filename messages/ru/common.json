@@ -1,4 +1,13 @@
 {
     "exit": "Chiqish",
-    "createdBy": "Создал"
+    "list": {
+        "createdBy": "Создал",
+        "createdByFilter": "Создал",
+        "allUsers": "Все пользователи",
+        "dateFrom": "Дата от",
+        "dateTo": "Дата до",
+        "resetFilters": "Сбросить фильтры",
+        "pageOf": "{page} / {totalPages}"
+    },
+    "methods": { "cash": "Наличные", "card": "Карта" }
 }

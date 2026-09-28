@@ -267,6 +267,15 @@ export async function createWriteOff(
         revalidatePath("/warehouses");
         revalidatePath("/products");
 
+        await logAudit({
+            organizationId: session.organizationId,
+            userId: session.userId,
+            action: "CREATE",
+            entityType: "WriteOff",
+            entityId: writeOff.id,
+            summary: `Hisobdan chiqarish ${writeOff.writeOffNumber} yaratildi`,
+        });
+
         return {
             success: true,
             data: { id: writeOff.id, writeOffNumber: writeOff.writeOffNumber },

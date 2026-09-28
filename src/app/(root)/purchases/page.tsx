@@ -3,7 +3,11 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getTranslations } from "next-intl/server";
 
-import { getPurchases } from "@/actions/purchase-actions";
+import {
+  getPurchases,
+  getPurchaseById,
+  getPurchaseFilterOptions,
+} from "@/actions/purchase-actions";
 import { getProducts } from "@/actions/product-actions";
 import { getPointOptions } from "@/actions/point-actions";
 import { getWarehouses } from "@/actions/warehouse-actions";
@@ -11,29 +15,55 @@ import { getContragentOptions } from "@/actions/contragent-actions";
 import { getServerSession } from "@/lib/auth";
 
 import { PurchaseList } from "./_components/purchase-list";
+import { PurchaseFilters } from "./_components/purchase-filters";
+import { ListPagination } from "@/components/list/list-pagination";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
 import { PurchaseForm } from "./_components/purchase-form";
-import { TSerializedPurchase } from "@/types/purchase.types";
 
 export const dynamic = "force-dynamic";
 
 export default async function PurchasesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ edit?: string; new?: string }>;
+  searchParams: Promise<{
+    edit?: string;
+    new?: string;
+    page?: string;
+    contragentId?: string;
+    createdBy?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }>;
 }) {
-  const { edit, new: isNew } = await searchParams;
+  const {
+    edit,
+    new: isNew,
+    page,
+    contragentId,
+    createdBy,
+    dateFrom,
+    dateTo,
+  } = await searchParams;
 
   const session = await getServerSession();
-  const purchases = await getPurchases();
+
+  const [purchasesResult, filterOptions] = await Promise.all([
+    getPurchases({
+      page: page ? Number(page) : undefined,
+      contragentId: contragentId || undefined,
+      createdBy: createdBy || undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+    }),
+    getPurchaseFilterOptions(),
+  ]);
 
   const t = await getTranslations("purchase");
 
-  const editTarget = edit
-    ? purchases.find(
-        (p: TSerializedPurchase) => p.id === edit
-      ) ?? null
-    : null;
+  // Tahrirlash uchun hujjatni har doim to'g'ridan-to'g'ri o'ziga xos
+  // so'rov bilan olamiz — u joriy filtr/sahifada ko'rinmayotgan bo'lishi
+  // mumkin, va shakli (product.price bilan) ro'yxatdagidan farq qiladi.
+  const editTarget = edit ? await getPurchaseById(edit) : null;
 
   const isOpen = !!editTarget || isNew === "1";
 
@@ -68,7 +98,17 @@ export default async function PurchasesPage({
           </Button>
         </div>
 
-        <PurchaseList purchases={purchases} />
+        <PurchaseFilters
+          contragents={filterOptions.contragents}
+          creators={filterOptions.creators}
+        />
+
+        <PurchaseList purchases={purchasesResult.items} />
+
+        <ListPagination
+          page={purchasesResult.page}
+          totalPages={purchasesResult.totalPages}
+        />
       </div>
 
       <DrawerBackdrop isOpen={isOpen}>
