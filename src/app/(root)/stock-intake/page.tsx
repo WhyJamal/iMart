@@ -7,6 +7,7 @@ import { getTranslations } from "next-intl/server";
 import {
   getStockIntakes,
   getStockIntakeById,
+  getStockIntakeFilterOptions,
 } from "@/actions/stock-intake-actions";
 import { getProducts } from "@/actions/product-actions";
 import { getPointOptions } from "@/actions/point-actions";
@@ -17,7 +18,9 @@ import { PAGES } from "@/config/pages.config";
 
 import { StockIntakeList } from "./_components/stock-intake-list";
 import { StockIntakeUploadButton } from "./_components/stock-intake-upload-button";
+import { StockIntakeFilters } from "./_components/stock-intake-filters";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
+import { ListPagination } from "@/components/list/list-pagination";
 import { StockIntakeForm } from "./_components/stock-intake-form";
 
 export const dynamic = "force-dynamic";
@@ -25,9 +28,25 @@ export const dynamic = "force-dynamic";
 export default async function StockIntakePage({
   searchParams,
 }: {
-  searchParams: Promise<{ edit?: string; new?: string }>;
+  searchParams: Promise<{
+    edit?: string;
+    new?: string;
+    page?: string;
+    pointId?: string;
+    createdBy?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }>;
 }) {
-  const { edit, new: isNew } = await searchParams;
+  const {
+    edit,
+    new: isNew,
+    page,
+    pointId,
+    createdBy,
+    dateFrom,
+    dateTo,
+  } = await searchParams;
 
   const session = await getServerSession();
 
@@ -35,12 +54,20 @@ export default async function StockIntakePage({
     redirect(PAGES.HOME);
   }
 
-  const [intakes, products, points, warehouses] = await Promise.all([
-    getStockIntakes(),
-    getProducts(),
-    getPointOptions(),
-    getWarehouses(),
-  ]);
+  const [intakesResult, filterOptions, products, points, warehouses] =
+    await Promise.all([
+      getStockIntakes({
+        page: page ? Number(page) : undefined,
+        pointId: pointId || undefined,
+        createdBy: createdBy || undefined,
+        dateFrom: dateFrom || undefined,
+        dateTo: dateTo || undefined,
+      }),
+      getStockIntakeFilterOptions(),
+      getProducts(),
+      getPointOptions(),
+      getWarehouses(),
+    ]);
 
   const t = await getTranslations("stock-intake");
 
@@ -74,7 +101,17 @@ export default async function StockIntakePage({
           </div>
         </div>
 
-        <StockIntakeList intakes={intakes} />
+        <StockIntakeFilters
+          points={points.map((p) => ({ id: p.id, name: p.name }))}
+          creators={filterOptions.creators}
+        />
+
+        <StockIntakeList intakes={intakesResult.items} />
+
+        <ListPagination
+          page={intakesResult.page}
+          totalPages={intakesResult.totalPages}
+        />
       </div>
 
       <DrawerBackdrop isOpen={isOpen}>

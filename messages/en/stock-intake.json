@@ -13,7 +13,8 @@
     "deleteConfirmTitle": "Delete this document?",
     "deleteConfirmDescription": "Document {number} will be deleted and warehouse stock reduced by the quantity it added. This cannot be undone.",
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "allPoints": "All points"
   },
   "form": {
     "newDocument": "New stock intake",

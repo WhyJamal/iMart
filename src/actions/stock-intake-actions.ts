@@ -11,6 +11,14 @@ import { StockIntakeSchema, type StockIntakeInput } from "@/schema/stock-intake.
 import type { ActionResult } from "@/types/action-result.types";
 import type { TxClient } from "@/types/prisma.types";
 import type { IStockIntake, IStockIntakeListItem } from "@/types/stock-intake.types";
+import type { Prisma } from "@/generated/prisma/client";
+import {
+  dateRangeFilter,
+  paginated,
+  resolvePagination,
+  type ListFilters,
+  type Paginated,
+} from "@/lib/pagination";
 
 function generateIntakeNumber(): string {
   const ts = Date.now().toString(36).toUpperCase();
@@ -20,24 +28,45 @@ function generateIntakeNumber(): string {
 
 // ─── O'qish ─────────────────────────────────────────────────────────────────
 
-export async function getStockIntakes(): Promise<IStockIntakeListItem[]> {
+export interface StockIntakeFilters extends ListFilters {
+  pointId?: string;
+}
+
+export async function getStockIntakes(
+  filters: StockIntakeFilters = {}
+): Promise<Paginated<IStockIntakeListItem>> {
   const session = await getServerSession();
-  if (!session) return [];
+  if (!session) return paginated([], 0, resolvePagination(0, filters));
+
+  const where: Prisma.StockIntakeWhereInput = {
+    organizationId: session.organizationId,
+  };
+
+  if (filters.pointId) where.pointId = filters.pointId;
+  if (filters.createdBy) where.createdBy = filters.createdBy;
+
+  const createdAt = dateRangeFilter(filters.dateFrom, filters.dateTo);
+  if (createdAt) where.createdAt = createdAt;
+
+  const total = await prisma.stockIntake.count({ where });
+  const window = resolvePagination(total, filters);
 
   const rows = await prisma.stockIntake.findMany({
-    where: { organizationId: session.organizationId },
+    where,
     include: {
       point: { select: { name: true } },
       items: { select: { qty: true } },
     },
     orderBy: { createdAt: "desc" },
+    skip: window.skip,
+    take: window.pageSize,
   });
 
   const userNames = await getUserNamesByIds(
     rows.map((r: (typeof rows)[number]) => r.createdBy)
   );
 
-  return rows.map((r: (typeof rows)[number]) => ({
+  const items: IStockIntakeListItem[] = rows.map((r: (typeof rows)[number]) => ({
     id: r.id,
     number: r.number,
     pointName: r.point?.name ?? null,
@@ -49,6 +78,35 @@ export async function getStockIntakes(): Promise<IStockIntakeListItem[]> {
     createdByName: r.createdBy ? userNames[r.createdBy] ?? null : null,
     createdAt: r.createdAt.toISOString(),
   }));
+
+  return paginated(items, total, window);
+}
+
+/**
+ * Filtr select'lari uchun: hujjat yaratgan foydalanuvchilar.
+ * (Nuqtalar ro'yxati sahifada allaqachon getPointOptions() dan olinadi.)
+ */
+export async function getStockIntakeFilterOptions(): Promise<{
+  creators: { id: string; name: string }[];
+}> {
+  const session = await getServerSession();
+  if (!session) return { creators: [] };
+
+  const rows = await prisma.stockIntake.findMany({
+    where: { organizationId: session.organizationId },
+    select: { createdBy: true },
+    distinct: ["createdBy"],
+  });
+
+  const ids = rows
+    .map((r: { createdBy: string | null }) => r.createdBy)
+    .filter((id: string | null): id is string => Boolean(id));
+
+  const names = await getUserNamesByIds(ids);
+
+  return {
+    creators: ids.map((id: string) => ({ id, name: names[id] ?? id })),
+  };
 }
 
 export async function getStockIntakeById(id: string): Promise<IStockIntake | null> {

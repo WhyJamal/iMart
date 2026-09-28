@@ -13,7 +13,8 @@
     "deleteConfirmTitle": "Hujjatni o'chirasizmi?",
     "deleteConfirmDescription": "{number} raqamli hujjat o'chiriladi va ombordagi qoldiq shu hujjat kirim qilgan miqdorga kamayadi. Bu amalni bekor qilib bo'lmaydi.",
     "cancel": "Bekor qilish",
-    "delete": "O'chirish"
+    "delete": "O'chirish",
+    "allPoints": "Barcha nuqtalar"
   },
   "form": {
     "newDocument": "Yangi kirim hujjati",
