@@ -37,6 +37,8 @@ import {
   createSupplierPayment,
   getContragentLedger,
 } from "@/actions/supplier-payment-actions";
+import { ListSearch } from "@/components/list/list-search";
+import { useLocalSearch } from "@/components/list/use-local-search";
 
 interface Props {
   contragents: IContragent[];
@@ -58,177 +60,184 @@ export function ContragentList({
     router.refresh()
   );
 
-  if (contragents.length === 0) {
-    return (
-      <div className="text-center py-16 text-muted-foreground">
-        <Handshake className="w-10 h-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">{t("empty")}</p>
-      </div>
-    );
-  }
+  const { search, setSearch, filtered } = useLocalSearch(
+    contragents,
+    (c) => `${c.name} ${c.inn ?? ""} ${c.phone ?? ""}`
+  );
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>{t("name")}</TableHead>
-          <TableHead>{t("inn")}</TableHead>
-          <TableHead>{t("type")}</TableHead>
-          <TableHead>{t("phone")}</TableHead>
-          <TableHead>{t("purchases")}</TableHead>
-          <TableHead>{t("debt")}</TableHead>
-          {canManage && (
-            <TableHead className="text-right">
-              {t("actions")}
-            </TableHead>
-          )}
-        </TableRow>
-      </TableHeader>
+    <div className="space-y-4">
+      <ListSearch value={search} onChange={setSearch} />
 
-      <TableBody>
-        {contragents.map((c) => (
-          <TableRow key={c.id}>
-            <TableCell className="font-medium">{c.name}</TableCell>
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground">
+          <Handshake className="w-10 h-10 mx-auto mb-3 opacity-30" />
+          <p className="text-sm">{t("empty")}</p>
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t("name")}</TableHead>
+              <TableHead>{t("inn")}</TableHead>
+              <TableHead>{t("type")}</TableHead>
+              <TableHead>{t("phone")}</TableHead>
+              <TableHead>{t("purchases")}</TableHead>
+              <TableHead>{t("debt")}</TableHead>
+              {canManage && (
+                <TableHead className="text-right">
+                  {t("actions")}
+                </TableHead>
+              )}
+            </TableRow>
+          </TableHeader>
 
-            <TableCell className="text-sm text-muted-foreground">
-              {c.inn || "—"}
-            </TableCell>
+          <TableBody>
+            {filtered.map((c) => (
+              <TableRow key={c.id}>
+                <TableCell className="font-medium">{c.name}</TableCell>
 
-            <TableCell>
-              <Badge
-                variant={
-                  c.type === "SUPPLIER" ? "default" : "secondary"
-                }
-              >
-                {c.type === "SUPPLIER"
-                  ? t("supplier")
-                  : t("buyer")}
-              </Badge>
-            </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {c.inn || "—"}
+                </TableCell>
 
-            <TableCell className="text-sm text-muted-foreground">
-              {c.phone || "—"}
-            </TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      c.type === "SUPPLIER" ? "default" : "secondary"
+                    }
+                  >
+                    {c.type === "SUPPLIER"
+                      ? t("supplier")
+                      : t("buyer")}
+                  </Badge>
+                </TableCell>
 
-            <TableCell>
-              <Badge variant="secondary">{c.purchaseCount}</Badge>
-            </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {c.phone || "—"}
+                </TableCell>
 
-            <TableCell>
-              {c.type === "SUPPLIER" ? (
-                <div className="flex items-center gap-2">
-                  {c.debt > 0 ? (
-                    <span className="text-sm font-medium text-amber-600">
-                      {c.debt.toLocaleString("uz-UZ")} so'm
-                    </span>
+                <TableCell>
+                  <Badge variant="secondary">{c.purchaseCount}</Badge>
+                </TableCell>
+
+                <TableCell>
+                  {c.type === "SUPPLIER" ? (
+                    <div className="flex items-center gap-2">
+                      {c.debt > 0 ? (
+                        <span className="text-sm font-medium text-amber-600">
+                          {c.debt.toLocaleString("uz-UZ")} so'm
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">—</span>
+                      )}
+
+                      {canManage && c.debt > 0 && (
+                        <DebtPaymentDialog
+                          name={c.name}
+                          debt={c.debt}
+                          points={points}
+                          defaultPointId={defaultPointId}
+                          onSubmit={(input) =>
+                            createSupplierPayment({
+                              contragentId: c.id,
+                              ...input,
+                            })
+                          }
+                          labels={{
+                            trigger: t("payDebt"),
+                            title: t("payDebtTitle"),
+                            currentDebt: t("currentDebt"),
+                            amount: t("amount"),
+                            method: t("method"),
+                            note: t("note"),
+                            submit: t("submit"),
+                            cancel: t("cancel"),
+                            cash: t("payCash"),
+                            card: t("payCard"),
+                            qr: t("payQr"),
+                            success: t("paymentSaved"),
+                            point: t("point"),
+                            noPoint: t("noPoint"),
+                          }}
+                        />
+                      )}
+
+                      <DebtHistoryDialog
+                        name={c.name}
+                        fetchLedger={() => getContragentLedger(c.id)}
+                        labels={{
+                          trigger: t("history"),
+                          title: t("historyTitle"),
+                          empty: t("historyEmpty"),
+                          debt: t("historyDebt"),
+                          payment: t("historyPayment"),
+                          balance: t("historyBalance"),
+                        }}
+                      />
+                    </div>
                   ) : (
                     <span className="text-sm text-muted-foreground">—</span>
                   )}
+                </TableCell>
 
-                  {canManage && c.debt > 0 && (
-                    <DebtPaymentDialog
-                      name={c.name}
-                      debt={c.debt}
-                      points={points}
-                      defaultPointId={defaultPointId}
-                      onSubmit={(input) =>
-                        createSupplierPayment({
-                          contragentId: c.id,
-                          ...input,
-                        })
-                      }
-                      labels={{
-                        trigger: t("payDebt"),
-                        title: t("payDebtTitle"),
-                        currentDebt: t("currentDebt"),
-                        amount: t("amount"),
-                        method: t("method"),
-                        note: t("note"),
-                        submit: t("submit"),
-                        cancel: t("cancel"),
-                        cash: t("payCash"),
-                        card: t("payCard"),
-                        qr: t("payQr"),
-                        success: t("paymentSaved"),
-                        point: t("point"),
-                        noPoint: t("noPoint"),
-                      }}
-                    />
-                  )}
-
-                  <DebtHistoryDialog
-                    name={c.name}
-                    fetchLedger={() => getContragentLedger(c.id)}
-                    labels={{
-                      trigger: t("history"),
-                      title: t("historyTitle"),
-                      empty: t("historyEmpty"),
-                      debt: t("historyDebt"),
-                      payment: t("historyPayment"),
-                      balance: t("historyBalance"),
-                    }}
-                  />
-                </div>
-              ) : (
-                <span className="text-sm text-muted-foreground">—</span>
-              )}
-            </TableCell>
-
-            {canManage && (
-              <TableCell className="text-right space-x-1">
-                <Button variant="ghost" size="sm" asChild>
-                  <Link
-                    href={`${PAGES.CONTRAGENTS}?edit=${c.id}`}
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </Link>
-                </Button>
-
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive"
-                      disabled={isPending}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        {t("deleteTitle")}
-                      </AlertDialogTitle>
-
-                      <AlertDialogDescription>
-                        <strong>{c.name}</strong>{" "}
-                        {t("deleteDescription", { name: c.name })
-                          .replace(c.name, "")
-                          .trim()}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>
-                        {t("cancel")}
-                      </AlertDialogCancel>
-
-                      <AlertDialogAction
-                        onClick={() => remove(c.id)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                {canManage && (
+                  <TableCell className="text-right space-x-1">
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link
+                        href={`${PAGES.CONTRAGENTS}?edit=${c.id}`}
                       >
-                        {t("delete")}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </TableCell>
-            )}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Link>
+                    </Button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive"
+                          disabled={isPending}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            {t("deleteTitle")}
+                          </AlertDialogTitle>
+
+                          <AlertDialogDescription>
+                            <strong>{c.name}</strong>{" "}
+                            {t("deleteDescription", { name: c.name })
+                              .replace(c.name, "")
+                              .trim()}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>
+                            {t("cancel")}
+                          </AlertDialogCancel>
+
+                          <AlertDialogAction
+                            onClick={() => remove(c.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            {t("delete")}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
   );
 }

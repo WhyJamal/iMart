@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import {
   Plus,
-  Search,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -13,7 +12,6 @@ import {
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
 import {
@@ -40,6 +38,8 @@ import { ProductFormContent } from "./product-form-content";
 import { getUnitLabel } from "@/config/units";
 import { PhotoImportButton } from "./photo-import-button";
 import { ExportProductsButton } from "./export-products-button";
+import { ListSearch } from "@/components/list/list-search";
+import { useLocalSearch } from "@/components/list/use-local-search";
 
 interface ICategoryOption {
   id: string;
@@ -64,25 +64,16 @@ export function ProductsClient({
   const t = useTranslations("product");
   const tl = useTranslations("product.list");
 
-  const [search, setSearch] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] =
     useState<IProduct | null>(null);
   const [deleteId, setDeleteId] =
     useState<string | null>(null);
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-
-    if (!q) return initialProducts;
-
-    return initialProducts.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.code.toLowerCase().includes(q) ||
-        p.categoryName.toLowerCase().includes(q)
-    );
-  }, [initialProducts, search]);
+  const { search, setSearch, filtered } = useLocalSearch(
+    initialProducts,
+    (p) => `${p.name} ${p.code} ${p.categoryName}`
+  );
 
   const usedCategories = useMemo(
     () => [
@@ -153,18 +144,7 @@ export function ProductsClient({
             </div>
           </div>
 
-          <div className="relative max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-
-            <Input
-              value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
-              placeholder={tl("searchPlaceholder")}
-              className="pl-9 h-9"
-            />
-          </div>
+          <ListSearch value={search} onChange={setSearch} />
 
           <div className="rounded-xl border border-border bg-card overflow-hidden">
             {filtered.length === 0 ? (

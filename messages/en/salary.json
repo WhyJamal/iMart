@@ -3,7 +3,6 @@
   "description": "Employee salary rates — all in one place",
   "setSalary": "Set salary",
   "employees": "Employees",
-
   "list": {
     "employee": "Employee",
     "role": "Role",
@@ -14,9 +13,12 @@
     "noEmployees": "No employees yet",
     "notSet": "Not set",
     "update": "Update",
-    "set": "Set"
+    "set": "Set",
+    "allSalaryTypes": "All salary types",
+    "typeFixed": "Monthly",
+    "typeDaily": "Daily",
+    "typeHourly": "Hourly"
   },
-
   "form": {
     "title": "Set salary",
     "employee": "Employee",

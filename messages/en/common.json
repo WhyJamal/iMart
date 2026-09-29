@@ -7,7 +7,14 @@
         "dateFrom": "Date from",
         "dateTo": "Date to",
         "resetFilters": "Reset filters",
-        "pageOf": "{page} / {totalPages}"
+        "pageOf": "{page} / {totalPages}",
+        "searchPlaceholder": "Search...",
+        "allPoints": "All points",
+        "allRoles": "All roles",
+        "allStatuses": "All statuses"
     },
-    "methods": { "cash": "Cash", "card": "Card" }
+    "methods": {
+        "cash": "Cash",
+        "card": "Card"
+    }
 }

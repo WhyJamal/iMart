@@ -18,44 +18,108 @@ import type {
   SalaryType,
 } from "@/types/payroll-accrual.types";
 import type { CashMethod } from "@/types/cash.types";
+import type { Prisma } from "@/generated/prisma/client";
 import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
 import { getUserNamesByIds } from "@/actions/user-actions";
 import { logAudit } from "@/actions/audit-actions";
+import {
+  dateRangeFilter,
+  paginated,
+  resolvePagination,
+  type ListFilters,
+  type Paginated,
+} from "@/lib/pagination";
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
-export async function getPayrollAccruals(): Promise<IPayrollAccrualSummary[]> {
+export interface PayrollAccrualFilters extends ListFilters {
+  pointId?: string;
+  status?: string;
+}
+
+export async function getPayrollAccruals(
+  filters: PayrollAccrualFilters = {}
+): Promise<Paginated<IPayrollAccrualSummary>> {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
+  const where: Prisma.PayrollAccrualWhereInput = {
+    organizationId: session.organizationId,
+  };
+
+  if (filters.pointId) where.pointId = filters.pointId;
+  if (filters.createdBy) where.createdBy = filters.createdBy;
+  if (filters.status) {
+    where.status = filters.status as Prisma.PayrollAccrualWhereInput["status"];
+  }
+
+  const createdAt = dateRangeFilter(filters.dateFrom, filters.dateTo);
+  if (createdAt) where.createdAt = createdAt;
+
+  const total = await prisma.payrollAccrual.count({ where });
+  const window = resolvePagination(total, filters);
+
   const rows = await prisma.payrollAccrual.findMany({
-    where: { organizationId: session.organizationId },
+    where,
     include: {
       point: { select: { name: true } },
       lines: { select: { payAmount: true } },
     },
     orderBy: [{ year: "desc" }, { month: "desc" }, { createdAt: "desc" }],
+    skip: window.skip,
+    take: window.pageSize,
   });
 
   const userNames = await getUserNamesByIds(
     rows.map((r: (typeof rows)[number]) => r.createdBy)
   );
 
-  return rows.map((r: (typeof rows)[number]) => ({
-    id: r.id,
-    pointId: r.pointId,
-    pointName: r.point.name,
-    year: r.year,
-    month: r.month,
-    status: r.status as "DRAFT" | "CONFIRMED",
-    lineCount: r.lines.length,
-    totalPayAmount: r.lines.reduce(
-      (sum: number, l: { payAmount: unknown }) => sum + Number(l.payAmount),
-      0
-    ),
-    createdByName: r.createdBy ? userNames[r.createdBy] ?? null : null,
-    createdAt: r.createdAt,
-  }));
+  const items: IPayrollAccrualSummary[] = rows.map(
+    (r: (typeof rows)[number]) => ({
+      id: r.id,
+      pointId: r.pointId,
+      pointName: r.point.name,
+      year: r.year,
+      month: r.month,
+      status: r.status as "DRAFT" | "CONFIRMED",
+      lineCount: r.lines.length,
+      totalPayAmount: r.lines.reduce(
+        (sum: number, l: { payAmount: unknown }) => sum + Number(l.payAmount),
+        0
+      ),
+      createdByName: r.createdBy ? userNames[r.createdBy] ?? null : null,
+      createdAt: r.createdAt,
+    })
+  );
+
+  return paginated(items, total, window);
+}
+
+/**
+ * Filtr select'lari uchun: hujjat yaratgan foydalanuvchilar.
+ * (Nuqtalar ro'yxati sahifada allaqachon getPointOptions() dan olinadi.)
+ */
+export async function getPayrollAccrualFilterOptions(): Promise<{
+  creators: { id: string; name: string }[];
+}> {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const rows = await prisma.payrollAccrual.findMany({
+    where: { organizationId: session.organizationId },
+    select: { createdBy: true },
+    distinct: ["createdBy"],
+  });
+
+  const ids = rows
+    .map((r: { createdBy: string | null }) => r.createdBy)
+    .filter((id: string | null): id is string => Boolean(id));
+
+  const names = await getUserNamesByIds(ids);
+
+  return {
+    creators: ids.map((id: string) => ({ id, name: names[id] ?? id })),
+  };
 }
 
 export async function getPayrollAccrualDetail(

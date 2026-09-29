@@ -8,11 +8,16 @@ import { Button } from "@/components/ui/button";
 import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
 
-import { getTimesheets } from "@/actions/timesheet-actions";
+import {
+  getTimesheets,
+  getTimesheetFilterOptions,
+} from "@/actions/timesheet-actions";
 import { getPointOptions } from "@/actions/point-actions";
 
 import { TimesheetList } from "./_components/timesheet-list";
+import { TimesheetFilters } from "./_components/timesheet-filters";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
+import { ListPagination } from "@/components/list/list-pagination";
 import { TimesheetForm } from "./_components/timesheet-form";
 
 import { PAGES } from "@/config/pages.config";
@@ -22,7 +27,15 @@ export const dynamic = "force-dynamic";
 export default async function TimesheetsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{
+    new?: string;
+    page?: string;
+    pointId?: string;
+    status?: string;
+    createdBy?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }>;
 }) {
   const session = await getServerSession();
 
@@ -33,10 +46,26 @@ export default async function TimesheetsPage({
     redirect(PAGES.HOME);
   }
 
-  const { new: isNew } = await searchParams;
+  const {
+    new: isNew,
+    page,
+    pointId,
+    status,
+    createdBy,
+    dateFrom,
+    dateTo,
+  } = await searchParams;
 
-  const [timesheets, points] = await Promise.all([
-    getTimesheets(),
+  const [timesheetsResult, filterOptions, points] = await Promise.all([
+    getTimesheets({
+      page: page ? Number(page) : undefined,
+      pointId: pointId || undefined,
+      status: status || undefined,
+      createdBy: createdBy || undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+    }),
+    getTimesheetFilterOptions(),
     getPointOptions(),
   ]);
 
@@ -64,9 +93,19 @@ export default async function TimesheetsPage({
           </Button>
         </div>
 
+        <TimesheetFilters
+          points={points.map((p) => ({ id: p.id, name: p.name }))}
+          creators={filterOptions.creators}
+        />
+
         <TimesheetList
-          timesheets={timesheets}
+          timesheets={timesheetsResult.items}
           canManage
+        />
+
+        <ListPagination
+          page={timesheetsResult.page}
+          totalPages={timesheetsResult.totalPages}
         />
       </div>
 

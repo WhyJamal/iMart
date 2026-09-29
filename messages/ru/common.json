@@ -7,7 +7,14 @@
         "dateFrom": "Дата от",
         "dateTo": "Дата до",
         "resetFilters": "Сбросить фильтры",
-        "pageOf": "{page} / {totalPages}"
+        "pageOf": "{page} / {totalPages}",
+        "allPoints": "Все точки",
+        "allRoles": "Все роли",
+        "allStatuses": "Все статусы",
+        "searchPlaceholder": "Поиск..."
     },
-    "methods": { "cash": "Наличные", "card": "Карта" }
+    "methods": {
+        "cash": "Наличные",
+        "card": "Карта"
+    }
 }

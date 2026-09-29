@@ -17,6 +17,8 @@ import { DebtHistoryDialog } from "@/components/debt-history-dialog";
 import { createDebtorPayment, getDebtorLedger } from "@/actions/debtor-actions";
 import type { IDebtor } from "@/types/debtor.types";
 import type { IPointOption } from "@/types/point.types";
+import { ListSearch } from "@/components/list/list-search";
+import { useLocalSearch } from "@/components/list/use-local-search";
 
 interface Props {
   debtors: (IDebtor & { debt: number })[];
@@ -27,87 +29,94 @@ interface Props {
 export function DebtorList({ debtors, points, defaultPointId }: Props) {
   const t = useTranslations("debtor.list");
 
-  if (debtors.length === 0) {
-    return (
-      <div className="text-center py-16 text-muted-foreground">
-        <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">{t("empty")}</p>
-      </div>
-    );
-  }
+  const { search, setSearch, filtered } = useLocalSearch(
+    debtors,
+    (d) => `${d.name} ${d.phone ?? ""}`
+  );
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>{t("name")}</TableHead>
-          <TableHead>{t("phone")}</TableHead>
-          <TableHead className="text-right">{t("debt")}</TableHead>
-          <TableHead className="text-right">{t("actions")}</TableHead>
-        </TableRow>
-      </TableHeader>
+    <div className="space-y-4">
+      <ListSearch value={search} onChange={setSearch} />
 
-      <TableBody>
-        {debtors.map((d) => (
-          <TableRow key={d.id}>
-            <TableCell className="font-medium">{d.name}</TableCell>
-            <TableCell className="text-sm text-muted-foreground">
-              {d.phone || "—"}
-            </TableCell>
-            <TableCell className="text-right">
-              {d.debt > 0 ? (
-                <span className="font-medium text-amber-600">
-                  {d.debt.toLocaleString("uz-UZ")} so'm
-                </span>
-              ) : (
-                <span className="text-sm text-muted-foreground">—</span>
-              )}
-            </TableCell>
-            <TableCell className="text-right space-x-1">
-              {d.debt > 0 && (
-                <DebtPaymentDialog
-                  name={d.name}
-                  debt={d.debt}
-                  points={points}
-                  defaultPointId={defaultPointId}
-                  onSubmit={(input) =>
-                    createDebtorPayment({ debtorId: d.id, ...input })
-                  }
-                  labels={{
-                    trigger: t("payDebt"),
-                    title: t("payDebtTitle"),
-                    currentDebt: t("currentDebt"),
-                    amount: t("amount"),
-                    method: t("method"),
-                    note: t("note"),
-                    submit: t("submit"),
-                    cancel: t("cancel"),
-                    cash: t("payCash"),
-                    card: t("payCard"),
-                    qr: t("payQr"),
-                    success: t("paymentSaved"),
-                    point: t("point"),
-                    noPoint: t("noPoint"),
-                  }}
-                />
-              )}
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground">
+          <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
+          <p className="text-sm">{t("empty")}</p>
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t("name")}</TableHead>
+              <TableHead>{t("phone")}</TableHead>
+              <TableHead className="text-right">{t("debt")}</TableHead>
+              <TableHead className="text-right">{t("actions")}</TableHead>
+            </TableRow>
+          </TableHeader>
 
-              <DebtHistoryDialog
-                name={d.name}
-                fetchLedger={() => getDebtorLedger(d.id)}
-                labels={{
-                  trigger: t("history"),
-                  title: t("historyTitle"),
-                  empty: t("historyEmpty"),
-                  debt: t("historyDebt"),
-                  payment: t("historyPayment"),
-                  balance: t("historyBalance"),
-                }}
-              />
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+          <TableBody>
+            {filtered.map((d) => (
+              <TableRow key={d.id}>
+                <TableCell className="font-medium">{d.name}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {d.phone || "—"}
+                </TableCell>
+                <TableCell className="text-right">
+                  {d.debt > 0 ? (
+                    <span className="font-medium text-amber-600">
+                      {d.debt.toLocaleString("uz-UZ")} so'm
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">—</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-right space-x-1">
+                  {d.debt > 0 && (
+                    <DebtPaymentDialog
+                      name={d.name}
+                      debt={d.debt}
+                      points={points}
+                      defaultPointId={defaultPointId}
+                      onSubmit={(input) =>
+                        createDebtorPayment({ debtorId: d.id, ...input })
+                      }
+                      labels={{
+                        trigger: t("payDebt"),
+                        title: t("payDebtTitle"),
+                        currentDebt: t("currentDebt"),
+                        amount: t("amount"),
+                        method: t("method"),
+                        note: t("note"),
+                        submit: t("submit"),
+                        cancel: t("cancel"),
+                        cash: t("payCash"),
+                        card: t("payCard"),
+                        qr: t("payQr"),
+                        success: t("paymentSaved"),
+                        point: t("point"),
+                        noPoint: t("noPoint"),
+                      }}
+                    />
+                  )}
+
+                  <DebtHistoryDialog
+                    name={d.name}
+                    fetchLedger={() => getDebtorLedger(d.id)}
+                    labels={{
+                      trigger: t("history"),
+                      title: t("historyTitle"),
+                      empty: t("historyEmpty"),
+                      debt: t("historyDebt"),
+                      payment: t("historyPayment"),
+                      balance: t("historyBalance"),
+                    }}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
   );
 }

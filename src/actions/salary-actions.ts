@@ -17,6 +17,14 @@ import type {
 } from "@/types/salary.types";
 import { IOrgUser } from "@/types/user.types";
 import type { Role } from "@/types/role.types";
+import type { Prisma } from "@/generated/prisma/client";
+import {
+  inDateRange,
+  paginated,
+  resolvePagination,
+  type ListFilters,
+  type Paginated,
+} from "@/lib/pagination";
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
@@ -66,16 +74,35 @@ export async function getSalaryHistory(
   }));
 }
 
+export interface EmployeeSalaryFilters extends ListFilters {
+  role?: string;
+  salaryType?: string;
+}
+
 /**
  * Tashkilotdagi barcha xodimlar + har birining HOZIRGI stavkasi
  * (agar belgilangan bo'lsa). Salary sahifasidagi asosiy jadval uchun.
+ *
+ * `role` DB darajasida (OrganizationMember.role) filtrlanadi.
+ * `salaryType` va sana oralig'i (effectiveFrom) esa SalaryRegister'dan
+ * hisoblangan "hozirgi holat" ekani uchun — hammasi olib kelingandan
+ * keyin, shu yerda (xotirada) filtrlanadi va sahifalanadi.
  */
-export async function getEmployeeSalaries(): Promise<IOrgUser[]> {
+export async function getEmployeeSalaries(
+  filters: EmployeeSalaryFilters = {}
+): Promise<Paginated<IOrgUser>> {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
+  const membershipWhere: Prisma.OrganizationMemberWhereInput = {
+    organizationId: session.organizationId,
+  };
+  if (filters.role) {
+    membershipWhere.role = filters.role as Prisma.OrganizationMemberWhereInput["role"];
+  }
+
   const memberships = await prisma.organizationMember.findMany({
-    where: { organizationId: session.organizationId },
+    where: membershipWhere,
     include: {
       point: { select: { id: true, name: true } },
       user: { select: { id: true, name: true, email: true, createdAt: true } },
@@ -101,21 +128,38 @@ export async function getEmployeeSalaries(): Promise<IOrgUser[]> {
     }
   }
 
-  return memberships.map((m: { user: { id: string; name: string; email: string; createdAt: Date }; role: string; point: { id: string; name: string } | null }) => {
-    const latest = latestByUser.get(m.user.id);
-    return {
-      id: m.user.id,
-      name: m.user.name,
-      email: m.user.email,
-      role: m.role as Role,
-      createdAt: m.user.createdAt,
-      pointId: m.point?.id ?? null,
-      pointName: m.point?.name ?? null,
-      salaryType: latest ? (latest.salaryType as SalaryType) : null,
-      rate: latest ? Number(latest.rate) : null,
-      effectiveFrom: latest ? latest.effectiveFrom : null,
-    };
+  const all: IOrgUser[] = memberships.map(
+    (m: {
+      user: { id: string; name: string; email: string; createdAt: Date };
+      role: string;
+      point: { id: string; name: string } | null;
+    }) => {
+      const latest = latestByUser.get(m.user.id);
+      return {
+        id: m.user.id,
+        name: m.user.name,
+        email: m.user.email,
+        role: m.role as Role,
+        createdAt: m.user.createdAt,
+        pointId: m.point?.id ?? null,
+        pointName: m.point?.name ?? null,
+        salaryType: latest ? (latest.salaryType as SalaryType) : null,
+        rate: latest ? Number(latest.rate) : null,
+        effectiveFrom: latest ? latest.effectiveFrom : null,
+      };
+    }
+  );
+
+  const filteredAll = all.filter((e) => {
+    if (filters.salaryType && e.salaryType !== filters.salaryType) return false;
+    if (!inDateRange(e.effectiveFrom, filters.dateFrom, filters.dateTo)) return false;
+    return true;
   });
+
+  const window = resolvePagination(filteredAll.length, filters);
+  const items = filteredAll.slice(window.skip, window.skip + window.pageSize);
+
+  return paginated(items, filteredAll.length, window);
 }
 
 // ─── Mutations ────────────────────────────────────────────────────────────────

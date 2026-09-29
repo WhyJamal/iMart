@@ -6,10 +6,15 @@ import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
-import { getPayrollAccruals } from "@/actions/payroll-accrual-actions";
+import {
+  getPayrollAccruals,
+  getPayrollAccrualFilterOptions,
+} from "@/actions/payroll-accrual-actions";
 import { getPointOptions } from "@/actions/point-actions";
 import { AccrualList } from "./_components/accrual-list";
+import { AccrualFilters } from "./_components/accrual-filters";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
+import { ListPagination } from "@/components/list/list-pagination";
 import { AccrualForm } from "./_components/accrual-form";
 import { PAGES } from "@/config/pages.config";
 
@@ -18,7 +23,15 @@ export const dynamic = "force-dynamic";
 export default async function PayrollPage({
   searchParams,
 }: {
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{
+    new?: string;
+    page?: string;
+    pointId?: string;
+    status?: string;
+    createdBy?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }>;
 }) {
   const t = await getTranslations("payroll");
 
@@ -30,10 +43,26 @@ export default async function PayrollPage({
 
   const canManage = hasPermission(session.role, "payroll:manage");
 
-  const { new: isNew } = await searchParams;
+  const {
+    new: isNew,
+    page,
+    pointId,
+    status,
+    createdBy,
+    dateFrom,
+    dateTo,
+  } = await searchParams;
 
-  const [accruals, points] = await Promise.all([
-    getPayrollAccruals(),
+  const [accrualsResult, filterOptions, points] = await Promise.all([
+    getPayrollAccruals({
+      page: page ? Number(page) : undefined,
+      pointId: pointId || undefined,
+      status: status || undefined,
+      createdBy: createdBy || undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+    }),
+    getPayrollAccrualFilterOptions(),
     getPointOptions(),
   ]);
 
@@ -64,9 +93,19 @@ export default async function PayrollPage({
           )}
         </div>
 
+        <AccrualFilters
+          points={points.map((p) => ({ id: p.id, name: p.name }))}
+          creators={filterOptions.creators}
+        />
+
         <AccrualList
-          accruals={accruals}
+          accruals={accrualsResult.items}
           canManage={canManage}
+        />
+
+        <ListPagination
+          page={accrualsResult.page}
+          totalPages={accrualsResult.totalPages}
         />
       </div>
 

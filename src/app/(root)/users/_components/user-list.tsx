@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Users as UsersIcon, Trash2 } from "lucide-react";
@@ -43,6 +44,10 @@ import {
   useDeleteUser,
   useUpdateUserSchedule,
 } from "../_hooks/use-user-mutations";
+import { ListSearch } from "@/components/list/list-search";
+import { useLocalSearch } from "@/components/list/use-local-search";
+import { FilterBar, FilterSelect } from "@/components/list/filter-fields";
+import { ALL } from "@/components/list/use-url-filters";
 
 interface Props {
   users: IOrgUser[];
@@ -73,6 +78,7 @@ export function UserList({
 }: Props) {
   const router = useRouter();
   const t = useTranslations("users.list");
+  const tCommon = useTranslations("common.list");
 
   const { mutate: changeRole, isPending: isChangingRole } =
     useUpdateUserRole(() => router.refresh());
@@ -88,187 +94,235 @@ export function UserList({
     isPending: isChangingSchedule,
   } = useUpdateUserSchedule(() => router.refresh());
 
-  if (users.length === 0) {
-    return (
-      <div className="text-center py-24 text-muted-foreground">
-        <UsersIcon className="w-10 h-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm">{t("empty")}</p>
-      </div>
-    );
-  }
-
   const assignableRoles = ROLES.filter(
     (r) => r !== "OWNER" || currentRole === "OWNER"
   );
 
+  const { search, setSearch, filtered: searched } = useLocalSearch(
+    users,
+    (u) => `${u.name} ${u.email}`
+  );
+
+  const [pointFilter, setPointFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const hasActiveFilters = pointFilter !== "" || roleFilter !== "";
+
+  const filtered = useMemo(() => {
+    return searched.filter((u) => {
+      if (pointFilter && u.pointId !== pointFilter) return false;
+      if (roleFilter && u.role !== roleFilter) return false;
+      return true;
+    });
+  }, [searched, pointFilter, roleFilter]);
+
+  const pointOptions = points.map((p) => ({ id: p.id, name: p.name }));
+  const roleOptions = assignableRoles.map((r) => ({ id: r, name: r }));
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>{t("name")}</TableHead>
-          <TableHead>{t("email")}</TableHead>
-          <TableHead>{t("role")}</TableHead>
-          <TableHead>{t("point")}</TableHead>
-          <TableHead>{t("schedule")}</TableHead>
-          <TableHead>{t("joined")}</TableHead>
-          <TableHead className="text-right">
-            {t("actions")}
-          </TableHead>
-        </TableRow>
-      </TableHeader>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <FilterBar
+          hasActive={hasActiveFilters}
+          onReset={() => {
+            setPointFilter("");
+            setRoleFilter("");
+          }}
+        >
+          <FilterSelect
+            label={t("point")}
+            allLabel={tCommon("allPoints")}
+            value={pointFilter}
+            onChange={(v) => setPointFilter(v === ALL ? "" : v)}
+            options={pointOptions}
+          />
 
-      <TableBody>
-        {users.map((u) => {
-          const isSelf = u.id === currentUserId;
+          <FilterSelect
+            label={t("role")}
+            allLabel={tCommon("allRoles")}
+            value={roleFilter}
+            onChange={(v) => setRoleFilter(v === ALL ? "" : v)}
+            options={roleOptions}
+          />
+        </FilterBar>
 
-          return (
-            <TableRow key={u.id}>
-              <TableCell className="font-medium">
-                {u.name}{" "}
-                {isSelf && (
-                  <Badge variant="secondary" className="ml-1">
-                    {t("you")}
-                  </Badge>
-                )}
-              </TableCell>
+        <ListSearch value={search} onChange={setSearch} />
+      </div>
 
-              <TableCell className="text-muted-foreground text-sm">
-                {u.email}
-              </TableCell>
-
-              <TableCell>
-                <Select
-                  value={u.role}
-                  disabled={isSelf || isChangingRole}
-                  onValueChange={(v) =>
-                    changeRole(u.id, v as Role)
-                  }
-                >
-                  <SelectTrigger className="w-35">
-                    <SelectValue />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    {assignableRoles.map((r) => (
-                      <SelectItem key={r} value={r}>
-                        {r}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </TableCell>
-
-              <TableCell>
-                <Select
-                  value={u.pointId ?? NO_POINT}
-                  disabled={isChangingPoint}
-                  onValueChange={(v) =>
-                    changePoint(
-                      u.id,
-                      v === NO_POINT ? null : v
-                    )
-                  }
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder={t("notAssigned")} />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectItem value={NO_POINT}>
-                      {t("notAssigned")}
-                    </SelectItem>
-
-                    {points.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>
-                        {p.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </TableCell>
-
-              <TableCell>
-                <Select
-                  value={u.workScheduleId ?? NO_SCHEDULE}
-                  disabled={isChangingSchedule}
-                  onValueChange={(v) =>
-                    changeSchedule(
-                      u.id,
-                      v === NO_SCHEDULE ? null : v
-                    )
-                  }
-                >
-                  <SelectTrigger className="w-45">
-                    <SelectValue placeholder={t("schedule")} />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectItem value={NO_SCHEDULE}>
-                      {t("notScheduled")}
-                    </SelectItem>
-
-                    {schedules.map((schedule) => (
-                      <SelectItem
-                        key={schedule.id}
-                        value={schedule.id}
-                      >
-                        {schedule.name} ({schedule.year})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </TableCell>
-
-              <TableCell className="text-muted-foreground text-sm">
-                {fmtDate(u.createdAt)}
-              </TableCell>
-
-              <TableCell className="text-right">
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive"
-                      disabled={isSelf || isDeleting}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        {t("deleteTitle")}
-                      </AlertDialogTitle>
-
-                      <AlertDialogDescription>
-                        {t("deleteDescription", {
-                          name: u.name,
-                          email: u.email,
-                        })}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>
-                        {t("cancel")}
-                      </AlertDialogCancel>
-
-                      <AlertDialogAction
-                        onClick={() => removeUser(u.id)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        {t("delete")}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </TableCell>
+      {filtered.length === 0 ? (
+        <div className="text-center py-24 text-muted-foreground">
+          <UsersIcon className="w-10 h-10 mx-auto mb-3 opacity-30" />
+          <p className="text-sm">{t("empty")}</p>
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t("name")}</TableHead>
+              <TableHead>{t("email")}</TableHead>
+              <TableHead>{t("role")}</TableHead>
+              <TableHead>{t("point")}</TableHead>
+              <TableHead>{t("schedule")}</TableHead>
+              <TableHead>{t("joined")}</TableHead>
+              <TableHead className="text-right">
+                {t("actions")}
+              </TableHead>
             </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+          </TableHeader>
+
+          <TableBody>
+            {filtered.map((u) => {
+              const isSelf = u.id === currentUserId;
+
+              return (
+                <TableRow key={u.id}>
+                  <TableCell className="font-medium">
+                    {u.name}{" "}
+                    {isSelf && (
+                      <Badge variant="secondary" className="ml-1">
+                        {t("you")}
+                      </Badge>
+                    )}
+                  </TableCell>
+
+                  <TableCell className="text-muted-foreground text-sm">
+                    {u.email}
+                  </TableCell>
+
+                  <TableCell>
+                    <Select
+                      value={u.role}
+                      disabled={isSelf || isChangingRole}
+                      onValueChange={(v) =>
+                        changeRole(u.id, v as Role)
+                      }
+                    >
+                      <SelectTrigger className="w-35">
+                        <SelectValue />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        {assignableRoles.map((r) => (
+                          <SelectItem key={r} value={r}>
+                            {r}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+
+                  <TableCell>
+                    <Select
+                      value={u.pointId ?? NO_POINT}
+                      disabled={isChangingPoint}
+                      onValueChange={(v) =>
+                        changePoint(
+                          u.id,
+                          v === NO_POINT ? null : v
+                        )
+                      }
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder={t("notAssigned")} />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectItem value={NO_POINT}>
+                          {t("notAssigned")}
+                        </SelectItem>
+
+                        {points.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+
+                  <TableCell>
+                    <Select
+                      value={u.workScheduleId ?? NO_SCHEDULE}
+                      disabled={isChangingSchedule}
+                      onValueChange={(v) =>
+                        changeSchedule(
+                          u.id,
+                          v === NO_SCHEDULE ? null : v
+                        )
+                      }
+                    >
+                      <SelectTrigger className="w-45">
+                        <SelectValue placeholder={t("schedule")} />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectItem value={NO_SCHEDULE}>
+                          {t("notScheduled")}
+                        </SelectItem>
+
+                        {schedules.map((schedule) => (
+                          <SelectItem
+                            key={schedule.id}
+                            value={schedule.id}
+                          >
+                            {schedule.name} ({schedule.year})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+
+                  <TableCell className="text-muted-foreground text-sm">
+                    {fmtDate(u.createdAt)}
+                  </TableCell>
+
+                  <TableCell className="text-right">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive"
+                          disabled={isSelf || isDeleting}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            {t("deleteTitle")}
+                          </AlertDialogTitle>
+
+                          <AlertDialogDescription>
+                            {t("deleteDescription", {
+                              name: u.name,
+                              email: u.email,
+                            })}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>
+                            {t("cancel")}
+                          </AlertDialogCancel>
+
+                          <AlertDialogAction
+                            onClick={() => removeUser(u.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            {t("delete")}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      )}
+    </div>
   );
 }

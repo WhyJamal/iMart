@@ -27,6 +27,8 @@ import {
 import type { IPoint } from "@/types/point.types";
 import { PAGES } from "@/config/pages.config";
 import { useDeletePoint } from "../_hooks/use-point-mutations";
+import { ListSearch } from "@/components/list/list-search";
+import { useLocalSearch } from "@/components/list/use-local-search";
 
 import { useTranslations } from "next-intl";
 
@@ -50,121 +52,128 @@ export function PointList({
     router.refresh()
   );
 
-  if (points.length === 0) {
-    return (
-      <div className="text-center py-16 text-muted-foreground">
-        <MapPin className="w-10 h-10 mx-auto mb-3 opacity-30" />
-
-        <p className="text-sm">
-          {t("empty")}
-        </p>
-      </div>
-    );
-  }
+  const { search, setSearch, filtered } = useLocalSearch(
+    points,
+    (p) => p.name
+  );
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>
-            {t("name")}
-          </TableHead>
+    <div className="space-y-4">
+      <ListSearch value={search} onChange={setSearch} />
 
-          <TableHead>
-            {t("warehouses")}
-          </TableHead>
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground">
+          <MapPin className="w-10 h-10 mx-auto mb-3 opacity-30" />
 
-          <TableHead>
-            {t("employees")}
-          </TableHead>
+          <p className="text-sm">
+            {t("empty")}
+          </p>
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>
+                {t("name")}
+              </TableHead>
 
-          {canManage && (
-            <TableHead className="text-right">
-              {t("actions")}
-            </TableHead>
-          )}
-        </TableRow>
-      </TableHeader>
+              <TableHead>
+                {t("warehouses")}
+              </TableHead>
 
-      <TableBody>
-        {points.map((p) => (
-          <TableRow key={p.id}>
-            <TableCell className="font-medium">
-              {p.name}
-            </TableCell>
+              <TableHead>
+                {t("employees")}
+              </TableHead>
 
-            <TableCell>
-              <Badge variant="secondary">
-                {p.warehouseCount}
-              </Badge>
-            </TableCell>
+              {canManage && (
+                <TableHead className="text-right">
+                  {t("actions")}
+                </TableHead>
+              )}
+            </TableRow>
+          </TableHeader>
 
-            <TableCell>
-              <Badge variant="secondary">
-                {p.userCount}
-              </Badge>
-            </TableCell>
+          <TableBody>
+            {filtered.map((p) => (
+              <TableRow key={p.id}>
+                <TableCell className="font-medium">
+                  {p.name}
+                </TableCell>
 
-            {canManage && (
-              <TableCell className="text-right space-x-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  asChild
-                >
-                  <Link
-                    href={`${PAGES.POINTS}?edit=${p.id}`}
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </Link>
-                </Button>
+                <TableCell>
+                  <Badge variant="secondary">
+                    {p.warehouseCount}
+                  </Badge>
+                </TableCell>
 
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
+                <TableCell>
+                  <Badge variant="secondary">
+                    {p.userCount}
+                  </Badge>
+                </TableCell>
+
+                {canManage && (
+                  <TableCell className="text-right space-x-1">
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive"
-                      disabled={isPending}
+                      size="sm"
+                      asChild
                     >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        {t("deleteTitle")}
-                      </AlertDialogTitle>
-
-                      <AlertDialogDescription>
-                        {t("deleteDescription", {
-                          name: p.name,
-                        })}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>
-                        {t("cancel")}
-                      </AlertDialogCancel>
-
-                      <AlertDialogAction
-                        onClick={() =>
-                          remove(p.id)
-                        }
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      <Link
+                        href={`${PAGES.POINTS}?edit=${p.id}`}
                       >
-                        {t("delete")}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </TableCell>
-            )}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Link>
+                    </Button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive"
+                          disabled={isPending}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            {t("deleteTitle")}
+                          </AlertDialogTitle>
+
+                          <AlertDialogDescription>
+                            {t("deleteDescription", {
+                              name: p.name,
+                            })}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>
+                            {t("cancel")}
+                          </AlertDialogCancel>
+
+                          <AlertDialogAction
+                            onClick={() =>
+                              remove(p.id)
+                            }
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            {t("delete")}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
   );
 }

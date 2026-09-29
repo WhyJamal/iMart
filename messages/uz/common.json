@@ -7,7 +7,14 @@
         "dateFrom": "Sanadan",
         "dateTo": "Sanagacha",
         "resetFilters": "Filtrlarni tozalash",
-        "pageOf": "{page} / {totalPages}"
+        "pageOf": "{page} / {totalPages}",
+        "allPoints": "Barcha nuqtalar",
+        "allRoles": "Barcha rollar",
+        "allStatuses": "Barcha statuslar",
+        "searchPlaceholder": "Qidirish..."
     },
-    "methods": { "cash": "Naqd", "card": "Karta" }
+    "methods": {
+        "cash": "Naqd",
+        "card": "Karta"
+    }
 }

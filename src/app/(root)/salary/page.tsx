@@ -5,7 +5,9 @@ import { getServerSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
 
 import { EmployeeSalaryList } from "./_components/employee-salary-list";
+import { SalaryFilters } from "./_components/salary-filters";
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
+import { ListPagination } from "@/components/list/list-pagination";
 import { PAGES } from "@/config/pages.config";
 import { SalaryRateForm } from "./_components/salary-rate-form";
 import { getEmployeeSalaries } from "@/actions/salary-actions";
@@ -15,10 +17,19 @@ import { Wallet2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+const ALL_EMPLOYEES_PAGE_SIZE = 10000;
+
 export default async function SalaryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ setSalary?: string }>;
+  searchParams: Promise<{
+    setSalary?: string;
+    page?: string;
+    role?: string;
+    salaryType?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }>;
 }) {
   const t = await getTranslations("salary");
 
@@ -30,12 +41,22 @@ export default async function SalaryPage({
 
   const canManage = hasPermission(session.role, "payroll:manage");
 
-  const { setSalary } = await searchParams;
+  const { setSalary, page, role, salaryType, dateFrom, dateTo } =
+    await searchParams;
 
   const setSalaryUserId =
     setSalary && setSalary !== "1" ? setSalary : undefined;
 
-  const employees = await getEmployeeSalaries();
+  const [employeesResult, allEmployees] = await Promise.all([
+    getEmployeeSalaries({
+      page: page ? Number(page) : undefined,
+      role: role || undefined,
+      salaryType: salaryType || undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+    }),
+    getEmployeeSalaries({ pageSize: ALL_EMPLOYEES_PAGE_SIZE }),
+  ]);
 
   return (
     <>
@@ -64,17 +85,24 @@ export default async function SalaryPage({
             {t("employees")}
           </h2>
 
+          <SalaryFilters />
+
           <div className="rounded-xl border border-border bg-card overflow-hidden">
             <EmployeeSalaryList
-              employees={employees}
+              employees={employeesResult.items}
               canManage={canManage}
             />
           </div>
+
+          <ListPagination
+            page={employeesResult.page}
+            totalPages={employeesResult.totalPages}
+          />
         </section>
       </div>
 
       <DrawerBackdrop isOpen={!!setSalary}>
-        <SalaryRateForm users={employees} />
+        <SalaryRateForm users={allEmployees.items} />
       </DrawerBackdrop>
     </>
   );

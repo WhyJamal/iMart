@@ -1,6 +1,6 @@
 import type { Prisma } from "@/generated/prisma/client";
 
-export const DEFAULT_PAGE_SIZE = 15;
+export const DEFAULT_PAGE_SIZE = 1;
 
 export interface ListFilters {
   createdBy?: string;
@@ -60,7 +60,7 @@ function parseLocalDate(
 ): Date | undefined {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
   const time = edge === "start" ? "00:00:00.000" : "23:59:59.999";
-  const d = new Date(`${value}T${time}`); 
+  const d = new Date(`${value}T${time}`);
   return Number.isNaN(d.getTime()) ? undefined : d;
 }
 
@@ -76,4 +76,21 @@ export function dateRangeFilter(
   if (gte) filter.gte = gte;
   if (lte) filter.lte = lte;
   return filter;
+}
+
+export function inDateRange(
+  date: Date | null | undefined,
+  dateFrom?: string,
+  dateTo?: string
+): boolean {
+  if (!dateFrom && !dateTo) return true;
+  if (!date) return false;
+
+  const from = parseLocalDate(dateFrom, "start");
+  if (from && date < from) return false;
+
+  const to = parseLocalDate(dateTo, "end");
+  if (to && date > to) return false;
+
+  return true;
 }

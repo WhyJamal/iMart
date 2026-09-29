@@ -29,6 +29,12 @@ const fmtDate = (d: Date) =>
     dateStyle: "medium",
   }).format(new Date(d));
 
+const SALARY_TYPE_KEY = {
+  FIXED: "typeFixed",
+  DAILY: "typeDaily",
+  HOURLY: "typeHourly",
+} as const;
+
 export function EmployeeSalaryList({
   employees,
   canManage,
@@ -46,8 +52,6 @@ export function EmployeeSalaryList({
       </div>
     );
   }
-
-  console.log(employees, canManage);
 
   return (
     <Table>
@@ -82,7 +86,7 @@ export function EmployeeSalaryList({
 
             <TableCell>
               {e.salaryType ? (
-                e.salaryType
+                t(SALARY_TYPE_KEY[e.salaryType])
               ) : (
                 <span className="text-muted-foreground text-sm">
                   {t("notSet")}

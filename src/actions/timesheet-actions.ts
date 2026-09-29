@@ -20,6 +20,14 @@ import type {
   ITimesheetUserRow,
   ITimesheetEntry,
 } from "@/types/timesheet.types";
+import type { Prisma } from "@/generated/prisma/client";
+import {
+  dateRangeFilter,
+  paginated,
+  resolvePagination,
+  type ListFilters,
+  type Paginated,
+} from "@/lib/pagination";
 
 function daysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
@@ -33,25 +41,51 @@ function dateKey(year: number, month: number, day: number): string {
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
-export async function getTimesheets(): Promise<ITimesheetSummary[]> {
+export interface TimesheetFilters extends ListFilters {
+  pointId?: string;
+  status?: string;
+}
+
+export async function getTimesheets(
+  filters: TimesheetFilters = {}
+): Promise<Paginated<ITimesheetSummary>> {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
+  const where: Prisma.TimesheetWhereInput = {
+    organizationId: session.organizationId,
+  };
+
+  if (filters.pointId) where.pointId = filters.pointId;
+  if (filters.createdBy) where.createdBy = filters.createdBy;
+  if (filters.status) {
+    where.status = filters.status as Prisma.TimesheetWhereInput["status"];
+  }
+
+  const createdAt = dateRangeFilter(filters.dateFrom, filters.dateTo);
+  if (createdAt) where.createdAt = createdAt;
+
+  const total = await prisma.timesheet.count({ where });
+  const window = resolvePagination(total, filters);
+
   const rows = await prisma.timesheet.findMany({
-    where: { organizationId: session.organizationId },
+    where,
     include: {
       point: { select: { name: true } },
       _count: { select: { entries: true } },
     },
     orderBy: [{ year: "desc" }, { month: "desc" }],
+    skip: window.skip,
+    take: window.pageSize,
   });
 
   const userNames = await getUserNamesByIds(
     rows.map((r: (typeof rows)[number]) => r.createdBy)
   );
 
-  // Har bir timesheet uchun user soni (entries'dagi distinct userId)
-  const withUserCount = await Promise.all(
+  // Har bir timesheet uchun user soni (entries'dagi distinct userId).
+  // Faqat shu sahifadagi (window.pageSize) yozuvlar uchun so'raladi.
+  const items: ITimesheetSummary[] = await Promise.all(
     rows.map(async (r: (typeof rows)[number]) => {
       const distinctUsers = await prisma.timesheetEntry.findMany({
         where: { timesheetId: r.id },
@@ -72,7 +106,35 @@ export async function getTimesheets(): Promise<ITimesheetSummary[]> {
     })
   );
 
-  return withUserCount;
+  return paginated(items, total, window);
+}
+
+/**
+ * Filtr select'lari uchun: tabel yaratgan foydalanuvchilar. Nuqtalar
+ * ro'yxati sahifada allaqachon getPointOptions() dan olinadi, status
+ * esa qattiq belgilangan ikkita qiymat (DRAFT/CONFIRMED).
+ */
+export async function getTimesheetFilterOptions(): Promise<{
+  creators: { id: string; name: string }[];
+}> {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const rows = await prisma.timesheet.findMany({
+    where: { organizationId: session.organizationId },
+    select: { createdBy: true },
+    distinct: ["createdBy"],
+  });
+
+  const ids = rows
+    .map((r: { createdBy: string | null }) => r.createdBy)
+    .filter((id: string | null): id is string => Boolean(id));
+
+  const names = await getUserNamesByIds(ids);
+
+  return {
+    creators: ids.map((id: string) => ({ id, name: names[id] ?? id })),
+  };
 }
 
 export async function getTimesheetDetail(

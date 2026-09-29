@@ -3,7 +3,6 @@
   "description": "Xodimlar stavkasi — bitta joyda",
   "setSalary": "Maosh belgilash",
   "employees": "Xodimlar",
-
   "list": {
     "employee": "Xodim",
     "role": "Rol",
@@ -14,9 +13,12 @@
     "noEmployees": "Hali xodimlar mavjud emas",
     "notSet": "Belgilanmagan",
     "update": "Yangilash",
-    "set": "Belgilash"
+    "set": "Belgilash",
+    "allSalaryTypes": "Barcha maosh turlari",
+    "typeFixed": "Oylik",
+    "typeDaily": "Kunlik",
+    "typeHourly": "Soatlik"
   },
-
   "form": {
     "title": "Maosh belgilash",
     "employee": "Xodim",
