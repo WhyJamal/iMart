@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { getDebtors } from "@/actions/debtor-actions";
 import { getContragents } from "@/actions/contragent-actions";
+import { DebtReportExport } from "./_components/debt-report-export";
 
 export const dynamic = "force-dynamic";
 
@@ -23,20 +24,36 @@ export default async function DebtReportPage() {
     .filter((c) => c.type === "SUPPLIER" && c.debt > 0)
     .sort((a, b) => b.debt - a.debt);
 
-  const totalOwedToUs = debtorsWithDebt.reduce((sum, d) => sum + d.debt, 0);
-  const totalWeOwe = suppliersWithDebt.reduce((sum, c) => sum + c.debt, 0);
+  const totalOwedToUs = debtorsWithDebt.reduce(
+    (sum, d) => sum + d.debt,
+    0,
+  );
+
+  const totalWeOwe = suppliersWithDebt.reduce(
+    (sum, c) => sum + c.debt,
+    0,
+  );
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <p className="text-muted-foreground text-sm mt-0.5">
-          {t("description")}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+
+          <p className="text-muted-foreground text-sm mt-0.5">
+            {t("description")}
+          </p>
+        </div>
+
+        <DebtReportExport
+          debtors={debtorsWithDebt}
+          suppliers={suppliersWithDebt}
+          totalOwedToUs={totalOwedToUs}
+          totalWeOwe={totalWeOwe}
+        />
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        {/* Bizga qarzdorlar (mijozlar) */}
         <div className="bg-card rounded-2xl shadow-sm border border-border p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold">{t("owedToUs.title")}</h2>
@@ -66,7 +83,6 @@ export default async function DebtReportPage() {
           )}
         </div>
 
-        {/* Biz qarzdormiz (yetkazib beruvchilar) */}
         <div className="bg-card rounded-2xl shadow-sm border border-border p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold">{t("weOwe.title")}</h2>

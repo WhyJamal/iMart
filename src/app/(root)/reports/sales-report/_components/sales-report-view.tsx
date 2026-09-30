@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-
 import { CalendarIcon, Loader2, RotateCcw } from "lucide-react";
 import { format, parseISO } from "date-fns";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -37,6 +34,9 @@ import { getSalesReport } from "@/actions/reports/sales-report-actions";
 
 import type { ISalesReport } from "@/types/sales-report.types";
 import type { IPointOption } from "@/types/point.types";
+
+import { ReportExportMenu } from "@/components/report/report-export-menu";
+import type { ReportExportConfig } from "@/lib/report-export";
 
 const ALL = "__all__";
 
@@ -98,6 +98,92 @@ export function SalesReportView({ points, categories }: Props) {
   }, [dateFrom, dateTo, pointId, categoryId]);
 
   const hasFilters = pointId !== ALL || categoryId !== ALL;
+
+  const subtitle = [
+    `${t("dateFrom")}: ${format(parseISO(dateFrom), "dd.MM.yyyy")}`,
+    `${t("dateTo")}: ${format(parseISO(dateTo), "dd.MM.yyyy")}`,
+    ...(pointId !== ALL
+      ? [`${t("filters.point")}: ${points.find((p) => p.id === pointId)?.name ?? ""}`]
+      : []),
+    ...(categoryId !== ALL
+      ? [
+        `${t("filters.category")}: ${categories.find((c) => c.id === categoryId)?.name ?? ""
+        }`,
+      ]
+      : []),
+  ].join(" · ");
+
+  const exportConfig = useMemo<ReportExportConfig<ISalesReport["rows"][number]>>(
+    () => ({
+      title: t("title"),
+      subtitle,
+      fileName: "sales-report",
+      orientation: "landscape",
+      rows: data?.rows ?? [],
+      columns: [
+        {
+          header: t("table.product"),
+          value: (r) => r.productName,
+        },
+        {
+          header: t("table.category"),
+          value: (r) => r.categoryName,
+        },
+        {
+          header: t("table.qty"),
+          value: (r) => r.qty,
+          format: fmtNum,
+          align: "right",
+        },
+        {
+          header: t("table.unit"),
+          value: (r) => r.unit,
+        },
+        {
+          header: t("table.avgPrice"),
+          value: (r) => r.avgPrice,
+          format: fmtSum,
+          align: "right",
+        },
+        {
+          header: t("table.revenue"),
+          value: (r) => r.revenue,
+          format: fmtSum,
+          align: "right",
+        },
+        {
+          header: t("table.cost"),
+          value: (r) => r.cost,
+          format: fmtSum,
+          align: "right",
+        },
+        {
+          header: t("table.profit"),
+          value: (r) => r.profit,
+          format: fmtSum,
+          align: "right",
+        },
+        {
+          header: t("table.margin"),
+          value: (r) => r.marginPct,
+          format: (value) => `${value.toFixed(1)}%`,
+          align: "right",
+        },
+      ],
+      footer: [
+        t("table.total"),
+        null,
+        data?.totals.qty ?? 0,
+        null,
+        null,
+        data?.totals.revenue ?? 0,
+        data?.totals.cost ?? 0,
+        data?.totals.profit ?? 0,
+        data?.totals.marginPct ?? 0,
+      ],
+    }),
+    [data, t, subtitle],
+  );
 
   const handleReset = () => {
     setPointId(ALL);
@@ -210,6 +296,13 @@ export function SalesReportView({ points, categories }: Props) {
               {t("filters.reset")}
             </Button>
           )}
+
+          <div className="ml-auto">
+            <ReportExportMenu
+              config={exportConfig}
+              disabled={!data || data.rows.length === 0 || loading}
+            />
+          </div>
         </CardContent>
       </Card>
 

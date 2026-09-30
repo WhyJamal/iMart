@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2, Printer } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -23,6 +23,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
+import { ReportExportMenu } from "@/components/report/report-export-menu";
+import type { ReportExportConfig } from "@/lib/report-export";
 
 function fmt(n: number) {
   return new Intl.NumberFormat("ru-RU").format(Math.round(n));
@@ -158,6 +161,115 @@ export function ProfitLossView({ points }: { points: IPointOption[] }) {
   const margin =
     data && data.netRevenue !== 0 ? (data.netProfit / data.netRevenue) * 100 : 0;
 
+  const exportConfig = useMemo<ReportExportConfig<{
+    number: string;
+    indicator: string;
+    amount: number;
+  }>>(
+    () => ({
+      title: t("statementTitle"),
+      subtitle: `${fmtDate(dateFrom)} — ${fmtDate(dateTo)} · ${pointName ?? t("allPoints")
+        }`,
+      fileName: "profit-loss-report",
+      orientation: "portrait",
+
+      rows: [
+        {
+          number: "1",
+          indicator: t("sections.revenue"),
+          amount: 0,
+        },
+        {
+          number: "1.1",
+          indicator: t("rows.revenue"),
+          amount: data?.revenue ?? 0,
+        },
+        {
+          number: "1.2",
+          indicator: t("rows.returns"),
+          amount: -(data?.returns ?? 0),
+        },
+        {
+          number: "1.3",
+          indicator: t("rows.netRevenue"),
+          amount: data?.netRevenue ?? 0,
+        },
+
+        {
+          number: "2",
+          indicator: t("sections.cost"),
+          amount: 0,
+        },
+        {
+          number: "2.1",
+          indicator: t("rows.cogs"),
+          amount: -(data?.cogs ?? 0),
+        },
+        {
+          number: "2.2",
+          indicator: t("rows.grossProfit"),
+          amount: data?.grossProfit ?? 0,
+        },
+
+        {
+          number: "3",
+          indicator: t("sections.expenses"),
+          amount: 0,
+        },
+        {
+          number: "3.1",
+          indicator: t("rows.writeOff"),
+          amount: -(data?.writeOffLoss ?? 0),
+        },
+        {
+          number: "3.2",
+          indicator: t("rows.manualExpenses"),
+          amount: -(data?.manualExpenses ?? 0),
+        },
+        {
+          number: "3.3",
+          indicator: t("rows.payroll"),
+          amount: -(data?.payrollExpense ?? 0),
+        },
+        {
+          number: "3.4",
+          indicator: t("rows.totalExpenses"),
+          amount: -(data?.totalExpenses ?? 0),
+        },
+
+        {
+          number: "4",
+          indicator: t("rows.netProfit"),
+          amount: data?.netProfit ?? 0,
+        },
+      ],
+
+      columns: [
+        {
+          header: "№",
+          value: (r) => r.number,
+        },
+        {
+          header: t("rows.indicator"),
+          value: (r) => r.indicator,
+        },
+        {
+          header: t("rows.amount"),
+          value: (r) => r.amount,
+          format: fmt,
+          align: "right",
+        },
+      ],
+
+      footer: [
+        "",
+        `${t("rows.netProfit")} (${t("margin")}: ${margin.toFixed(1)}%)`,
+        data?.netProfit ?? 0,
+      ],
+    }),
+    [data, dateFrom, dateTo, margin, pointName, t],
+  );
+
   return (
     <div className="space-y-4">
       {/* Filtrlar */}
@@ -251,16 +363,12 @@ export function ProfitLossView({ points }: { points: IPointOption[] }) {
           </Select>
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9 gap-1.5 ml-auto"
-          onClick={() => window.print()}
-          disabled={loading || !data}
-        >
-          <Printer className="w-3.5 h-3.5" />
-          {t("print")}
-        </Button>
+        <div className="ml-auto">
+          <ReportExportMenu
+            config={exportConfig}
+            disabled={loading || !data}
+          />
+        </div>
       </div>
 
       {/* Hisobot */}
@@ -424,14 +532,6 @@ export function ProfitLossView({ points }: { points: IPointOption[] }) {
       </div>
 
       <p className="text-xs text-muted-foreground max-w-2xl">{t("note")}</p>
-
-      <style>{`
-        @media print {
-          body * { visibility: hidden; }
-          #pl-print-area, #pl-print-area * { visibility: visible; }
-          #pl-print-area { position: fixed; top: 0; left: 0; right: 0; box-shadow: none; }
-        }
-      `}</style>
     </div>
   );
 }

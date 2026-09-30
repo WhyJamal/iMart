@@ -8,5 +8,11 @@
   "weOwe": {
     "title": "Biz yetkazib beruvchilarga qarzmiz",
     "empty": "Hech qanday qarzingiz yo‘q"
-  }
+  },
+  "columns": {
+    "type": "Turi",
+    "name": "Nomi",
+    "debt": "Qarz"
+  },
+  "total": "Jami"
 }

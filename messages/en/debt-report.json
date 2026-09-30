@@ -8,5 +8,11 @@
   "weOwe": {
     "title": "We owe suppliers",
     "empty": "You have no debts"
-  }
+  },
+  "columns": {
+    "type": "Type",
+    "name": "Name",
+    "debt": "Debt"
+  },
+  "total": "Total"
 }
