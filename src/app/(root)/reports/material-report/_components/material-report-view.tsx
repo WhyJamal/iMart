@@ -1,11 +1,8 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-
 import { useTranslations } from "next-intl";
-
 import { FileBarChart, RotateCcw } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -31,6 +28,9 @@ import type { IMaterialReportRow } from "@/types/material-report.types";
 import type { IPointOption } from "@/types/point.types";
 import type { IWarehouse } from "@/types/warehouse.types";
 import type { IProduct } from "@/types/product.types";
+
+import { ReportExportMenu } from "@/components/report/report-export-menu";
+import type { ReportExportConfig } from "@/lib/report-export";
 
 const ALL = "all";
 
@@ -91,6 +91,49 @@ export function MaterialReportView({
         { amount: 0 }
       ),
     [rows]
+  );
+
+  const subtitle = useMemo(() => {
+    const parts: string[] = [];
+
+    if (pointId !== ALL) {
+      parts.push(`${t("filters.point")}: ${points.find((p) => p.id === pointId)?.name ?? ""}`);
+    }
+    if (warehouseId !== ALL) {
+      parts.push(`${t("filters.warehouse")}: ${warehouses.find((w) => w.id === warehouseId)?.name ?? ""}`);
+    }
+    if (categoryId !== ALL) {
+      parts.push(`${t("filters.category")}: ${categories.find((c) => c.id === categoryId)?.name ?? ""}`);
+    }
+    if (productId !== ALL) {
+      parts.push(`${t("filters.product")}: ${products.find((p) => p.id === productId)?.name ?? ""}`);
+    }
+
+    return parts.join(" · ");
+  }, [pointId, warehouseId, categoryId, productId, points, warehouses, categories, products, t]);
+
+  const exportConfig = useMemo<ReportExportConfig<IMaterialReportRow>>(
+    () => ({
+      title: t("title"),
+      subtitle,
+      fileName: "material-report",
+      orientation: "landscape",
+      rows,
+      columns: [
+        { header: t("table.product"), value: (r) => r.productName },
+        { header: t("table.code"), value: (r) => r.productCode },
+        { header: t("table.category"), value: (r) => r.categoryName },
+        { header: t("table.point"), value: (r) => r.pointName },
+        { header: t("table.warehouse"), value: (r) => r.warehouseName },
+        { header: t("table.cell"), value: (r) => r.cellName },
+        { header: t("table.qty"), value: (r) => r.qty, format: fmtNum, align: "right" },
+        { header: t("table.unit"), value: (r) => r.unit },
+        { header: t("table.price"), value: (r) => r.price, format: fmtSum, align: "right" },
+        { header: t("table.amount"), value: (r) => r.amount, format: fmtSum, align: "right" },
+      ],
+      footer: [t("table.total"), null, null, null, null, null, null, null, null, totals.amount],
+    }),
+    [t, subtitle, rows, totals.amount]
   );
 
   const refresh = (next: {
@@ -247,6 +290,14 @@ export function MaterialReportView({
               {t("filters.reset")}
             </Button>
           )}
+
+          <div className="ml-auto">
+            <ReportExportMenu
+              config={exportConfig}
+              disabled={rows.length === 0 || isPending}
+            />
+          </div>
+
         </CardContent>
       </Card>
 

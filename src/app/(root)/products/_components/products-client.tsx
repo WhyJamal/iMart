@@ -40,6 +40,7 @@ import { PhotoImportButton } from "./photo-import-button";
 import { ExportProductsButton } from "./export-products-button";
 import { ListSearch } from "@/components/list/list-search";
 import { useLocalSearch } from "@/components/list/use-local-search";
+import { Highlight } from "@/components/list/highlight";
 
 interface ICategoryOption {
   id: string;
@@ -201,21 +202,21 @@ export function ProductsClient({
                       </TableCell>
 
                       <TableCell className="font-medium">
-                        {product.name}
+                        <Highlight text={product.name} query={search} />
                       </TableCell>
 
                       <TableCell>
                         <span className="text-xs font-mono bg-muted text-muted-foreground px-2 py-0.5 rounded-md">
-                          {product.code}
+                          <Highlight text={product.code} query={search} />
                         </span>
                       </TableCell>
 
                       <TableCell>
                         <Badge
                           variant="secondary"
-                          className="font-normal"
+                          className="font-normal gap-0"
                         >
-                          {product.categoryName}
+                          <Highlight text={product.categoryName} query={search} />
                         </Badge>
                       </TableCell>
 

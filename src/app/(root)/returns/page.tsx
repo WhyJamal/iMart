@@ -1,23 +1,45 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { getSaleReturns } from "@/actions/return-actions";
-import { ReturnList } from "./_components/return-list";
-import { DrawerBackdrop } from "@/components/drawer-backdrop";
-import { ReturnForm } from "./_components/return-form";
-import { PAGES } from "@/config/pages.config";
 import { getTranslations } from "next-intl/server";
+
+import { Button } from "@/components/ui/button";
+import { DrawerBackdrop } from "@/components/drawer-backdrop";
+import { ListPagination } from "@/components/list/list-pagination";
+import {
+  getSaleReturns,
+  getSaleReturnFilterOptions,
+} from "@/actions/return-actions";
+import { ReturnList } from "./_components/return-list";
+import { ReturnForm } from "./_components/return-form";
+import { ReturnFilters } from "./_components/return-filters";
+import { PAGES } from "@/config/pages.config";
 
 export const dynamic = "force-dynamic";
 
 export default async function ReturnsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{
+    new?: string;
+    page?: string;
+    createdBy?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }>;
 }) {
-  const { new: isNew } = await searchParams;
-  const returns = await getSaleReturns();
   const t = await getTranslations("sale-return");
+
+  const sp = await searchParams;
+
+  const [result, filterOptions] = await Promise.all([
+    getSaleReturns({
+      page: sp.page ? Number(sp.page) : undefined,
+      createdBy: sp.createdBy,
+      dateFrom: sp.dateFrom,
+      dateTo: sp.dateTo,
+    }),
+    getSaleReturnFilterOptions(),
+  ]);
 
   return (
     <>
@@ -39,10 +61,14 @@ export default async function ReturnsPage({
           </Button>
         </div>
 
-        <ReturnList returns={returns} />
+        <ReturnFilters creators={filterOptions.creators} />
+
+        <ReturnList returns={result.items} />
+
+        <ListPagination page={result.page} totalPages={result.totalPages} />
       </div>
 
-      <DrawerBackdrop isOpen={isNew === "1"}>
+      <DrawerBackdrop isOpen={sp.new === "1"}>
         <ReturnForm />
       </DrawerBackdrop>
     </>

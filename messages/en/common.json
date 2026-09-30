@@ -16,5 +16,14 @@
     "methods": {
         "cash": "Cash",
         "card": "Card"
+    },
+    "report": {
+        "export": "Export",
+        "excel": "Excel (.xlsx)",
+        "pdf": "PDF (.pdf)",
+        "print": "Print",
+        "generatedAt": "Generated",
+        "page": "Page",
+        "failed": "Export failed"
     }
 }

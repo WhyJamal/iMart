@@ -11,10 +11,6 @@ interface Props {
   totalPages: number;
 }
 
-/**
- * Hamma ro'yxatlar uchun umumiy pagination. Faqat `page` parametrini
- * o'zgartiradi, qolgan barcha query parametrlar (filtrlar) saqlanadi.
- */
 export function ListPagination({ page, totalPages }: Props) {
   const tCommon = useTranslations("common.list");
   const pathname = usePathname();

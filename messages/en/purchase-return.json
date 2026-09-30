@@ -50,6 +50,7 @@
     "unitCost": "Unit cost",
     "currency": "UZS",
     "cancel": "Cancel",
+    "allSuppliers": "All suppliers",
     "delete": "Delete",
     "deleteTitle": "Delete return?",
     "deleteDescriptionBefore": "This will reverse inventory and cash movements for",

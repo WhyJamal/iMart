@@ -1,19 +1,17 @@
 import Link from "next/link";
-
 import { Plus } from "lucide-react";
-
 import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
-
-import { getPurchaseReturns } from "@/actions/purchase-return-actions";
-
-import { PurchaseReturnList } from "./_components/purchase-return-list";
-
 import { DrawerBackdrop } from "@/components/drawer-backdrop";
-
+import { ListPagination } from "@/components/list/list-pagination";
+import {
+  getPurchaseReturns,
+  getPurchaseReturnFilterOptions,
+} from "@/actions/purchase-return-actions";
+import { PurchaseReturnList } from "./_components/purchase-return-list";
 import { PurchaseReturnForm } from "./_components/purchase-return-form";
-
+import { PurchaseReturnFilters } from "./_components/purchase-return-filters";
 import { PAGES } from "@/config/pages.config";
 
 export const dynamic = "force-dynamic";
@@ -21,12 +19,29 @@ export const dynamic = "force-dynamic";
 export default async function PurchaseReturnsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{
+    new?: string;
+    page?: string;
+    contragentId?: string;
+    createdBy?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }>;
 }) {
   const t = await getTranslations("purchase-return");
 
-  const { new: isNew } = await searchParams;
-  const returns = await getPurchaseReturns();
+  const sp = await searchParams;
+
+  const [result, filterOptions] = await Promise.all([
+    getPurchaseReturns({
+      page: sp.page ? Number(sp.page) : undefined,
+      contragentId: sp.contragentId,
+      createdBy: sp.createdBy,
+      dateFrom: sp.dateFrom,
+      dateTo: sp.dateTo,
+    }),
+    getPurchaseReturnFilterOptions(),
+  ]);
 
   return (
     <>
@@ -47,10 +62,17 @@ export default async function PurchaseReturnsPage({
           </Button>
         </div>
 
-        <PurchaseReturnList returns={returns} />
+        <PurchaseReturnFilters
+          contragents={filterOptions.contragents}
+          creators={filterOptions.creators}
+        />
+
+        <PurchaseReturnList returns={result.items} />
+
+        <ListPagination page={result.page} totalPages={result.totalPages} />
       </div>
 
-      <DrawerBackdrop isOpen={isNew === "1"}>
+      <DrawerBackdrop isOpen={sp.new === "1"}>
         <PurchaseReturnForm />
       </DrawerBackdrop>
     </>

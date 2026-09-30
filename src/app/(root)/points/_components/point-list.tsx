@@ -31,6 +31,7 @@ import { ListSearch } from "@/components/list/list-search";
 import { useLocalSearch } from "@/components/list/use-local-search";
 
 import { useTranslations } from "next-intl";
+import { Highlight } from "@/components/list/highlight";
 
 interface Props {
   points: IPoint[];
@@ -97,7 +98,7 @@ export function PointList({
             {filtered.map((p) => (
               <TableRow key={p.id}>
                 <TableCell className="font-medium">
-                  {p.name}
+                  <Highlight text={p.name} query={search} />
                 </TableCell>
 
                 <TableCell>

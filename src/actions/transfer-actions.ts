@@ -12,18 +12,50 @@ import { applyStockMovement } from "@/actions/stock-actions";
 import { logAudit } from "@/actions/audit-actions";
 import { getUserNamesByIds } from "@/actions/user-actions";
 
+import {
+  dateRangeFilter,
+  paginated,
+  resolvePagination,
+  type ListFilters,
+  type Paginated,
+} from "@/lib/pagination";
+import { Prisma } from "@/generated/prisma/client";
+
 function generateTransferNumber(): string {
   const ts = Date.now().toString(36).toUpperCase();
   const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
   return `PER-${ts}-${rand}`;
 }
 
-export async function getTransfers(): Promise<TSerializedTransfer[]> {
+export interface TransferFilters extends ListFilters {
+  fromPointId?: string;
+  toPointId?: string;
+}
+
+export type PaginatedTransfers = Paginated<TSerializedTransfer>;
+
+export async function getTransfers(
+  filters: TransferFilters = {}
+): Promise<PaginatedTransfers> {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
+  const where: Prisma.TransferWhereInput = {
+    organizationId: session.organizationId,
+  };
+
+  if (filters.fromPointId) where.fromPointId = filters.fromPointId;
+  if (filters.toPointId) where.toPointId = filters.toPointId;
+  if (filters.createdBy) where.createdBy = filters.createdBy;
+
+  const createdAt = dateRangeFilter(filters.dateFrom, filters.dateTo);
+  if (createdAt) where.createdAt = createdAt;
+
+  const total = await prisma.transfer.count({ where });
+  const window = resolvePagination(total, filters);
+
   const transfers = await prisma.transfer.findMany({
-    where: { organizationId: session.organizationId },
+    where,
     include: {
       fromPoint: { select: { id: true, name: true } },
       toPoint: { select: { id: true, name: true } },
@@ -36,13 +68,15 @@ export async function getTransfers(): Promise<TSerializedTransfer[]> {
       },
     },
     orderBy: { createdAt: "desc" },
+    skip: window.skip,
+    take: window.pageSize,
   });
 
   const userNames = await getUserNamesByIds(
     transfers.map((t: { createdBy: string | null }) => t.createdBy)
   );
 
-  return transfers.map((transfer) => ({
+  const items: TSerializedTransfer[] = transfers.map((transfer) => ({
     ...transfer,
     totalAmount: Number(transfer.totalAmount),
     createdByName: transfer.createdBy ? userNames[transfer.createdBy] ?? null : null,
@@ -52,6 +86,38 @@ export async function getTransfers(): Promise<TSerializedTransfer[]> {
       unitCost: Number(item.unitCost),
     })),
   }));
+
+  return paginated(items, total, window);
+}
+
+export async function getTransferFilterOptions() {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const [points, creatorRows] = await Promise.all([
+    prisma.point.findMany({
+      where: { organizationId: session.organizationId },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.transfer.findMany({
+      where: { organizationId: session.organizationId },
+      select: { createdBy: true },
+      distinct: ["createdBy"],
+    }),
+  ]);
+
+  const creatorIds = creatorRows
+    .map((r: { createdBy: string | null }) => r.createdBy)
+    .filter((id: string | null): id is string => Boolean(id));
+
+  const names = await getUserNamesByIds(creatorIds);
+  const creators = creatorIds.map((id: string) => ({
+    id,
+    name: names[id] ?? id,
+  }));
+
+  return { points, creators };
 }
 
 export async function getCellStockForTransfer(

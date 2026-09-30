@@ -50,6 +50,7 @@
     "unitCost": "Birlik narxi",
     "currency": "so‘m",
     "cancel": "Bekor qilish",
+    "allSuppliers": "Barcha yetkazib beruvchilar",
     "delete": "O‘chirish",
     "deleteTitle": "Qaytarishni o‘chirish?",
     "deleteDescriptionBefore": "Bu amal",

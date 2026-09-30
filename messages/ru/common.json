@@ -16,5 +16,14 @@
     "methods": {
         "cash": "Наличные",
         "card": "Карта"
+    },
+    "report": {
+        "export": "Экспорт",
+        "excel": "Excel (.xlsx)",
+        "pdf": "PDF (.pdf)",
+        "print": "Печать",
+        "generatedAt": "Сформировано",
+        "page": "Стр.",
+        "failed": "Не удалось выполнить экспорт"
     }
 }

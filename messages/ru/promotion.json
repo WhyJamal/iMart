@@ -41,6 +41,12 @@
     "hoursShort": "ч",
     "minutesShort": "м",
     "secondsShort": "с",
-    "deleted": "Акция удалена"
+    "deleted": "Акция удалена",
+    "point": "Точка",
+    "warehouse": "Склад",
+    "cell": "Ячейка",
+    "allWarehouses": "Все склады",
+    "allCells": "Все ячейки",
+    "searchPlaceholder": "Поиск по названию, товару или комментарию..."
   }
 }

@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import type { IPromotion } from "@/types/promotion.types";
 import { deletePromotion } from "@/actions/promotion-actions";
 
+import { Highlight } from "@/components/list/highlight";
+
 const moneyDate = (d: Date) =>
   new Intl.DateTimeFormat("ru-RU", {
     dateStyle: "medium",
@@ -51,8 +53,10 @@ const countdown = (
 
 export function PromotionList({
   promotions,
+  query = "",
 }: {
   promotions: IPromotion[];
+  query?: string;
 }) {
   const t = useTranslations("promotion.list");
 
@@ -68,13 +72,19 @@ export function PromotionList({
   return (
     <div className="grid gap-3">
       {promotions.map((p) => (
-        <PromotionCard key={p.id} promotion={p} />
+        <PromotionCard key={p.id} promotion={p} query={query} />
       ))}
     </div>
   );
 }
 
-function PromotionCard({ promotion: p }: { promotion: IPromotion }) {
+function PromotionCard({
+  promotion: p,
+  query,
+}: {
+  promotion: IPromotion;
+  query: string;
+}) {
   const t = useTranslations("promotion.list");
   const tCommon = useTranslations("common.list");
 
@@ -116,7 +126,9 @@ function PromotionCard({ promotion: p }: { promotion: IPromotion }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold">{p.name}</h3>
+            <div className="gap-0">
+              <Highlight text={p.name} query={query} />
+            </div>
 
             <Badge variant={expired ? "secondary" : "default"}>
               {p.discountPercent}%
@@ -146,8 +158,8 @@ function PromotionCard({ promotion: p }: { promotion: IPromotion }) {
 
       <div className="mt-4 flex flex-wrap gap-2">
         {p.items.map((i) => (
-          <Badge key={i.id} variant="outline">
-            {i.productName}
+          <Badge key={i.id} variant="outline" className="gap-0">
+            <Highlight text={i.productName} query={query} />
           </Badge>
         ))}
       </div>
@@ -171,7 +183,7 @@ function PromotionCard({ promotion: p }: { promotion: IPromotion }) {
 
       {p.comment && (
         <p className="mt-3 text-xs text-muted-foreground border-t pt-3">
-          {p.comment}
+          <Highlight text={p.comment} query={query} />
         </p>
       )}
     </div>

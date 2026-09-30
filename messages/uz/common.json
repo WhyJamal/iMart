@@ -16,5 +16,14 @@
     "methods": {
         "cash": "Naqd",
         "card": "Karta"
+    },
+    "report": {
+        "export": "Yuklab olish",
+        "excel": "Excel (.xlsx)",
+        "pdf": "PDF (.pdf)",
+        "print": "Chop etish",
+        "generatedAt": "Yaratilgan",
+        "page": "Sahifa",
+        "failed": "Yuklab olishda xatolik"
     }
 }

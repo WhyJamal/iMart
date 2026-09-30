@@ -19,7 +19,15 @@ import { recordCashFlow, reverseCashFlowsByDoc } from "@/actions/cash-actions";
 import { applyStockMovement } from "@/actions/stock-actions";
 import { getUserNamesByIds } from "@/actions/user-actions";
 import { logAudit } from "@/actions/audit-actions";
-import type { SaleItem } from "@/generated/prisma/client";
+
+import {
+  dateRangeFilter,
+  paginated,
+  resolvePagination,
+  type ListFilters,
+  type Paginated,
+} from "@/lib/pagination";
+import type { Prisma, SaleItem } from "@/generated/prisma/client";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -31,12 +39,30 @@ function generateReturnNumber(): string {
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
-export async function getSaleReturns(): Promise<TSerializedSaleReturn[]> {
+export type SaleReturnFilters = ListFilters;
+
+export type PaginatedSaleReturns = Paginated<TSerializedSaleReturn>;
+
+export async function getSaleReturns(
+  filters: SaleReturnFilters = {}
+): Promise<PaginatedSaleReturns> {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
+  const where: Prisma.SaleReturnWhereInput = {
+    organizationId: session.organizationId,
+  };
+
+  if (filters.createdBy) where.createdBy = filters.createdBy;
+
+  const createdAt = dateRangeFilter(filters.dateFrom, filters.dateTo);
+  if (createdAt) where.createdAt = createdAt;
+
+  const total = await prisma.saleReturn.count({ where });
+  const window = resolvePagination(total, filters);
+
   const returns = await prisma.saleReturn.findMany({
-    where: { organizationId: session.organizationId },
+    where,
     include: {
       sale: { select: { id: true, saleNumber: true } },
       items: {
@@ -46,13 +72,17 @@ export async function getSaleReturns(): Promise<TSerializedSaleReturn[]> {
       },
     },
     orderBy: { createdAt: "desc" },
+    skip: window.skip,
+    take: window.pageSize,
   });
 
   const userNames = await getUserNamesByIds(
     returns.map((r: { createdBy: string | null }) => r.createdBy)
   );
 
-  return (returns as TSaleReturnWithItems[]).map((r) => ({
+  const items: TSerializedSaleReturn[] = (
+    returns as TSaleReturnWithItems[]
+  ).map((r) => ({
     ...r,
     totalAmount: Number(r.totalAmount),
     createdByName: r.createdBy ? userNames[r.createdBy] ?? null : null,
@@ -62,14 +92,33 @@ export async function getSaleReturns(): Promise<TSerializedSaleReturn[]> {
       unitPrice: Number(item.unitPrice),
     })),
   }));
+
+  return paginated(items, total, window);
 }
 
-/**
- * Chek raqami (saleNumber) bo'yicha sotuvni topadi va har bir
- * SaleItem uchun avval qancha qaytarilgani + hali qancha qaytarish
- * mumkinligini hisoblab qaytaradi. POS/Return formasi shu bilan
- * ishlaydi.
- */
+export async function getSaleReturnFilterOptions() {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const creatorRows = await prisma.saleReturn.findMany({
+    where: { organizationId: session.organizationId },
+    select: { createdBy: true },
+    distinct: ["createdBy"],
+  });
+
+  const creatorIds = creatorRows
+    .map((r: { createdBy: string | null }) => r.createdBy)
+    .filter((id: string | null): id is string => Boolean(id));
+
+  const names = await getUserNamesByIds(creatorIds);
+  const creators = creatorIds.map((id: string) => ({
+    id,
+    name: names[id] ?? id,
+  }));
+
+  return { creators };
+}
+
 export async function findSaleForReturn(
   saleNumber: string
 ): Promise<ISaleForReturn | null> {

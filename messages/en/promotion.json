@@ -41,6 +41,12 @@
     "hoursShort": "h",
     "minutesShort": "m",
     "secondsShort": "s",
-    "deleted": "Promotion deleted"
+    "deleted": "Promotion deleted",
+    "point": "Point",
+    "warehouse": "Warehouse",
+    "cell": "Cell",
+    "allWarehouses": "All warehouses",
+    "allCells": "All cells",
+    "searchPlaceholder": "Search by name, product or comment..."
   }
 }

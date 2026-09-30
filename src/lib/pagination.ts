@@ -1,6 +1,6 @@
 import type { Prisma } from "@/generated/prisma/client";
 
-export const DEFAULT_PAGE_SIZE = 1;
+export const DEFAULT_PAGE_SIZE = 15;
 
 export interface ListFilters {
   createdBy?: string;

@@ -1,35 +1,56 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+
 import { Button } from "@/components/ui/button";
-import { getWriteOffs } from "@/actions/write-off-actions";
+import { DrawerBackdrop } from "@/components/drawer-backdrop";
+import { ListPagination } from "@/components/list/list-pagination";
+import {
+  getWriteOffs,
+  getWriteOffFilterOptions,
+} from "@/actions/write-off-actions";
 import { getWarehouses } from "@/actions/warehouse-actions";
 import { getCurrentUserPointId, getPointOptions } from "@/actions/point-actions";
 import { WriteOffList } from "./_components/write-off-list";
 import { WriteOffForm } from "./_components/write-off-form";
-import { DrawerBackdrop } from "@/components/drawer-backdrop";
+import { WriteOffFilters } from "./_components/write-off-filters";
 import { PAGES } from "@/config/pages.config";
-
-import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function WriteOffsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{
+    new?: string;
+    page?: string;
+    pointId?: string;
+    createdBy?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }>;
 }) {
   const t = await getTranslations("write-off");
 
-  const { new: isNew } = await searchParams;
-  const writeOffs = await getWriteOffs();
+  const sp = await searchParams;
+  const isOpen = sp.new === "1";
 
-  const points = isNew === "1" ? await getPointOptions() : [];
-  const defaultPointId = isNew === "1" ? await getCurrentUserPointId() : null;
+  const [result, filterOptions] = await Promise.all([
+    getWriteOffs({
+      page: sp.page ? Number(sp.page) : undefined,
+      pointId: sp.pointId,
+      createdBy: sp.createdBy,
+      dateFrom: sp.dateFrom,
+      dateTo: sp.dateTo,
+    }),
+    getWriteOffFilterOptions(),
+  ]);
+
+  const points = isOpen ? await getPointOptions() : [];
+  const defaultPointId = isOpen ? await getCurrentUserPointId() : null;
 
   const warehouses =
-    isNew === "1" && defaultPointId
-      ? await getWarehouses()
-      : [];
+    isOpen && defaultPointId ? await getWarehouses() : [];
 
   return (
     <>
@@ -50,11 +71,18 @@ export default async function WriteOffsPage({
           </Button>
         </div>
 
-        <WriteOffList writeOffs={writeOffs} />
+        <WriteOffFilters
+          points={filterOptions.points}
+          creators={filterOptions.creators}
+        />
+
+        <WriteOffList writeOffs={result.items} />
+
+        <ListPagination page={result.page} totalPages={result.totalPages} />
       </div>
 
-      <DrawerBackdrop isOpen={isNew === "1"}>
-        {isNew === "1" && (
+      <DrawerBackdrop isOpen={isOpen}>
+        {isOpen && (
           <WriteOffForm
             warehouses={warehouses}
             points={points}

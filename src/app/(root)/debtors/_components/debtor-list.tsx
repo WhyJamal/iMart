@@ -19,6 +19,7 @@ import type { IDebtor } from "@/types/debtor.types";
 import type { IPointOption } from "@/types/point.types";
 import { ListSearch } from "@/components/list/list-search";
 import { useLocalSearch } from "@/components/list/use-local-search";
+import { Highlight } from "@/components/list/highlight";
 
 interface Props {
   debtors: (IDebtor & { debt: number })[];
@@ -57,9 +58,11 @@ export function DebtorList({ debtors, points, defaultPointId }: Props) {
           <TableBody>
             {filtered.map((d) => (
               <TableRow key={d.id}>
-                <TableCell className="font-medium">{d.name}</TableCell>
+                <TableCell className="font-medium">
+                  <Highlight text={d.name} query={search} />
+                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
-                  {d.phone || "—"}
+                  <Highlight text={d.phone || "—"} query={search} />
                 </TableCell>
                 <TableCell className="text-right">
                   {d.debt > 0 ? (

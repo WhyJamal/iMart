@@ -48,6 +48,7 @@ import { ListSearch } from "@/components/list/list-search";
 import { useLocalSearch } from "@/components/list/use-local-search";
 import { FilterBar, FilterSelect } from "@/components/list/filter-fields";
 import { ALL } from "@/components/list/use-url-filters";
+import { Highlight } from "@/components/list/highlight";
 
 interface Props {
   users: IOrgUser[];
@@ -176,7 +177,8 @@ export function UserList({
               return (
                 <TableRow key={u.id}>
                   <TableCell className="font-medium">
-                    {u.name}{" "}
+                    <Highlight text={u.name} query={search} />
+                    {" "}
                     {isSelf && (
                       <Badge variant="secondary" className="ml-1">
                         {t("you")}
@@ -185,7 +187,7 @@ export function UserList({
                   </TableCell>
 
                   <TableCell className="text-muted-foreground text-sm">
-                    {u.email}
+                    <Highlight text={u.email} query={search} />
                   </TableCell>
 
                   <TableCell>

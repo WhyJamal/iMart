@@ -3,14 +3,8 @@
 import { useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-/** Select'larda "Hammasi" uchun ishlatiladigan belgi qiymat. */
 export const ALL = "__all__";
 
-/**
- * URL query parametrlari orqali ishlaydigan filtrlar uchun umumiy hook.
- * `keys` — shu hujjatning filtr parametrlari (masalan ["createdBy", "dateFrom"]).
- * Filtr o'zgarganda `page` avtomatik o'chiriladi (1-sahifaga qaytadi).
- */
 export function useUrlFilters(keys: readonly string[]) {
   const router = useRouter();
   const pathname = usePathname();
@@ -45,5 +39,18 @@ export function useUrlFilters(keys: readonly string[]) {
 
   const hasActive = keys.some((key) => !!searchParams.get(key));
 
-  return { get, set, reset, hasActive };
+  const setMany = useCallback(
+    (entries: Record<string, string>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(entries)) {
+        if (!value || value === ALL) params.delete(key);
+        else params.set(key, value);
+      }
+      params.delete("page");
+      push(params);
+    },
+    [searchParams, push]
+  );
+
+  return { get, set, setMany, reset, hasActive };
 }

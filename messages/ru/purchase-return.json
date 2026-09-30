@@ -50,6 +50,7 @@
     "unitCost": "Цена за единицу",
     "currency": "сум",
     "cancel": "Отмена",
+    "allSuppliers": "Все поставщики",
     "delete": "Удалить",
     "deleteTitle": "Удалить возврат?",
     "deleteDescriptionBefore": "Это действие отменит движения товара и денежных средств для",

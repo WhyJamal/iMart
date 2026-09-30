@@ -47,6 +47,9 @@ import { getWarehouseStock } from "@/actions/warehouse-actions";
 import { PAGES } from "@/config/pages.config";
 
 import { useDeleteWarehouse } from "../_hooks/use-warehouse-mutations";
+import { ListSearch } from "@/components/list/list-search";
+import { useLocalSearch } from "@/components/list/use-local-search";
+import { Highlight } from "@/components/list/highlight";
 
 interface Props {
   warehouses: IWarehouse[];
@@ -56,10 +59,12 @@ interface Props {
 function WarehouseRow({
   warehouse,
   canManage,
+  search,
   onDeleted,
 }: {
   warehouse: IWarehouse;
   canManage: boolean;
+  search: string;
   onDeleted: () => void;
 }) {
   const t = useTranslations("warehouse.list");
@@ -105,12 +110,12 @@ function WarehouseRow({
         </TableCell>
 
         <TableCell className="font-medium">
-          {warehouse.name}
+          <Highlight text={warehouse.name} query={search} />
         </TableCell>
 
         <TableCell>
-          <Badge variant="secondary">
-            {warehouse.pointName}
+          <Badge variant="secondary" className="gap-0">
+            <Highlight text={warehouse.pointName} query={search} />
           </Badge>
         </TableCell>
 
@@ -268,54 +273,62 @@ export function WarehouseList({
   const t = useTranslations("warehouse.list");
   const router = useRouter();
 
-  if (warehouses.length === 0) {
-    return (
-      <div className="text-center py-16 text-muted-foreground">
-        <WarehouseIcon className="w-10 h-10 mx-auto mb-3 opacity-30" />
-
-        <p className="text-sm">
-          {t("empty")}
-        </p>
-      </div>
-    );
-  }
+  const { search, setSearch, filtered } = useLocalSearch(
+    warehouses,
+    (w) => `${w.name} ${w.pointName}`
+  );
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-6" />
+    <div className="space-y-4">
+      <ListSearch value={search} onChange={setSearch} />
 
-          <TableHead>
-            {t("name")}
-          </TableHead>
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground">
+          <WarehouseIcon className="w-10 h-10 mx-auto mb-3 opacity-30" />
 
-          <TableHead>
-            {t("point")}
-          </TableHead>
+          <p className="text-sm">
+            {t("empty")}
+          </p>
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-6" />
 
-          <TableHead>
-            {t("cells")}
-          </TableHead>
+              <TableHead>
+                {t("name")}
+              </TableHead>
 
-          {canManage && (
-            <TableHead className="text-right">
-              {t("actions")}
-            </TableHead>
-          )}
-        </TableRow>
-      </TableHeader>
+              <TableHead>
+                {t("point")}
+              </TableHead>
 
-      <TableBody>
-        {warehouses.map((w) => (
-          <WarehouseRow
-            key={w.id}
-            warehouse={w}
-            canManage={canManage}
-            onDeleted={() => router.refresh()}
-          />
-        ))}
-      </TableBody>
-    </Table>
+              <TableHead>
+                {t("cells")}
+              </TableHead>
+
+              {canManage && (
+                <TableHead className="text-right">
+                  {t("actions")}
+                </TableHead>
+              )}
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {filtered.map((w) => (
+              <WarehouseRow
+                key={w.id}
+                warehouse={w}
+                search={search}
+                canManage={canManage}
+                onDeleted={() => router.refresh()}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
   );
 }

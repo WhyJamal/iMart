@@ -19,6 +19,15 @@ import { applyStockMovement } from "@/actions/stock-actions";
 import { logAudit } from "@/actions/audit-actions";
 import { getUserNamesByIds } from "@/actions/user-actions";
 
+import {
+    dateRangeFilter,
+    paginated,
+    resolvePagination,
+    type ListFilters,
+    type Paginated,
+} from "@/lib/pagination";
+import { Prisma } from "@/generated/prisma/client";
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function generateWriteOffNumber(): string {
@@ -29,12 +38,33 @@ function generateWriteOffNumber(): string {
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
-export async function getWriteOffs(): Promise<TSerializedWriteOff[]> {
+export interface WriteOffFilters extends ListFilters {
+    pointId?: string;
+}
+
+export type PaginatedWriteOffs = Paginated<TSerializedWriteOff>;
+
+export async function getWriteOffs(
+    filters: WriteOffFilters = {}
+): Promise<PaginatedWriteOffs> {
     const session = await getServerSession();
     if (!session) throw new Error("Unauthorized");
 
+    const where: Prisma.WriteOffWhereInput = {
+        organizationId: session.organizationId,
+    };
+
+    if (filters.pointId) where.pointId = filters.pointId;
+    if (filters.createdBy) where.createdBy = filters.createdBy;
+
+    const createdAt = dateRangeFilter(filters.dateFrom, filters.dateTo);
+    if (createdAt) where.createdAt = createdAt;
+
+    const total = await prisma.writeOff.count({ where });
+    const window = resolvePagination(total, filters);
+
     const writeOffs = await prisma.writeOff.findMany({
-        where: { organizationId: session.organizationId },
+        where,
         include: {
             point: { select: { id: true, name: true } },
             items: {
@@ -45,22 +75,58 @@ export async function getWriteOffs(): Promise<TSerializedWriteOff[]> {
             },
         },
         orderBy: { createdAt: "desc" },
+        skip: window.skip,
+        take: window.pageSize,
     });
 
     const userNames = await getUserNamesByIds(
         writeOffs.map((w: { createdBy: string | null }) => w.createdBy)
     );
 
-    return (writeOffs as TWriteOffWithItems[]).map((w) => ({
-        ...w,
-        totalAmount: Number(w.totalAmount),
-        createdByName: w.createdBy ? userNames[w.createdBy] ?? null : null,
-        items: w.items.map((item) => ({
-            ...item,
-            qty: Number(item.qty),
-            unitCost: Number(item.unitCost),
-        })),
+    const items: TSerializedWriteOff[] = (writeOffs as TWriteOffWithItems[]).map(
+        (w) => ({
+            ...w,
+            totalAmount: Number(w.totalAmount),
+            createdByName: w.createdBy ? userNames[w.createdBy] ?? null : null,
+            items: w.items.map((item) => ({
+                ...item,
+                qty: Number(item.qty),
+                unitCost: Number(item.unitCost),
+            })),
+        })
+    );
+
+    return paginated(items, total, window);
+}
+
+export async function getWriteOffFilterOptions() {
+    const session = await getServerSession();
+    if (!session) throw new Error("Unauthorized");
+
+    const [points, creatorRows] = await Promise.all([
+        prisma.point.findMany({
+            where: { organizationId: session.organizationId },
+            select: { id: true, name: true },
+            orderBy: { name: "asc" },
+        }),
+        prisma.writeOff.findMany({
+            where: { organizationId: session.organizationId },
+            select: { createdBy: true },
+            distinct: ["createdBy"],
+        }),
+    ]);
+
+    const creatorIds = creatorRows
+        .map((r: { createdBy: string | null }) => r.createdBy)
+        .filter((id: string | null): id is string => Boolean(id));
+
+    const names = await getUserNamesByIds(creatorIds);
+    const creators = creatorIds.map((id: string) => ({
+        id,
+        name: names[id] ?? id,
     }));
+
+    return { points, creators };
 }
 
 /**

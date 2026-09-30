@@ -41,6 +41,12 @@
     "hoursShort": "s",
     "minutesShort": "d",
     "secondsShort": "s",
-    "deleted": "Aksiya o‘chirildi"
+    "deleted": "Aksiya o‘chirildi",
+    "point": "Nuqta",
+    "warehouse": "Ombor",
+    "cell": "Yacheyka",
+    "allWarehouses": "Barcha omborlar",
+    "allCells": "Barcha yacheykalar",
+    "searchPlaceholder": "Nomi, tovar yoki izoh bo'yicha qidirish..."
   }
 }

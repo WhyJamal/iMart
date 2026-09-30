@@ -39,6 +39,7 @@ import {
 } from "@/actions/supplier-payment-actions";
 import { ListSearch } from "@/components/list/list-search";
 import { useLocalSearch } from "@/components/list/use-local-search";
+import { Highlight } from "@/components/list/highlight";
 
 interface Props {
   contragents: IContragent[];
@@ -95,10 +96,12 @@ export function ContragentList({
           <TableBody>
             {filtered.map((c) => (
               <TableRow key={c.id}>
-                <TableCell className="font-medium">{c.name}</TableCell>
+                <TableCell className="font-medium">
+                  <Highlight text={c.name} query={search} />
+                </TableCell>
 
                 <TableCell className="text-sm text-muted-foreground">
-                  {c.inn || "—"}
+                  <Highlight text={c.inn || "—"} query={search} />
                 </TableCell>
 
                 <TableCell>
@@ -114,7 +117,7 @@ export function ContragentList({
                 </TableCell>
 
                 <TableCell className="text-sm text-muted-foreground">
-                  {c.phone || "—"}
+                  <Highlight text={c.phone || "—"} query={search} />
                 </TableCell>
 
                 <TableCell>

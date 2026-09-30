@@ -10,12 +10,63 @@ import type { IPromotion, IPromotionDiscount } from "@/types/promotion.types";
 import { getUserNamesByIds } from "@/actions/user-actions";
 import { logAudit } from "@/actions/audit-actions";
 
-export async function getPromotions(): Promise<IPromotion[]> {
+import {
+  paginated,
+  resolvePagination,
+  type ListFilters,
+  type Paginated,
+} from "@/lib/pagination";
+import { Prisma } from "@/generated/prisma/client";
+
+export interface PromotionFilters extends ListFilters {
+  q?: string;
+  pointId?: string;
+  warehouseId?: string;
+  warehouseCellId?: string;
+}
+
+export type PaginatedPromotions = Paginated<IPromotion>;
+
+export async function getPromotions(
+  filters: PromotionFilters = {}
+): Promise<PaginatedPromotions> {
   const session = await getServerSession();
   if (!session) throw new Error("Unauthorized");
 
+  const where: Prisma.PromotionWhereInput = {
+    organizationId: session.organizationId,
+  };
+
+  if (filters.pointId) where.pointId = filters.pointId;
+  if (filters.warehouseId) where.warehouseId = filters.warehouseId;
+  if (filters.warehouseCellId) where.warehouseCellId = filters.warehouseCellId;
+  if (filters.createdBy) where.createdBy = filters.createdBy;
+
+  const q = filters.q?.trim();
+  if (q) {
+    where.OR = [
+      { name: { contains: q, mode: "insensitive" } },
+      { comment: { contains: q, mode: "insensitive" } },
+      {
+        items: {
+          some: {
+            product: {
+              OR: [
+                { name: { contains: q, mode: "insensitive" } },
+                { code: { contains: q, mode: "insensitive" } },
+              ],
+            },
+          },
+        },
+      },
+    ];
+  }
+
+  const total = await prisma.promotion.count({ where });
+  const window = resolvePagination(total, filters);
+
   const rows = await prisma.promotion.findMany({
-    where: { organizationId: session.organizationId },
+    where,
     include: {
       point: { select: { id: true, name: true } },
       warehouse: { select: { id: true, name: true } },
@@ -26,13 +77,15 @@ export async function getPromotions(): Promise<IPromotion[]> {
       },
     },
     orderBy: { endsAt: "asc" },
+    skip: window.skip,
+    take: window.pageSize,
   });
 
   const userNames = await getUserNamesByIds(
     rows.map((r: (typeof rows)[number]) => r.createdBy)
   );
 
-  return rows.map((r: (typeof rows)[number]) => ({
+  const items: IPromotion[] = rows.map((r: (typeof rows)[number]) => ({
     id: r.id,
     name: r.name,
     pointId: r.pointId,
@@ -53,6 +106,65 @@ export async function getPromotions(): Promise<IPromotion[]> {
       productCode: i.product.code,
     })),
   }));
+
+  return paginated(items, total, window);
+}
+
+export async function getPromotionFilterOptions() {
+  const session = await getServerSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const [points, warehouseRows, creatorRows] = await Promise.all([
+    prisma.point.findMany({
+      where: { organizationId: session.organizationId },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.warehouse.findMany({
+      where: { organizationId: session.organizationId },
+      select: {
+        id: true,
+        name: true,
+        pointId: true,
+        cells: { select: { id: true, name: true }, orderBy: { name: "asc" } },
+      },
+      orderBy: { name: "asc" },
+    }),
+    prisma.promotion.findMany({
+      where: { organizationId: session.organizationId },
+      select: { createdBy: true },
+      distinct: ["createdBy"],
+    }),
+  ]);
+
+  const warehouses = warehouseRows.map(
+    (w: (typeof warehouseRows)[number]) => ({
+      id: w.id,
+      name: w.name,
+      pointId: w.pointId,
+    })
+  );
+
+  const cells = warehouseRows.flatMap((w: (typeof warehouseRows)[number]) =>
+    w.cells.map((c: (typeof w.cells)[number]) => ({
+      id: c.id,
+      name: c.name,
+      warehouseId: w.id,
+      warehouseName: w.name,
+    }))
+  );
+
+  const creatorIds = creatorRows
+    .map((r: { createdBy: string | null }) => r.createdBy)
+    .filter((id: string | null): id is string => Boolean(id));
+
+  const names = await getUserNamesByIds(creatorIds);
+  const creators = creatorIds.map((id: string) => ({
+    id,
+    name: names[id] ?? id,
+  }));
+
+  return { points, warehouses, cells, creators };
 }
 
 export async function createPromotion(
